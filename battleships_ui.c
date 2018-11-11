@@ -13,8 +13,8 @@
 #include "util.h"
 
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
-// https://sourceforge.net/projects/conio/
 #ifdef _WIN32
+// Borland-style CONIO implementation for MinGW/Dev-C++ (http://conio.sourceforge.net/)
 #include "conio21/conio2.h"
 #else
 #define clrscr() printf("\e[1;1H\e[2J")
