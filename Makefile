@@ -16,9 +16,8 @@ REL_DIR := Release
 endif
 
 CC := gcc
-CFLAGS := -Wall -I. -std=c99
+CFLAGS := -Wall -I.
 ifdef DEBUG
-#CFLAGS += -O0 -g3 -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)"
 CFLAGS += -O0 -g3 -c -fmessage-length=0
 endif
 
@@ -35,9 +34,6 @@ OBJS := $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
 RM := rm -rf
 
-# pull in dependency info for *existing* .o files
--include $(OBJS:.o=.d)
-
 .PHONY: all
 all: $(BIN_DIR)/$(TGT)
 
@@ -45,6 +41,7 @@ $(BIN_DIR)/$(TGT): $(BIN_DIR) $(OBJ_DIR) $(OBJS)
 	$(SUMMARY) 'Linking $@'
 	$(QUIET)$(LINKER) $(OBJS) $(LFLAGS) -o $@
 
+# http://scottmcpeak.com/autodepend/autodepend.html
 # more complicated dependency computation, so all prereqs listed
 # will also become command-less, prereq-less targets
 #    sed:    strip the target (everything before colon)
@@ -52,6 +49,9 @@ $(BIN_DIR)/$(TGT): $(BIN_DIR) $(OBJ_DIR) $(OBJS)
 #    fmt -1: list words one per line
 #    sed:    strip leading spaces
 #    sed:    add trailing colons
+
+# pull in dependency info for *existing* .o files
+-include $(OBJS:.o=.d)
 
 $(OBJS): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
 	$(SUMMARY) "Compiling $<"
