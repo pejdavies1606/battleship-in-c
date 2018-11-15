@@ -5,8 +5,8 @@
  *      Author: pejdavies1606
  */
 
-#ifndef BATTLESHIPS_SHIP_H_
-#define BATTLESHIPS_SHIP_H_
+#ifndef BATTLESHIP_SHIP_H_
+#define BATTLESHIP_SHIP_H_
 
 #include "commondefs.h"
 #include "coord.h"
@@ -45,4 +45,4 @@ typedef struct
 Ship_Type_t Ship_Init( uint i );
 Ship_Player_t Ship_Player_Init( uint i );
 
-#endif /* BATTLESHIPS_SHIP_H_ */
+#endif /* BATTLESHIP_SHIP_H_ */

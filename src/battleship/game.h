@@ -1,17 +1,17 @@
 /*
- * battleships.h
+ * battleship.h
  *
  *  Created on: 25 Jun 2018
  *      Author: pejdavies1606, Univeristy of Surrey, 2013
  */
 
-#ifndef BATTLESHIPS_GAME_H_
-#define BATTLESHIPS_GAME_H_
+#ifndef BATTLESHIP_GAME_H_
+#define BATTLESHIP_GAME_H_
 
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "battleships_ship.h"
+#include "ship.h"
 #include "commondefs.h"
 #include "rng.h"
 #include "scoreboard.h"
@@ -27,8 +27,8 @@
 #define SCOREBOARD_HITS_TOTAL_WIDTH 1
 
 #include "convert.h"
-#include "battleships_player.h"
-#include "battleships_comp_player.h"
+#include "player.h"
+#include "comp_player.h"
 
 #define STATE_BLANK " "
 #define STATE_HIT   "*"
@@ -47,7 +47,7 @@ typedef struct
    Scoreboard_t scoreboard_hit_score;
 } Game_t;
 
-void Battleships_Game_Init();
-void Battleships_Game_Start();
+void BattleShip_Game_Init();
+void BattleShip_Game_Start();
 
-#endif /* BATTLESHIPS_GAME_H_ */
+#endif /* BATTLESHIP_GAME_H_ */

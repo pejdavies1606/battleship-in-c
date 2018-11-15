@@ -5,8 +5,8 @@
  *      Author: pejdavies1606
  */
 
-#ifndef BATTLESHIPS_COMP_PLAYER_H_
-#define BATTLESHIPS_COMP_PLAYER_H_
+#ifndef BATTLESHIP_COMP_PLAYER_H_
+#define BATTLESHIP_COMP_PLAYER_H_
 
 #include "commondefs.h"
 
@@ -26,4 +26,4 @@ typedef struct
 	_Bool first_time;
 } Comp_Player_t;
 
-#endif /* BATTLESHIPS_COMP_PLAYER_H_ */
+#endif /* BATTLESHIP_COMP_PLAYER_H_ */

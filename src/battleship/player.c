@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "battleships_player.h"
+#include "player.h"
 
 Grid_State_t Grid_State_Init(const Ship_Type_t type, const Hit_State_t state)
 {

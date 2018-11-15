@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "battleships_ship.h"
+#include "ship.h"
 
 // see ship.h
 const String_t SHIP_NAME[] =

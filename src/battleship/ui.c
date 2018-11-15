@@ -1,5 +1,5 @@
 /*
- * battleships_print.c
+ * ui.c
  *
  *  Created on: 8 Jul 2018
  *      Author: pejdavies1606
@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "battleships_ui.h"
-#include "battleships_ship.h"
+#include "ui.h"
+#include "ship.h"
 #include "util.h"
 
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
@@ -94,8 +94,9 @@ static Menu_t ship_menu =
       .options = ship_menu_options
 };
 
-void Battleships_UI_Print_Logo()
+void BattleShip_UI_Print_Logo()
 {
+   // ASCII font 'cybermedium' http://www.topster.de/text-to-ascii/cybermedium.html
    puts("                       |                           ");
    puts("                       |                           ");
    puts("                 .  -  +  -  .                     ");
@@ -119,10 +120,10 @@ void Battleships_UI_Print_Logo()
    puts("                       |                           ");
 }
 
-Main_Menu_Option_t Battleships_UI_Main_Menu(String_t message)
+Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 {
 #ifdef DEBUG
-   puts("Battleships_UI_Main_Menu");
+   puts("BattleShip_UI_Main_Menu");
 #endif
    Menu_Meta_t meta;
    Menu_Meta_Init( &meta, &main_menu );
@@ -132,19 +133,19 @@ Main_Menu_Option_t Battleships_UI_Main_Menu(String_t message)
    while(!read_success)
    {
       //clrscr();
-      //Battleships_UI_Print_Logo();
+      //BattleShip_UI_Print_Logo();
       puts(message);
-      Battleships_UI_Print_Menu(&main_menu, &meta);
-      read_success = Battleships_UI_Read_Menu(&main_menu, &meta, (uint*) &choice);
+      BattleShip_UI_Print_Menu(&main_menu, &meta);
+      read_success = BattleShip_UI_Read_Menu(&main_menu, &meta, (uint*) &choice);
       printf("read=%s\n", read_success ? "true" : "false");
    }
    return choice;
 }
 
-Place_Menu_Option_t Battleships_UI_Place_Menu()
+Place_Menu_Option_t BattleShip_UI_Place_Menu()
 {
 #ifdef DEBUG
-   puts("Battleships_UI_Place_Menu");
+   puts("BattleShip_UI_Place_Menu");
 #endif
    Menu_Meta_t meta;
    Menu_Meta_Init( &meta, &place_menu );
@@ -154,17 +155,17 @@ Place_Menu_Option_t Battleships_UI_Place_Menu()
    while(!read_success)
    {
       //clrscr();
-      //Battleships_UI_Print_Grid(); // TODO
-      Battleships_UI_Print_Menu(&place_menu, &meta);
-      read_success = Battleships_UI_Read_Menu(&place_menu, &meta, (uint*) &choice);
+      //BattleShip_UI_Print_Grid(); // TODO
+      BattleShip_UI_Print_Menu(&place_menu, &meta);
+      read_success = BattleShip_UI_Read_Menu(&place_menu, &meta, (uint*) &choice);
    }
    return choice;
 }
 
-Ship_Menu_Option_t Battleships_UI_Ship_Menu()
+Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
 {
 #ifdef DEBUG
-   puts("Battleships_UI_Ship_Menu");
+   puts("BattleShip_UI_Ship_Menu");
 #endif
 
    String_t *ship_menu_data = malloc(sizeof(String_t) * NUM_SHIPS * NUM_SHIP_MENU_HEADERS);
@@ -201,17 +202,17 @@ Ship_Menu_Option_t Battleships_UI_Ship_Menu()
    while(!read_success)
    {
       //clrscr();
-      //Battleships_UI_Print_Grid(); // TODO
-      Battleships_UI_Print_Menu(&ship_menu, &meta);
-      read_success = Battleships_UI_Read_Menu(&ship_menu, &meta, (uint*) &choice);
+      //BattleShip_UI_Print_Grid(); // TODO
+      BattleShip_UI_Print_Menu(&ship_menu, &meta);
+      read_success = BattleShip_UI_Read_Menu(&ship_menu, &meta, (uint*) &choice);
    }
    return choice;
 }
 
-void Battleships_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
+void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
 {
 #ifdef DEBUG
-   //puts("Battleships_UI_Print_Menu");
+   //puts("BattleShip_UI_Print_Menu");
 #endif
    puts("");
    printf("%*s%s\n", meta->column_width_index, "", menu->title);
@@ -233,10 +234,10 @@ void Battleships_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
    }
 }
 
-bool Battleships_UI_Read_Menu(Menu_t *menu, Menu_Meta_t *meta, uint *choice)
+bool BattleShip_UI_Read_Menu(Menu_t *menu, Menu_Meta_t *meta, uint *choice)
 {
 #ifdef DEBUG
-   puts("Battleships_UI_Read_Menu");
+   puts("BattleShip_UI_Read_Menu");
 #endif
    size_t chosen_option_len = meta->column_width_index + 1;
    String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );

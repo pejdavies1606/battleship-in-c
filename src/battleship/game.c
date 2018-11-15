@@ -1,5 +1,5 @@
 /*
- * battleships.c
+ * game.c
  *
  *  Created on: 25 Jun 2018
  *      Author: pejdavies1606
@@ -13,9 +13,9 @@
 // add limited number of shots, regain ammo when an enemy's ship is sunk, and lose ammo when one of your ships is sunk, equal to the length of that ship multiplied by a scale factor
 // replace symbols for blank space, miss and hit: "-" -> " ", "M" -> ".", "H"-> "*"
 
-#include "battleships_game.h"
+#include "game.h"
 #include "window.h"
-#include "battleships_ui.h"
+#include "ui.h"
 
 #include <string.h>
 
@@ -31,10 +31,10 @@
 
 static Game_t game;
 
-void Battleships_Game_Init()
+void BattleShip_Game_Init()
 {
 #ifdef DEBUG
-   puts("Battleships_Game_Init");
+   puts("BattleShip_Game_Init");
 #endif
 
    Window_Init(POS_WINDOW_X, POS_WINDOW_Y, SIZE_WINDOW_W, SIZE_WINDOW_H);
@@ -60,13 +60,13 @@ void Process_Place_Menu(Place_Menu_Option_t choice)
       case MENU_OPTION_PLACE_RETURN:
          return;
       case MENU_OPTION_PLACE_HELP:
-         //Battleships_UI_Print_Place_Help(); // TODO
+         //BattleShip_UI_Print_Place_Help(); // TODO
          break;
       case MENU_OPTION_PLACE_AUTO:
-         //Battleships_UI_Ship_Auto(); // TODO
+         //BattleShip_UI_Ship_Auto(); // TODO
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         Battleships_UI_Ship_Menu();
+         BattleShip_UI_Ship_Menu();
    }
 }
 void Process_Main_Menu(Main_Menu_Option_t choice)
@@ -80,7 +80,7 @@ void Process_Main_Menu(Main_Menu_Option_t choice)
       case MENU_OPTION_MAIN_RETURN:
          return;
       case MENU_OPTION_MAIN_PLACE:
-         Process_Place_Menu(Battleships_UI_Place_Menu());
+         Process_Place_Menu(BattleShip_UI_Place_Menu());
          break;
       case MENU_OPTION_MAIN_BEGIN:
          break;
@@ -92,42 +92,42 @@ void Process_Main_Menu(Main_Menu_Option_t choice)
 }
 
 
-void Battleships_Game_Start()
+void BattleShip_Game_Start()
 {
    //while(1) // menu loop
    //{
-      Process_Main_Menu(Battleships_UI_Main_Menu(""));
+      Process_Main_Menu(BattleShip_UI_Main_Menu(""));
    //}
 }
 
 // set ship data (x,y,z) such that all ships are on the grid and no ships overlap
 // begin with longest ship, and fit others around existing ships
-/*void Battleships_Set_Random_Ships()
+/*void BattleShip_Set_Random_Ships()
 {
    // TODO
 }*/
 
 // Identify which ship was hit and determine if it has been sunk.
-/*void Battleships_Identify_Ship()
+/*void BattleShip_Identify_Ship()
 {
    // TODO
 }*/
 
 // state machine
-/*void Battleships_Ai()
+/*void BattleShip_Ai()
 {
    // TODO
 }*/
 
 // TODO define these
-/*static void Battleships_Logo_Print();
-static void Battleships_Grid_Print_2();
-static void Battleships_Grid_Print_1();
-static void Battleships_Set_Ship();
-static void Battleships_Clear_Ship();
-static void Battleships_Enter_Ship_Data();
-static void Battleships_Check_Ship_Grid();
-static void Battleships_Check_Ship_Collision();
-static void Battleships_Target_Print();
+/*static void BattleShip_Logo_Print();
+static void BattleShip_Grid_Print_2();
+static void BattleShip_Grid_Print_1();
+static void BattleShip_Set_Ship();
+static void BattleShip_Clear_Ship();
+static void BattleShip_Enter_Ship_Data();
+static void BattleShip_Check_Ship_Grid();
+static void BattleShip_Check_Ship_Collision();
+static void BattleShip_Target_Print();
 static void Strip_Spaces(); // for config read
  */

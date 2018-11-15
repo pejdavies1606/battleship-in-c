@@ -5,10 +5,10 @@
  *      Author: pejdavies1606
  */
 
-#ifndef BATTLESHIPS_PLAYER_H_
-#define BATTLESHIPS_PLAYER_H_
+#ifndef BATTLESHIP_PLAYER_H_
+#define BATTLESHIP_PLAYER_H_
 
-#include "battleships_ship.h"
+#include "ship.h"
 #include "commondefs.h"
 #include "scoreboard.h"
 
@@ -38,4 +38,4 @@ typedef struct
 Grid_State_t Grid_State_Init(const Ship_Type_t type, const Hit_State_t state);
 Player_t Player_Init();
 
-#endif /* BATTLESHIPS_PLAYER_H_ */
+#endif /* BATTLESHIP_PLAYER_H_ */

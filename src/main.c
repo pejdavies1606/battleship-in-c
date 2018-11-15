@@ -6,14 +6,18 @@
  *
  */
 
-#include "battleships_game.h"
+#include "BattleShipConfig.h"
+#include "battleship/game.h"
 
 int main(int argc, char *argv[])
 {
-   puts("hello world");
+   printf("%s Version %d.%d\n",
+		   argv[0],
+		   BattleShip_VERSION_MAJOR,
+		   BattleShip_VERSION_MINOR);
    setvbuf(stdout, NULL, _IONBF, 0); // No buffering
-   Battleships_Game_Init();
-   Battleships_Game_Start();
+   BattleShip_Game_Init();
+   BattleShip_Game_Start();
    puts("done");
    getchar();
    return 0;
