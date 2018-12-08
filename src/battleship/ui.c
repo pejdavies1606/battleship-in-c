@@ -13,7 +13,7 @@
 #include "util.h"
 
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
-#ifdef MSDOS
+#if defined(MSDOS) && MSDOS == 1
 // Borland-style CONIO implementation for MinGW/Dev-C++ (http://conio.sourceforge.net/)
 #include "../conio21/conio2.h"
 #else
