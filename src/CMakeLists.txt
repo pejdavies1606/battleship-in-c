@@ -5,21 +5,26 @@ project (BattleShip)
 set (BattleShip_VERSION_MAJOR 0)
 set (BattleShip_VERSION_MINOR 0)
 
+# preprocessor flags
+option(FOR_MSDOS "Use Conio to clear the screen" OFF)
+
+if (FOR_MSDOS)
+	add_definitions(-DMSDOS=1)
+else ()
+	add_definitions(-DMSDOS=0)
+endif ()
+
 # configure a header file to pass some of the CMake settings
 # to the source code
 configure_file (
-	"${PROJECT_SOURCE_DIR}/BattleShipConfig.h.in"
-	"${PROJECT_BINARY_DIR}/BattleShipConfig.h"
+	BattleShipConfig.h.in
+	BattleShipConfig.h
 	)
 
-# add the binary tree to the search path for include files
-# so that CMake will find the header file
-include_directories ("${PROJECT_BINARY_DIR}")
-
-include_directories ("${PROJECT_SOURCE_DIR}/battleship")
+include_directories (battleship)
+link_directories (battleship)
 add_subdirectory (battleship)
-set (LIBS ${LIBS} battleship)
+add_subdirectory (conio21)
 
-# add the executable
-add_executable(BattleShip main.c)
-target_link_libraries (BattleShip ${LIBS})
+add_executable (BattleShip main.c)
+target_link_libraries (BattleShip battleship)

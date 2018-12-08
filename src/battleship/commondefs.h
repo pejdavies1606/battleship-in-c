@@ -12,8 +12,6 @@
 #include <stdlib.h> // NULL, size_t
 #include <stdbool.h> // bool
 
-#define DEBUG 1
-
 #ifdef DEBUG
 #include <stdio.h> // puts, printf
 #endif

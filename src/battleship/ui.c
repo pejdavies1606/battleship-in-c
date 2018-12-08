@@ -13,9 +13,9 @@
 #include "util.h"
 
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
-#ifdef _WIN32
+#ifdef MSDOS
 // Borland-style CONIO implementation for MinGW/Dev-C++ (http://conio.sourceforge.net/)
-#include "conio21/conio2.h"
+#include "../conio21/conio2.h"
 #else
 #define clrscr() printf("\e[1;1H\e[2J")
 #endif
@@ -132,12 +132,16 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
    bool read_success = false;
    while(!read_success)
    {
-      //clrscr();
-      //BattleShip_UI_Print_Logo();
+#ifndef DEBUG
+      clrscr();
+      BattleShip_UI_Print_Logo();
+#endif
       puts(message);
       BattleShip_UI_Print_Menu(&main_menu, &meta);
       read_success = BattleShip_UI_Read_Menu(&main_menu, &meta, (uint*) &choice);
+#ifdef DEBUG
       printf("read=%s\n", read_success ? "true" : "false");
+#endif
    }
    return choice;
 }
@@ -154,8 +158,10 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu()
    bool read_success = false;
    while(!read_success)
    {
-      //clrscr();
+#ifndef DEBUG
+      clrscr();
       //BattleShip_UI_Print_Grid(); // TODO
+#endif
       BattleShip_UI_Print_Menu(&place_menu, &meta);
       read_success = BattleShip_UI_Read_Menu(&place_menu, &meta, (uint*) &choice);
    }
