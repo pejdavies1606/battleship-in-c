@@ -33,7 +33,7 @@ void Menu_Init(
 
 void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
 {
-#ifdef DEBUG
+#ifndef NDEBUG
    puts("Menu_Meta_Init");
    printf("title=%s\n", menu->title );
 #endif
@@ -47,7 +47,7 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
    }
    meta->column_width_index = index_width;
 
-#ifdef DEBUG
+#ifndef NDEBUG
    printf("index_width=%u\n", index_width );
 #endif
 
@@ -71,7 +71,7 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
       {
          uint i = header_index*menu->num_options+option_index;
          option_widths[i] = strnlen(menu->options[i], STR_LEN_MAX);
-#ifdef DEBUG
+#ifndef NDEBUG
          //printf("option_widths[%u]=%u\n", i, option_widths[i] );
 #endif
       }
@@ -85,7 +85,7 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
       {
          header_widths[header_index] = option_width_max;
       }
-#ifdef DEBUG
+#ifndef NDEBUG
       printf("header_widths[%u]=%u\n", header_index, header_widths[header_index] );
 #endif
    }

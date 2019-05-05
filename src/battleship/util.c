@@ -10,6 +10,18 @@
 #include <errno.h>
 #include <limits.h>
 
+void ReadString(char *str, int strlen, FILE *stream)
+{
+   fgets(str, strlen, stream); // includes newline
+   // Clear input buffer to prevent type-ahead
+   // https://stackoverflow.com/questions/7898215/how-to-clear-input-buffer-in-c/9750394
+   if (str[0] != '\n')
+   {
+      int c;
+      while ((c = getchar()) != '\n' && c != EOF);
+   }
+}
+
 bool ParseUnsignedLong(const char *str, unsigned long *val)
 {
     bool ret = true;

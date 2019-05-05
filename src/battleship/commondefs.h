@@ -12,7 +12,7 @@
 #include <stdlib.h> // NULL, size_t
 #include <stdbool.h> // bool
 
-#ifdef DEBUG
+#ifndef NDEBUG
 #include <stdio.h> // puts, printf
 #endif
 

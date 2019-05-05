@@ -12,12 +12,16 @@
 #include "ship.h"
 #include "util.h"
 
+#ifndef NDEBUG
+#define clrscr() puts("\n-----clrscr-----")
+#else
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
 #if defined(MSDOS) && MSDOS == 1
 // Borland-style CONIO implementation for MinGW/Dev-C++ (http://conio.sourceforge.net/)
 #include "../conio21/conio2.h"
 #else
 #define clrscr() printf("\e[1;1H\e[2J")
+#endif
 #endif
 
 #define SIZE_SHIP_SYMBOLS 3
@@ -122,8 +126,8 @@ void BattleShip_UI_Print_Logo()
 
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 {
-#ifdef DEBUG
-   puts("BattleShip_UI_Main_Menu");
+#ifndef NDEBUG
+   puts("\nBattleShip_UI_Main_Menu");
 #endif
    Menu_Meta_t meta;
    Menu_Meta_Init( &meta, &main_menu );
@@ -132,14 +136,12 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
    bool read_success = false;
    while(!read_success)
    {
-#ifndef DEBUG
       clrscr();
       BattleShip_UI_Print_Logo();
-#endif
       puts(message);
       BattleShip_UI_Print_Menu(&main_menu, &meta);
       read_success = BattleShip_UI_Read_Menu(&main_menu, &meta, (uint*) &choice);
-#ifdef DEBUG
+#ifndef NDEBUG
       printf("read=%s\n", read_success ? "true" : "false");
 #endif
    }
@@ -148,8 +150,8 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 
 Place_Menu_Option_t BattleShip_UI_Place_Menu()
 {
-#ifdef DEBUG
-   puts("BattleShip_UI_Place_Menu");
+#ifndef NDEBUG
+   puts("\nBattleShip_UI_Place_Menu");
 #endif
    Menu_Meta_t meta;
    Menu_Meta_Init( &meta, &place_menu );
@@ -158,10 +160,8 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu()
    bool read_success = false;
    while(!read_success)
    {
-#ifndef DEBUG
       clrscr();
       //BattleShip_UI_Print_Grid(); // TODO
-#endif
       BattleShip_UI_Print_Menu(&place_menu, &meta);
       read_success = BattleShip_UI_Read_Menu(&place_menu, &meta, (uint*) &choice);
    }
@@ -170,8 +170,8 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu()
 
 Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
 {
-#ifdef DEBUG
-   puts("BattleShip_UI_Ship_Menu");
+#ifndef NDEBUG
+   puts("\nBattleShip_UI_Ship_Menu");
 #endif
 
    String_t *ship_menu_data = malloc(sizeof(String_t) * NUM_SHIPS * NUM_SHIP_MENU_HEADERS);
@@ -184,11 +184,11 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
       uint symbol_index = i + NUM_SHIPS;
       //uint length_index = i + NUM_SHIPS*2;
 
-      ship_menu_data[name_index] = malloc(sizeof place_prefix + 1 + sizeof SHIP_NAME[i] + 1);
+      ship_menu_data[name_index] = malloc(sizeof(place_prefix) + 1 + sizeof(SHIP_NAME[i]) + 1);
       ship_menu_data[symbol_index] = malloc(SIZE_SHIP_SYMBOLS + 1);
       //ship_menu_data[length_index] = malloc(1);
 
-      strcat(strcat(strcat(ship_menu_data[name_index], place_prefix), " "), SHIP_NAME[i]);
+      snprintf(ship_menu_data[name_index], sizeof(ship_menu_data[name_index]), "%s %s", place_prefix, SHIP_NAME[i]);
 
       char ship_symbol_upper = toupper(SHIP_NAME[i][0]);
       char ship_symbol_lower = tolower(ship_symbol_upper);
@@ -217,8 +217,8 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
 
 void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
 {
-#ifdef DEBUG
-   //puts("BattleShip_UI_Print_Menu");
+#ifndef NDEBUG
+   //puts("\nBattleShip_UI_Print_Menu");
 #endif
    puts("");
    printf("%*s%s\n", meta->column_width_index, "", menu->title);
@@ -242,8 +242,8 @@ void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
 
 bool BattleShip_UI_Read_Menu(Menu_t *menu, Menu_Meta_t *meta, uint *choice)
 {
-#ifdef DEBUG
-   puts("BattleShip_UI_Read_Menu");
+#ifndef NDEBUG
+   puts("\nBattleShip_UI_Read_Menu");
 #endif
    size_t chosen_option_len = meta->column_width_index + 1;
    String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );
@@ -252,20 +252,15 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, Menu_Meta_t *meta, uint *choice)
    bool parse_success = false;
    while (!parse_success && retries < MAX_READ_RETRIES)
    {
-#ifdef DEBUG
+#ifndef NDEBUG
       printf("[%d]Enter option: ", retries);
 #else
       printf("Enter option: ");
 #endif
-      getline(&chosen_option_str, &chosen_option_len, stdin); // includes newline
+      ReadString(chosen_option_str, chosen_option_len, stdin);
       parse_success = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
       if (chosen_option >= menu->num_options) parse_success = false;
       if (!parse_success) retries++;
-#ifdef DEBUG
-      //printf("input='%s'\n", chosen_option_str);
-      //printf("parse=%s\n", parse_success ? "true" : "false");
-      //printf("uint=%u\n", chosen_option);
-#endif
    }
    free(chosen_option_str);
    *choice = chosen_option;

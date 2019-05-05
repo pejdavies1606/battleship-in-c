@@ -10,6 +10,7 @@
 
 #include "commondefs.h"
 
+void ReadString(char *str, int strlen, FILE *stream);
 bool ParseUnsignedLong(const char *str, unsigned long *val);
 uint Number_Width(int n);
 

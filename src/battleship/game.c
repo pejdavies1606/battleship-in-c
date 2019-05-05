@@ -33,8 +33,8 @@ static Game_t game;
 
 void BattleShip_Game_Init()
 {
-#ifdef DEBUG
-   puts("BattleShip_Game_Init");
+#ifndef NDEBUG
+   puts("\nBattleShip_Game_Init");
 #endif
 
    Window_Init(POS_WINDOW_X, POS_WINDOW_Y, SIZE_WINDOW_W, SIZE_WINDOW_H);
@@ -71,8 +71,8 @@ void Process_Place_Menu(Place_Menu_Option_t choice)
 }
 void Process_Main_Menu(Main_Menu_Option_t choice)
 {
-#ifdef DEBUG
-   puts("Process_Main_Menu");
+#ifndef NDEBUG
+   puts("\nProcess_Main_Menu");
    printf("choice=%d\n", choice);
 #endif
    switch(choice)

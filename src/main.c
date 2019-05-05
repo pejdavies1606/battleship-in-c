@@ -12,9 +12,12 @@
 int main(int argc, char *argv[])
 {
    printf("%s Version %d.%d\n",
-		   argv[0],
-		   BattleShip_VERSION_MAJOR,
-		   BattleShip_VERSION_MINOR);
+      argv[0],
+      BattleShip_VERSION_MAJOR,
+      BattleShip_VERSION_MINOR);
+#ifndef NDEBUG
+   puts("DEBUG");
+#endif
    setvbuf(stdout, NULL, _IONBF, 0); // No buffering
    BattleShip_Game_Init();
    BattleShip_Game_Start();
