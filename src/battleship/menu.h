@@ -16,14 +16,15 @@ typedef struct
    uint num_headers;
    String_t *headers;
    uint num_options;
-   String_t *options; // 2D array: row*num_cols+col = header*num_options+option
+   String_t *options; // 2D array: row+col*num_rows = option+header*num_options
 } Menu_t;
 
 typedef struct
 {
-   uint column_width_index;
-   uint *column_width_data;
-   uint *option_width_data; // 2D array: row*num_cols+col = header*num_options+option
+   uint column_width_index; // depends on num_options
+   uint *column_width_data; // num_headers, max width of header and options for that column
+   uint *header_width_data; // num_headers, width of each header
+   uint *option_width_data; // 2D array: row+col*num_rows = option+header*num_options
 } Menu_Meta_t;
 
 void Menu_Init(Menu_t *menu, String_t title, uint num_headers, String_t *headers, uint num_options, String_t *options);

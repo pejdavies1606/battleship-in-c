@@ -16,6 +16,9 @@
 #include <stdio.h> // puts, printf
 #endif
 
+#define IF_NULL_VAL(a,b) (( NULL == a ) ? b : a)
+#define IF_NULL(a,b,c) (( NULL == a ) ? b : c)
+
 typedef unsigned int uint;
 typedef char *String_t;
 

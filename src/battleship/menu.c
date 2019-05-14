@@ -11,9 +11,24 @@
 #include <string.h>
 #include <stdarg.h>
 
-#define STR_LEN_MAX 32
+static int Max(uint *max, uint size, uint *data)
+{
+   if (NULL == data)
+   {
+      return -1;
+   }
 
-static int Max(uint *max, uint size, uint *data);
+   *max = data[0];
+   for (uint i=0; i<size; i++)
+   {
+      if (data[i] > *max)
+      {
+         *max = data[i];
+      }
+   }
+
+   return 0;
+}
 
 void Menu_Init(
       Menu_t *menu,
@@ -35,7 +50,7 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
 {
 #ifndef NDEBUG
    puts("Menu_Meta_Init");
-   printf("title=%s\n", menu->title );
+   //printf("title=%s\n", menu->title );
 #endif
    // calculate number width from number of options
    uint n = menu->num_options;
@@ -48,9 +63,15 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
    meta->column_width_index = index_width;
 
 #ifndef NDEBUG
-   printf("index_width=%u\n", index_width );
+   //printf("index_width=%u\n", index_width );
 #endif
 
+   uint *column_widths = malloc( menu->num_headers * sizeof(*column_widths) );
+   if (NULL == column_widths )
+   {
+      meta = NULL;
+      return;
+   }
    uint *header_widths = malloc( menu->num_headers * sizeof(*header_widths) );
    if (NULL == header_widths )
    {
@@ -65,14 +86,16 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
    }
    for (uint header_index=0; header_index<menu->num_headers; header_index++)
    {
-      header_widths[header_index] = strnlen(menu->headers[header_index], STR_LEN_MAX);
-
+      header_widths[header_index] = strlens(menu->headers[header_index]);
+#ifndef NDEBUG
+      //printf("header_widths[%u](%s)=%u\n", header_index, IF_NULL_VAL(menu->headers[header_index],""), header_widths[header_index] );
+#endif
       for (uint option_index=0; option_index<menu->num_options; option_index++)
       {
          uint i = header_index*menu->num_options+option_index;
-         option_widths[i] = strnlen(menu->options[i], STR_LEN_MAX);
+         option_widths[i] = strlens(menu->options[i]);
 #ifndef NDEBUG
-         //printf("option_widths[%u]=%u\n", i, option_widths[i] );
+         //printf("option_widths[%u](%s)=%u\n", i, IF_NULL_VAL(menu->options[i],""), option_widths[i] );
 #endif
       }
       uint option_width_max = 0;
@@ -83,31 +106,18 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
       }
       if (option_width_max > header_widths[header_index])
       {
-         header_widths[header_index] = option_width_max;
+         column_widths[header_index] = option_width_max;
+      }
+      else
+      {
+         column_widths[header_index] = header_widths[header_index];
       }
 #ifndef NDEBUG
-      printf("header_widths[%u]=%u\n", header_index, header_widths[header_index] );
+      //printf("column_widths[%u]=%u\n", header_index, column_widths[header_index] );
 #endif
    }
-   meta->column_width_data = header_widths;
+   meta->column_width_data = column_widths;
+   meta->header_width_data = header_widths;
    meta->option_width_data = option_widths;
 }
 
-static int Max(uint *max, uint size, uint *data)
-{
-   if (NULL == data)
-   {
-      return -1;
-   }
-
-   *max = data[0];
-   for (uint i=0; i<size; i++)
-   {
-      if (data[i] > *max)
-      {
-         *max = data[i];
-      }
-   }
-
-   return 0;
-}

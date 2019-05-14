@@ -3,5 +3,6 @@
 .cproject
 .settings/
 build/
+*.swp
 .*.swp
 tags
