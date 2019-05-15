@@ -20,23 +20,23 @@ Grid_State_t Grid_State_Init(const Ship_Type_t type, const Hit_State_t state)
 
 Player_t Player_Init()
 {
-   Grid_State_t defense[GRID_SIZE][GRID_SIZE];
-   Hit_State_t offense[GRID_SIZE][GRID_SIZE];
+   Grid_State_t defense[GRID_SIZE*GRID_SIZE];
+   Hit_State_t offense[GRID_SIZE*GRID_SIZE];
 
-   for (int row = 0; row < GRID_SIZE; row++)
+   for (uint row = 0; row < GRID_SIZE; row++)
    {
-      for (int col = 0; col < GRID_SIZE; col++)
+      for (uint col = 0; col < GRID_SIZE; col++)
       {
-         defense[row][col] = Grid_State_Init(NUM_SHIPS, BLANK);
-         offense[row][col] = BLANK;
+         defense[row*GRID_SIZE + col] = Grid_State_Init(NUM_SHIPS, BLANK);
+         offense[row*GRID_SIZE + col] = BLANK;
       }
    }
 
-   Ship_Player_t ships[NUM_SHIPS];
+   Ship_t ships[NUM_SHIPS];
    Scoreboard_Entity_t ship_health[NUM_SHIPS];
-   for (int i = 0; i < NUM_SHIPS; i++)
+   for (uint i = 0; i < NUM_SHIPS; i++)
    {
-      ships[i] = Ship_Player_Init( i );
+      ships[i] = Ship_Init( (Ship_Type_t) i );
       ship_health[i] = Scoreboard_Entity_Init(SHIP_NAME[i], 0, SHIP_LENGTH[i]);
    }
 

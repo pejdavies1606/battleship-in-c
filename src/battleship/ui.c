@@ -128,10 +128,31 @@ void BattleShip_UI_Print_Logo()
    puts("                       |                           ");
 }
 
+void BattleShip_UI_Print_Grid(const Grid_State_t *defense)
+{
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
+}
+
+/*void BattleShip_UI_Print_Grid(const Hit_State_t *offense)
+{
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
+}*/
+
+/*void BattleShip_UI_Print_Grid(const Grid_State_t *defense, const Hit_State_t *offense)
+{
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
+}*/
+
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 {
 #ifndef NDEBUG
-   puts("\nBattleShip_UI_Main_Menu");
+   printf("\n%s\n", __FUNCTION__);
 #endif
    Menu_Meta_t meta;
    Menu_Meta_Init( &meta, &main_menu );
@@ -155,7 +176,7 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 Place_Menu_Option_t BattleShip_UI_Place_Menu()
 {
 #ifndef NDEBUG
-   puts("\nBattleShip_UI_Place_Menu");
+   printf("\n%s\n", __FUNCTION__);
 #endif
    Menu_Meta_t meta;
    Menu_Meta_Init( &meta, &place_menu );
@@ -172,10 +193,10 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu()
    return choice;
 }
 
-Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
+Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense)
 {
 #ifndef NDEBUG
-   puts("\nBattleShip_UI_Ship_Menu");
+   printf("\n%s\n", __FUNCTION__);
 #endif
 
    // define new options table
@@ -192,11 +213,6 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
    snprintf(ship_menu_data[0], return_len, "%s", return_str);
    snprintf(ship_menu_data[1], 1, "");
    snprintf(ship_menu_data[2], 1, "");
-
-   /*printf("sizeof ship_menu_data[%u]=%u\n", 0, return_len);
-   printf("ship_menu_data[%u]='%s'\n", 0, ship_menu_data[0]);
-   printf("ship_menu_data[%u]='%s'\n", 1, ship_menu_data[1]);
-   printf("ship_menu_data[%u]='%s'\n", 2, ship_menu_data[2]);*/
 
    // use template options table to complete new options table
    String_t place_prefix = ship_menu_options[MENU_OPTION_SHIP_PLACE];
@@ -215,15 +231,9 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
       ship_menu_data[symbol_index] = malloc(symbol_len);
       ship_menu_data[length_index] = malloc(length_len);
 
-      //printf("sizeof ship_menu_data[%u]=%u\n", name_index, name_len);
-
       snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, SHIP_NAME[i-1]);
       snprintf(ship_menu_data[symbol_index], symbol_len, "%c %c", SHIP_NAME[i-1][0], tolower(SHIP_NAME[i-1][0]));
       snprintf(ship_menu_data[length_index], length_len, "%u", SHIP_LENGTH[i-1]);
-
-      /*printf("ship_menu_data[%u]='%s'\n", name_index, ship_menu_data[name_index]);
-      printf("ship_menu_data[%u]='%s'\n", symbol_index, ship_menu_data[symbol_index]);
-      printf("ship_menu_data[%u]='%s'\n", length_index, ship_menu_data[length_index]);*/
    }
 
    // redefine template options table in menu with new, completed options table
@@ -238,7 +248,7 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
    while(!read_success)
    {
       clrscr();
-      //BattleShip_UI_Print_Grid(); // TODO
+      BattleShip_UI_Print_Grid(defense);
       BattleShip_UI_Print_Menu(&ship_menu, &meta);
       read_success = BattleShip_UI_Read_Menu(&ship_menu, &meta, (uint*) &choice);
    }
@@ -248,7 +258,7 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu()
 void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
 {
 #ifndef NDEBUG
-   puts("\nBattleShip_UI_Print_Menu");
+   printf("\n%s\n", __FUNCTION__);
 #endif
    puts("");
    printf("%*s%s\n", meta->column_width_index, "", menu->title);
@@ -284,7 +294,7 @@ void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
 bool BattleShip_UI_Read_Menu(Menu_t *menu, Menu_Meta_t *meta, uint *choice)
 {
 #ifndef NDEBUG
-   puts("\nBattleShip_UI_Read_Menu");
+   printf("\n%s\n", __FUNCTION__);
 #endif
    size_t chosen_option_len = meta->column_width_index + 1;
    String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );

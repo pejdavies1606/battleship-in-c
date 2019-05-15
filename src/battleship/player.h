@@ -29,9 +29,9 @@ typedef struct
 
 typedef struct
 {
-   Grid_State_t (*defense)[GRID_SIZE];
-   Hit_State_t (*offense)[GRID_SIZE];
-   Ship_Player_t *ships;
+   Grid_State_t *defense;
+   Hit_State_t *offense;
+   Ship_t *ships;
    Scoreboard_t scoreboard_ship_health;
 } Player_t;
 

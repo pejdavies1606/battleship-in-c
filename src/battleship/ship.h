@@ -40,9 +40,8 @@ typedef struct
    Coord_t location;
    Heading_t heading;
    uint hits;
-} Ship_Player_t;
+} Ship_t;
 
-Ship_Type_t Ship_Init( uint i );
-Ship_Player_t Ship_Player_Init( uint i );
+Ship_t Ship_Init( Ship_Type_t type );
 
 #endif /* BATTLESHIP_SHIP_H_ */

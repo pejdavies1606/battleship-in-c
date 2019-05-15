@@ -49,7 +49,7 @@ void Menu_Init(
 void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
 {
 #ifndef NDEBUG
-   puts("Menu_Meta_Init");
+   printf("\n%s\n", __FUNCTION__);
    //printf("title=%s\n", menu->title );
 #endif
    // calculate number width from number of options

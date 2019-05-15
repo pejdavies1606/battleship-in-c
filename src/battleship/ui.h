@@ -10,6 +10,7 @@
 
 #include "scoreboard.h"
 #include "menu.h"
+#include "player.h"
 
 #include <stdio.h>
 
@@ -41,10 +42,13 @@ typedef enum
 } Ship_Menu_Option_t;
 
 void BattleShip_UI_Print_Logo();
+void BattleShip_UI_Print_Grid(const Grid_State_t *defense);
+//void BattleShip_UI_Print_Grid(const Hit_State_t *offense);
+//void BattleShip_UI_Print_Grid(const Grid_State_t *defense, const Hit_State_t *offense);
 
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message);
 Place_Menu_Option_t BattleShip_UI_Place_Menu();
-Ship_Menu_Option_t BattleShip_UI_Ship_Menu();
+Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense);
 void BattleShip_UI_Print_Place_Help();
 void BattleShip_UI_Ship_Auto();
 
