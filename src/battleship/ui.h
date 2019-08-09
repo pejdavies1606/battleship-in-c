@@ -18,6 +18,20 @@
 #define NUM_PLACE_MENU_OPTIONS 4 // must match enum below
 #define NUM_SHIP_MENU_OPTIONS 2 // must match enum below
 
+#define SIZE_STATE_STR 1 // not including null terminator
+
+#define STR_STATE_BLANK " "
+#define STR_STATE_HIT   "*"
+#define STR_STATE_MISS  "."
+
+#define STR_GRID_SIDE_V "|"
+#define STR_GRID_SIDE_H "="
+#define STR_GRID_CORNER "+"
+#define SIZE_GRID_SPACE 1
+
+#define STR_DEF "DEFENSE"
+#define STR_OFF "OFFENSE"
+
 typedef enum
 {
    MENU_OPTION_MAIN_RETURN,
@@ -42,9 +56,9 @@ typedef enum
 } Ship_Menu_Option_t;
 
 void BattleShip_UI_Print_Logo();
-void BattleShip_UI_Print_Grid(const Grid_State_t *defense);
-//void BattleShip_UI_Print_Grid(const Hit_State_t *offense);
-//void BattleShip_UI_Print_Grid(const Grid_State_t *defense, const Hit_State_t *offense);
+void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense);
+//void BattleShip_UI_Print_Offense_Grid(const Hit_State_t *offense);
+//void BattleShip_UI_Print_Both_Grids(const Grid_State_t *defense, const Hit_State_t *offense);
 
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message);
 Place_Menu_Option_t BattleShip_UI_Place_Menu();

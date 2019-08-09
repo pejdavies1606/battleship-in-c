@@ -16,9 +16,9 @@
 
 typedef enum
 {
-   BLANK,
-   HIT,
-   MISS
+   STATE_BLANK,
+   STATE_HIT,
+   STATE_MISS
 } Hit_State_t;
 
 typedef struct

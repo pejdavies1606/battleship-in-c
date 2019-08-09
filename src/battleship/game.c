@@ -29,18 +29,15 @@
 //static _Bool sunk, two_ai = false, configExist;
 //static _Bool p1sunk[NUM_SHIPS], p2sunk[NUM_SHIPS];
 
-static Game_t game;
-
-void BattleShip_Game_Init()
+void BattleShip_Game_Init(Game_t *game)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-
    Window_Init(POS_WINDOW_X, POS_WINDOW_Y, SIZE_WINDOW_W, SIZE_WINDOW_H);
    Rng_Init();
 
-   Scoreboard_Init(&game.scoreboard_hit_score,
+   Scoreboard_Init(&game->scoreboard_hit_score,
                    SCOREBOARD_HITS_TITLE,
                    NUM_PLAYERS,
                    SCOREBOARD_HITS_SCORE_WIDTH,
@@ -48,13 +45,15 @@ void BattleShip_Game_Init()
 
    for (uint i = 0; i < NUM_PLAYERS; i++)
    {
-      game.players[i] = Player_Init();
+      game->players[i] = Player_Init();
    }
-
 }
 
-void Process_Place_Menu(Place_Menu_Option_t choice)
+void Process_Place_Menu(Game_t *game, Place_Menu_Option_t choice)
 {
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
    switch(choice)
    {
       case MENU_OPTION_PLACE_RETURN:
@@ -66,22 +65,22 @@ void Process_Place_Menu(Place_Menu_Option_t choice)
          //BattleShip_UI_Ship_Auto(); // TODO
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         BattleShip_UI_Ship_Menu(game.players[0].defense);
+         BattleShip_UI_Ship_Menu(game->players[0].defense);
    }
 }
 
-void Process_Main_Menu(Main_Menu_Option_t choice)
+void Process_Main_Menu(Game_t *game, Main_Menu_Option_t choice)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
-   printf("choice=%d\n", choice);
 #endif
    switch(choice)
    {
       case MENU_OPTION_MAIN_RETURN:
          return;
       case MENU_OPTION_MAIN_PLACE:
-         Process_Place_Menu(BattleShip_UI_Place_Menu());
+         Process_Place_Menu(game,
+               BattleShip_UI_Place_Menu(game->players[0].defense));
          break;
       case MENU_OPTION_MAIN_BEGIN:
          break;
@@ -92,12 +91,11 @@ void Process_Main_Menu(Main_Menu_Option_t choice)
    }
 }
 
-
-void BattleShip_Game_Start()
+void BattleShip_Game_Start(Game_t *game)
 {
    //while(1) // menu loop
    //{
-      Process_Main_Menu(BattleShip_UI_Main_Menu(""));
+      Process_Main_Menu(game, BattleShip_UI_Main_Menu(""));
    //}
 }
 

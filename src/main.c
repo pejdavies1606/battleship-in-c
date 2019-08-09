@@ -19,8 +19,11 @@ int main(int argc, char *argv[])
    puts("DEBUG");
 #endif
    setvbuf(stdout, NULL, _IONBF, 0); // No buffering
-   BattleShip_Game_Init();
-   BattleShip_Game_Start();
+
+   Game_t game;
+   BattleShip_Game_Init(&game);
+   BattleShip_Game_Start(&game);
+
    puts("done");
    getchar();
    return 0;

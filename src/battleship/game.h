@@ -30,16 +30,6 @@
 #include "player.h"
 #include "comp_player.h"
 
-#define STATE_BLANK " "
-#define STATE_HIT   "*"
-#define STATE_MISS  "."
-
-#define STATE_ZERO  "0"
-
-#define GRID_SIDE_V "|"
-#define GRID_SIDE_H "="
-#define GRID_CORNER "+"
-
 typedef struct
 {
    Player_t players[NUM_PLAYERS];

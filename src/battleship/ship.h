@@ -23,11 +23,12 @@
 
 typedef enum
 {
-   DESTROYER,
-   CRUISER,
-   SUBMARINE,
-   BATTLESHIP,
-   AIRCRAFT_CARRIER
+   SHIP_DESTROYER,
+   SHIP_CRUISER,
+   SHIP_SUBMARINE,
+   SHIP_BATTLESHIP,
+   SHIP_AIRCRAFT_CARRIER,
+   SHIP_NONE
 } Ship_Type_t;
 
 // ensure these arrays correspond with the enum above

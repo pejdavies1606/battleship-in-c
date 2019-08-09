@@ -104,6 +104,9 @@ static Menu_t ship_menu =
 
 void BattleShip_UI_Print_Logo()
 {
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#else
    // ASCII font 'cybermedium' http://www.topster.de/text-to-ascii/cybermedium.html
    puts("                       |                           ");
    puts("                       |                           ");
@@ -126,13 +129,107 @@ void BattleShip_UI_Print_Logo()
    puts("                 '  -  +  -  '                     ");
    puts("                       |                           ");
    puts("                       |                           ");
+#endif
 }
 
-void BattleShip_UI_Print_Grid(const Grid_State_t *defense)
+void ShipType2Str(const Ship_Type_t type, char *str, const size_t str_len)
+{
+   switch(type)
+   {
+      case SHIP_DESTROYER:
+      case SHIP_CRUISER:
+      case SHIP_SUBMARINE:
+      case SHIP_BATTLESHIP:
+      case SHIP_AIRCRAFT_CARRIER:
+         snprintf(str, str_len, "%s", SHIP_NAME[type][0]);
+         break;
+      case SHIP_NONE:
+         snprintf(str, str_len, "%s", STR_STATE_BLANK);
+         break;
+   }
+}
+
+void HitState2Str(const Hit_State_t state, char *str, size_t str_len)
+{
+   switch(state)
+   {
+      case STATE_BLANK:
+         snprintf(str, str_len, "%s", STR_STATE_BLANK);
+         break;
+      case STATE_HIT:
+         snprintf(str, str_len, "%s", STR_STATE_HIT);
+         break;
+      case STATE_MISS:
+         snprintf(str, str_len, "%s", STR_STATE_MISS);
+         break;
+   }
+}
+
+void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
+   char *ship_str = malloc( (SIZE_STATE_STR+1) * sizeof(char) );
+   if (NULL == ship_str)
+   {
+      return;
+   }
+
+   char *state_str = malloc( (SIZE_STATE_STR+1) * sizeof(char) );
+   if (NULL == state_str)
+   {
+      return;
+   }
+
+   int col_width = CalcNumWidth(GRID_SIZE);
+
+   size_t corner_len = col_width+1;
+   char *corner_str = STR_GRID_CORNER;
+   char corner[corner_len];
+   memset(corner, corner_str[0], corner_len);
+   corner[corner_len] = '\0';
+
+   size_t side_len = (col_width+1)*GRID_SIZE-1;
+   char *side_str = STR_GRID_SIDE_H;
+   char side[side_len];
+   memset(side, side_str[0], side_len);
+   side[side_len] = '\0';
+
+   printf("%*s%s\n", (GRID_SIZE/2)*(col_width+1), "", STR_DEF);
+   for (int row = -1; row < GRID_SIZE+1; row++)
+   {
+      if (row == -1)
+      {
+         printf("%*s%.*s", col_width-1, "", SIZE_GRID_SPACE, corner);
+         for (uint col = 0; col < GRID_SIZE; col++)
+         {
+            printf("%*s%-*c", SIZE_GRID_SPACE, "", col_width, col+65); // ASCII
+         }
+         printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
+      }
+      else if(row == GRID_SIZE)
+      {
+         printf("%*s%.*s", col_width-1, "", SIZE_GRID_SPACE, corner);
+         printf("%*s%.*s", SIZE_GRID_SPACE, "", side_len, side);
+         printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
+      }
+      else
+      {
+         printf("%*u", col_width, row+1);
+         for (uint col = 0; col < GRID_SIZE; col++)
+         {
+            Grid_State_t p = defense[row*GRID_SIZE + col];
+            ShipType2Str(p.ship_type, ship_str, strlen(ship_str));
+            HitState2Str(p.hit_state, state_str, strlen(state_str));
+            printf("%*s%s%s", SIZE_GRID_SPACE, "", ship_str, state_str);
+         }
+         printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V);
+      }
+   }
+
+   free(ship_str);
+   free(state_str);
 }
 
 /*void BattleShip_UI_Print_Grid(const Hit_State_t *offense)
@@ -173,7 +270,7 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
    return choice;
 }
 
-Place_Menu_Option_t BattleShip_UI_Place_Menu()
+Place_Menu_Option_t BattleShip_UI_Place_Menu(const Grid_State_t *defense)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
@@ -186,7 +283,7 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu()
    while(!read_success)
    {
       clrscr();
-      //BattleShip_UI_Print_Grid(); // TODO
+      BattleShip_UI_Print_Defense_Grid(defense);
       BattleShip_UI_Print_Menu(&place_menu, &meta);
       read_success = BattleShip_UI_Read_Menu(&place_menu, &meta, (uint*) &choice);
    }
@@ -198,7 +295,6 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense)
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-
    // define new options table
    size_t num_options = NUM_SHIPS + 1;
    String_t *ship_menu_data = malloc(sizeof(String_t) * num_options * NUM_SHIP_MENU_HEADERS);
@@ -248,7 +344,7 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense)
    while(!read_success)
    {
       clrscr();
-      BattleShip_UI_Print_Grid(defense);
+      BattleShip_UI_Print_Defense_Grid(defense);
       BattleShip_UI_Print_Menu(&ship_menu, &meta);
       read_success = BattleShip_UI_Read_Menu(&ship_menu, &meta, (uint*) &choice);
    }

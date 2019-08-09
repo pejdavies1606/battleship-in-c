@@ -11,25 +11,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-static int Max(uint *max, uint size, uint *data)
-{
-   if (NULL == data)
-   {
-      return -1;
-   }
-
-   *max = data[0];
-   for (uint i=0; i<size; i++)
-   {
-      if (data[i] > *max)
-      {
-         *max = data[i];
-      }
-   }
-
-   return 0;
-}
-
 void Menu_Init(
       Menu_t *menu,
       String_t title,
@@ -49,7 +30,7 @@ void Menu_Init(
 void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   //printf("\n%s\n", __FUNCTION__);
    //printf("title=%s\n", menu->title );
 #endif
    // calculate number width from number of options
@@ -67,19 +48,19 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
 #endif
 
    uint *column_widths = malloc( menu->num_headers * sizeof(*column_widths) );
-   if (NULL == column_widths )
+   if (NULL == column_widths)
    {
       meta = NULL;
       return;
    }
    uint *header_widths = malloc( menu->num_headers * sizeof(*header_widths) );
-   if (NULL == header_widths )
+   if (NULL == header_widths)
    {
       meta = NULL;
       return;
    }
    uint *option_widths = malloc( menu->num_options * menu->num_headers * sizeof(*option_widths) );
-   if (NULL == option_widths )
+   if (NULL == option_widths)
    {
       meta = NULL;
       return;
@@ -99,7 +80,9 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
 #endif
       }
       uint option_width_max = 0;
-      if (Max(&option_width_max, menu->num_options, &option_widths[header_index*menu->num_options]) != 0)
+      if ( 0 != CalcMax(&option_width_max,
+               &option_widths[header_index*menu->num_options],
+               menu->num_options))
       {
          meta = NULL;
          return;

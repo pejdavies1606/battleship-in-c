@@ -20,15 +20,19 @@ Grid_State_t Grid_State_Init(const Ship_Type_t type, const Hit_State_t state)
 
 Player_t Player_Init()
 {
-   Grid_State_t defense[GRID_SIZE*GRID_SIZE];
-   Hit_State_t offense[GRID_SIZE*GRID_SIZE];
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
+
+   Grid_State_t *defense = malloc(GRID_SIZE * GRID_SIZE * sizeof(Grid_State_t));
+   Hit_State_t *offense = malloc(GRID_SIZE * GRID_SIZE * sizeof(Hit_State_t));
 
    for (uint row = 0; row < GRID_SIZE; row++)
    {
       for (uint col = 0; col < GRID_SIZE; col++)
       {
-         defense[row*GRID_SIZE + col] = Grid_State_Init(NUM_SHIPS, BLANK);
-         offense[row*GRID_SIZE + col] = BLANK;
+         defense[row*GRID_SIZE + col] = Grid_State_Init(SHIP_NONE, STATE_BLANK);
+         offense[row*GRID_SIZE + col] = STATE_BLANK;
       }
    }
 
