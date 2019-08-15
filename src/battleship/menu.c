@@ -79,14 +79,9 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
          //printf("option_widths[%u](%s)=%u\n", i, IF_NULL_VAL(menu->options[i],""), option_widths[i] );
 #endif
       }
-      uint option_width_max = 0;
-      if ( 0 != CalcMax(&option_width_max,
-               &option_widths[header_index*menu->num_options],
-               menu->num_options))
-      {
-         meta = NULL;
-         return;
-      }
+      uint option_width_max =
+         CalcMax(&option_widths[header_index*menu->num_options],
+               menu->num_options);
       if (option_width_max > header_widths[header_index])
       {
          column_widths[header_index] = option_width_max;

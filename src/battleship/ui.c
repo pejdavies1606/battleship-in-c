@@ -24,12 +24,11 @@
 #endif
 #endif
 
-#define SIZE_SHIP_SYMBOLS 3
 #define MAX_READ_RETRIES 3
 
 #define NUM_MAIN_MENU_HEADERS 1
 #define NUM_PLACE_MENU_HEADERS 1
-#define NUM_SHIP_MENU_HEADERS 3
+#define NUM_SHIP_MENU_HEADERS 2
 
 #define IF_NULL_BLANK(s) ( (NULL == s) ? "" : s)
 
@@ -81,7 +80,6 @@ static Menu_t place_menu =
 static String_t ship_menu_headers[NUM_SHIP_MENU_HEADERS] =
 {
    "Option",
-   "Symbol",
    "Length"
 };
 
@@ -89,7 +87,6 @@ static String_t ship_menu_headers[NUM_SHIP_MENU_HEADERS] =
 static String_t ship_menu_options[NUM_SHIP_MENU_OPTIONS*NUM_SHIP_MENU_HEADERS] =
 {
    "Return", "Place",
-   "S0", "S1",
    "L0", "L1",
 };
 
@@ -98,8 +95,6 @@ static Menu_t ship_menu =
    .title = "Ships",
    .num_headers = NUM_SHIP_MENU_HEADERS,
    .headers = ship_menu_headers,
-   .num_options = NUM_SHIP_MENU_OPTIONS,
-   .options = ship_menu_options
 };
 
 void BattleShip_UI_Print_Logo()
@@ -299,37 +294,37 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense)
    size_t num_options = NUM_SHIPS + 1;
    String_t *ship_menu_data = malloc(sizeof(String_t) * num_options * NUM_SHIP_MENU_HEADERS);
 
-   String_t return_str = ship_menu_options[MENU_OPTION_SHIP_RETURN];
-   size_t return_len = strlen(return_str) + 1;
-
-   ship_menu_data[0] = malloc(return_len);
-   ship_menu_data[1] = malloc(1);
-   ship_menu_data[2] = malloc(1);
-
-   snprintf(ship_menu_data[0], return_len, "%s", return_str);
-   snprintf(ship_menu_data[1], 1, "");
-   snprintf(ship_menu_data[2], 1, "");
-
    // use template options table to complete new options table
+   String_t return_str = ship_menu_options[MENU_OPTION_SHIP_RETURN];
    String_t place_prefix = ship_menu_options[MENU_OPTION_SHIP_PLACE];
 
-   for (uint i=1; i<num_options; i++)
+   for (uint i=0; i<num_options; i++)
    {
       uint name_index = i;
-      uint symbol_index = i + 1*num_options;
-      uint length_index = i + 2*num_options;
+      uint length_index = i + num_options;
 
-      size_t name_len = strlen(place_prefix) + 1 + strlen(SHIP_NAME[i-1]) + 1;
-      size_t symbol_len = SIZE_SHIP_SYMBOLS + 1;
-      size_t length_len = strlen(SHIP_NAME[i-1]) + 1;
+      if ( i == 0 )
+      {
+         size_t return_len = strlen(return_str) + 1;
+         ship_menu_data[name_index] = malloc(return_len);
+         snprintf(ship_menu_data[name_index], return_len, "%s", return_str);
 
-      ship_menu_data[name_index] = malloc(name_len);
-      ship_menu_data[symbol_index] = malloc(symbol_len);
-      ship_menu_data[length_index] = malloc(length_len);
+         // blank entry
+         ship_menu_data[length_index] = "";
+      }
+      else
+      {
+         String_t ship_name = SHIP_NAME[i-1];
 
-      snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, SHIP_NAME[i-1]);
-      snprintf(ship_menu_data[symbol_index], symbol_len, "%c %c", SHIP_NAME[i-1][0], tolower(SHIP_NAME[i-1][0]));
-      snprintf(ship_menu_data[length_index], length_len, "%u", SHIP_LENGTH[i-1]);
+         size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
+         size_t length_len = CalcNumWidth(CalcMax(SHIP_LENGTH, NUM_SHIPS)) + 1;
+
+         ship_menu_data[name_index] = malloc(name_len);
+         ship_menu_data[length_index] = malloc(length_len);
+
+         snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, ship_name);
+         snprintf(ship_menu_data[length_index], length_len, "%u", SHIP_LENGTH[i-1]);
+      }
    }
 
    // redefine template options table in menu with new, completed options table

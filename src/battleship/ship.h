@@ -18,7 +18,7 @@
 // Battleship       4
 // Aircraft Carrier 5
 
-// must match enum below
+// must match enum below, minus SHIP_NONE
 #define NUM_SHIPS 5
 
 typedef enum

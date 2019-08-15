@@ -47,23 +47,17 @@ bool ParseUnsignedLong(const char *str, unsigned long *val)
     return ret;
 }
 
-int CalcMax(int *max, int *data, size_t n)
+int CalcMax(const int *data, size_t n)
 {
-   if (NULL == data)
-   {
-      return -1;
-   }
-
-   *max = data[0];
+   int max = data[0];
    for (int i = 0; i < n; i++)
    {
-      if (data[i] > *max)
+      if (data[i] > max)
       {
-         *max = data[i];
+         max = data[i];
       }
    }
-
-   return 0;
+   return max;
 }
 
 int CalcNumWidth(int n)

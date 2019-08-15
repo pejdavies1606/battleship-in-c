@@ -16,7 +16,7 @@
 
 void ReadString(char *str, int strlen, FILE *stream);
 bool ParseUnsignedLong(const char *str, unsigned long *val);
-int CalcMax(int *max, int *data, size_t n);
+int CalcMax(const int *data, size_t n);
 int CalcNumWidth(int n);
 
 #endif /* UTIL_H_ */
