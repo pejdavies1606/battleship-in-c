@@ -11,60 +11,19 @@
 #include <string.h>
 #include <stdarg.h>
 
-void Menu_Init(
-      Menu_t *menu,
-      String_t title,
-      uint num_headers,
-      String_t *headers,
-      uint num_options,
-      String_t *options
-      )
-{
-   menu->title = title;
-   menu->num_headers = num_headers;
-   menu->headers = headers;
-   menu->num_options = num_options;
-   menu->options = options;
-}
-
-void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
+void Menu_Meta_Init(Menu_t *menu)
 {
 #ifndef NDEBUG
    //printf("\n%s\n", __FUNCTION__);
    //printf("title=%s\n", menu->title );
 #endif
-   // calculate number width from number of options
-   uint n = menu->num_options;
-   uint index_width = 0;
-   while (n != 0)
-   {
-      n /= 10;
-      ++index_width;
-   }
-   meta->column_width_index = index_width;
-
+   menu->meta.column_width_index = CalcNumWidth(menu->num_options);
 #ifndef NDEBUG
    //printf("index_width=%u\n", index_width );
 #endif
-
    uint *column_widths = malloc( menu->num_headers * sizeof(*column_widths) );
-   if (NULL == column_widths)
-   {
-      meta = NULL;
-      return;
-   }
    uint *header_widths = malloc( menu->num_headers * sizeof(*header_widths) );
-   if (NULL == header_widths)
-   {
-      meta = NULL;
-      return;
-   }
    uint *option_widths = malloc( menu->num_options * menu->num_headers * sizeof(*option_widths) );
-   if (NULL == option_widths)
-   {
-      meta = NULL;
-      return;
-   }
    for (uint header_index=0; header_index<menu->num_headers; header_index++)
    {
       header_widths[header_index] = strlens(menu->headers[header_index]);
@@ -94,8 +53,8 @@ void Menu_Meta_Init(Menu_Meta_t *meta, Menu_t *menu)
       //printf("column_widths[%u]=%u\n", header_index, column_widths[header_index] );
 #endif
    }
-   meta->column_width_data = column_widths;
-   meta->header_width_data = header_widths;
-   meta->option_width_data = option_widths;
+   menu->meta.column_width_data = column_widths;
+   menu->meta.header_width_data = header_widths;
+   menu->meta.option_width_data = option_widths;
 }
 

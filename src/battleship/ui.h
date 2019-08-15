@@ -55,6 +55,8 @@ typedef enum
    MENU_OPTION_SHIP_PLACE
 } Ship_Menu_Option_t;
 
+void BattleShip_UI_Init();
+
 void BattleShip_UI_Print_Logo();
 void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense);
 //void BattleShip_UI_Print_Offense_Grid(const Hit_State_t *offense);
@@ -66,9 +68,9 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense);
 void BattleShip_UI_Print_Place_Help();
 void BattleShip_UI_Ship_Auto();
 
-void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta);
-void BattleShip_UI_Print_Ship_Menu(Menu_t *menu, Menu_Meta_t *meta);
-bool BattleShip_UI_Read_Menu(Menu_t *menu, Menu_Meta_t *meta, uint *choice);
+void BattleShip_UI_Print_Menu(Menu_t *menu);
+void BattleShip_UI_Print_Ship_Menu(Menu_t *menu);
+bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice);
 void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 
 #endif /* BATTLESHIP_UI_H_ */

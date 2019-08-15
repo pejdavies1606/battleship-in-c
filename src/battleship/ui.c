@@ -97,7 +97,55 @@ static Menu_t ship_menu =
    .headers = ship_menu_headers,
 };
 
-void BattleShip_UI_Print_Logo()
+void BattleShip_UI_Init(void)
+{
+   Menu_Meta_Init( &main_menu );
+   Menu_Meta_Init( &place_menu );
+
+   // complete ship menu at runtime
+   {
+      size_t num_options = NUM_SHIPS + 1;
+      String_t *ship_menu_data = malloc(sizeof(String_t) * num_options * NUM_SHIP_MENU_HEADERS);
+      String_t return_str = ship_menu_options[MENU_OPTION_SHIP_RETURN];
+      String_t place_prefix = ship_menu_options[MENU_OPTION_SHIP_PLACE];
+
+      for (uint i=0; i<num_options; i++)
+      {
+         uint name_index = i;
+         uint length_index = i + num_options;
+
+         if ( i == 0 )
+         {
+            size_t return_len = strlen(return_str) + 1;
+            ship_menu_data[name_index] = malloc(return_len);
+            snprintf(ship_menu_data[name_index], return_len, "%s", return_str);
+
+            ship_menu_data[length_index] = ""; // blank entry
+         }
+         else
+         {
+            String_t ship_name = SHIP_NAME[i-1];
+
+            size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
+            size_t length_len = CalcNumWidth(CalcMax(SHIP_LENGTH, NUM_SHIPS)) + 1;
+
+            ship_menu_data[name_index] = malloc(name_len);
+            ship_menu_data[length_index] = malloc(length_len);
+
+            snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, ship_name);
+            snprintf(ship_menu_data[length_index], length_len, "%u", SHIP_LENGTH[i-1]);
+         }
+      }
+
+      // redefine template options table in menu with new, completed options table
+      ship_menu.num_options = num_options;
+      ship_menu.options = ship_menu_data;
+   }
+
+   Menu_Meta_Init( &ship_menu );
+}
+
+void BattleShip_UI_Print_Logo(void)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
@@ -166,16 +214,7 @@ void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense)
    printf("\n%s\n", __FUNCTION__);
 #endif
    char *ship_str = malloc( (SIZE_STATE_STR+1) * sizeof(char) );
-   if (NULL == ship_str)
-   {
-      return;
-   }
-
    char *state_str = malloc( (SIZE_STATE_STR+1) * sizeof(char) );
-   if (NULL == state_str)
-   {
-      return;
-   }
 
    int col_width = CalcNumWidth(GRID_SIZE);
 
@@ -196,6 +235,7 @@ void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense)
    {
       if (row == -1)
       {
+         // style choice: SIZE_GRID_SPACE instead of corner_len
          printf("%*s%.*s", col_width-1, "", SIZE_GRID_SPACE, corner);
          for (uint col = 0; col < GRID_SIZE; col++)
          {
@@ -246,9 +286,6 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   Menu_Meta_t meta;
-   Menu_Meta_Init( &meta, &main_menu );
-
    Main_Menu_Option_t choice = MENU_OPTION_MAIN_RETURN;
    bool read_success = false;
    while(!read_success)
@@ -256,8 +293,8 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
       clrscr();
       BattleShip_UI_Print_Logo();
       puts(message);
-      BattleShip_UI_Print_Menu(&main_menu, &meta);
-      read_success = BattleShip_UI_Read_Menu(&main_menu, &meta, (uint*) &choice);
+      BattleShip_UI_Print_Menu(&main_menu);
+      read_success = BattleShip_UI_Read_Menu(&main_menu, (uint*) &choice);
 #ifndef NDEBUG
       printf("read=%s\n", read_success ? "true" : "false");
 #endif
@@ -270,17 +307,14 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu(const Grid_State_t *defense)
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   Menu_Meta_t meta;
-   Menu_Meta_Init( &meta, &place_menu );
-
    Place_Menu_Option_t choice = MENU_OPTION_PLACE_RETURN;
    bool read_success = false;
    while(!read_success)
    {
       clrscr();
       BattleShip_UI_Print_Defense_Grid(defense);
-      BattleShip_UI_Print_Menu(&place_menu, &meta);
-      read_success = BattleShip_UI_Read_Menu(&place_menu, &meta, (uint*) &choice);
+      BattleShip_UI_Print_Menu(&place_menu);
+      read_success = BattleShip_UI_Read_Menu(&place_menu, (uint*) &choice);
    }
    return choice;
 }
@@ -290,74 +324,30 @@ Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense)
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   // define new options table
-   size_t num_options = NUM_SHIPS + 1;
-   String_t *ship_menu_data = malloc(sizeof(String_t) * num_options * NUM_SHIP_MENU_HEADERS);
-
-   // use template options table to complete new options table
-   String_t return_str = ship_menu_options[MENU_OPTION_SHIP_RETURN];
-   String_t place_prefix = ship_menu_options[MENU_OPTION_SHIP_PLACE];
-
-   for (uint i=0; i<num_options; i++)
-   {
-      uint name_index = i;
-      uint length_index = i + num_options;
-
-      if ( i == 0 )
-      {
-         size_t return_len = strlen(return_str) + 1;
-         ship_menu_data[name_index] = malloc(return_len);
-         snprintf(ship_menu_data[name_index], return_len, "%s", return_str);
-
-         // blank entry
-         ship_menu_data[length_index] = "";
-      }
-      else
-      {
-         String_t ship_name = SHIP_NAME[i-1];
-
-         size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
-         size_t length_len = CalcNumWidth(CalcMax(SHIP_LENGTH, NUM_SHIPS)) + 1;
-
-         ship_menu_data[name_index] = malloc(name_len);
-         ship_menu_data[length_index] = malloc(length_len);
-
-         snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, ship_name);
-         snprintf(ship_menu_data[length_index], length_len, "%u", SHIP_LENGTH[i-1]);
-      }
-   }
-
-   // redefine template options table in menu with new, completed options table
-   ship_menu.num_options = num_options;
-   ship_menu.options = ship_menu_data;
-
-   Menu_Meta_t meta;
-   Menu_Meta_Init( &meta, &ship_menu );
-
    Ship_Menu_Option_t choice = MENU_OPTION_SHIP_RETURN;
    bool read_success = false;
    while(!read_success)
    {
       clrscr();
       BattleShip_UI_Print_Defense_Grid(defense);
-      BattleShip_UI_Print_Menu(&ship_menu, &meta);
-      read_success = BattleShip_UI_Read_Menu(&ship_menu, &meta, (uint*) &choice);
+      BattleShip_UI_Print_Menu(&ship_menu);
+      read_success = BattleShip_UI_Read_Menu(&ship_menu, (uint*) &choice);
    }
    return choice;
 }
 
-void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
+void BattleShip_UI_Print_Menu(Menu_t *menu)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
    puts("");
-   printf("%*s%s\n", meta->column_width_index, "", menu->title);
-   printf("%*s%s", meta->column_width_index, "", "#");
+   printf("%*s%s\n", menu->meta.column_width_index, "", menu->title);
+   printf("%*s%s", menu->meta.column_width_index, "", "#");
    for (uint col=0; col < menu->num_headers; col++)
    {
       uint column_width = (col == 0) ? 1 :
-         (meta->column_width_data[col-1] - meta->header_width_data[
+         (menu->meta.column_width_data[col-1] - menu->meta.header_width_data[
           (col-1)
          ] + 1);
       printf("%*s%s", column_width, "",
@@ -367,11 +357,11 @@ void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
    printf("\n");
    for (uint row=0; row < menu->num_options; row++)
    {
-      printf("%*s%d", meta->column_width_index, "", row);
+      printf("%*s%d", menu->meta.column_width_index, "", row);
       for (uint col=0; col < menu->num_headers; col++)
       {
          uint column_width = (col == 0) ? 1 :
-            (meta->column_width_data[col-1] - meta->option_width_data[
+            (menu->meta.column_width_data[col-1] - menu->meta.option_width_data[
              row + (col-1)*menu->num_options
             ] + 1);
          printf("%*s%s", column_width, "",
@@ -382,12 +372,12 @@ void BattleShip_UI_Print_Menu(Menu_t *menu, Menu_Meta_t *meta)
    }
 }
 
-bool BattleShip_UI_Read_Menu(Menu_t *menu, Menu_Meta_t *meta, uint *choice)
+bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   size_t chosen_option_len = meta->column_width_index + 1;
+   size_t chosen_option_len = menu->meta.column_width_index + 1;
    String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );
    uint chosen_option = menu->num_options;
    int retries = 0;

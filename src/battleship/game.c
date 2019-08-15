@@ -47,6 +47,7 @@ void BattleShip_Game_Init(Game_t *game)
    {
       game->players[i] = Player_Init();
    }
+   BattleShip_UI_Init();
 }
 
 void Process_Place_Menu(Game_t *game, Place_Menu_Option_t choice)
