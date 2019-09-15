@@ -2,7 +2,7 @@
  * battleship.h
  *
  *  Created on: 25 Jun 2018
- *      Author: pejdavies1606, Univeristy of Surrey, 2013
+ *      Author: pejdavies1606, University of Surrey, 2013
  */
 
 #ifndef BATTLESHIP_GAME_H_

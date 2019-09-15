@@ -7,17 +7,6 @@
 
 #include "player.h"
 
-Grid_State_t Grid_State_Init(const Ship_Type_t type, const Hit_State_t state)
-{
-   Grid_State_t grid_state =
-   {
-         .ship_type = type,
-         .hit_state = state
-   };
-
-   return grid_state;
-}
-
 Player_t Player_Init()
 {
 #ifndef NDEBUG
@@ -31,7 +20,7 @@ Player_t Player_Init()
    {
       for (uint col = 0; col < GRID_SIZE; col++)
       {
-         defense[row*GRID_SIZE + col] = Grid_State_Init(SHIP_NONE, STATE_BLANK);
+         defense[row*GRID_SIZE + col] = (Grid_State_t){ SHIP_NONE, STATE_BLANK };
          offense[row*GRID_SIZE + col] = STATE_BLANK;
       }
    }

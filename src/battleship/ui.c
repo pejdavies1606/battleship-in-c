@@ -8,9 +8,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "ui.h"
 #include "ship.h"
+#include "grid.h"
 #include "util.h"
+#include "ui.h"
 
 #ifndef NDEBUG
 #define clrscr() puts("\n-----clrscr-----")
@@ -97,6 +98,8 @@ static Menu_t ship_menu =
    .headers = ship_menu_headers,
 };
 
+static Grid_Meta_t grid_meta;
+
 void BattleShip_UI_Init(void)
 {
    Menu_Meta_Init( &main_menu );
@@ -143,6 +146,8 @@ void BattleShip_UI_Init(void)
    }
 
    Menu_Meta_Init( &ship_menu );
+
+   Grid_Meta_Init( &grid_meta, GRID_SIZE );
 }
 
 void BattleShip_UI_Print_Logo(void)
@@ -213,45 +218,38 @@ void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense)
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   char *ship_str = malloc( (SIZE_STATE_STR+1) * sizeof(char) );
-   char *state_str = malloc( (SIZE_STATE_STR+1) * sizeof(char) );
+   char ship_str[SIZE_STATE_STR + 1];
+   char state_str[SIZE_STATE_STR + 1];
 
-   int col_width = CalcNumWidth(GRID_SIZE);
-
-   size_t corner_len = col_width+1;
-   char *corner_str = STR_GRID_CORNER;
-   char corner[corner_len];
-   memset(corner, corner_str[0], corner_len);
-   corner[corner_len] = '\0';
-
-   size_t side_len = (col_width+1)*GRID_SIZE-1;
-   char *side_str = STR_GRID_SIDE_H;
-   char side[side_len];
-   memset(side, side_str[0], side_len);
-   side[side_len] = '\0';
-
-   printf("%*s%s\n", (GRID_SIZE/2)*(col_width+1), "", STR_DEF);
+   printf("%*s%s\n", (GRID_SIZE/2)*(grid_meta.col_width + SIZE_GRID_SPACE), "",
+      STR_DEF);
    for (int row = -1; row < GRID_SIZE+1; row++)
    {
       if (row == -1)
       {
          // style choice: SIZE_GRID_SPACE instead of corner_len
-         printf("%*s%.*s", col_width-1, "", SIZE_GRID_SPACE, corner);
+         printf("%*s%.*s", grid_meta.col_width - 1, "",
+            SIZE_GRID_SPACE, grid_meta.corner_str);
          for (uint col = 0; col < GRID_SIZE; col++)
          {
-            printf("%*s%-*c", SIZE_GRID_SPACE, "", col_width, col+65); // ASCII
+            printf("%*s%-*c", SIZE_GRID_SPACE, "", 
+               grid_meta.col_width, col + 65); // ASCII
          }
          printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
       }
       else if(row == GRID_SIZE)
       {
-         printf("%*s%.*s", col_width-1, "", SIZE_GRID_SPACE, corner);
-         printf("%*s%.*s", SIZE_GRID_SPACE, "", side_len, side);
-         printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
+         // style choice: SIZE_GRID_SPACE instead of corner_len
+         printf("%*s%.*s", grid_meta.col_width - 1, "",
+            SIZE_GRID_SPACE, grid_meta.corner_str);
+         printf("%*s%.*s", SIZE_GRID_SPACE, "",
+            grid_meta.side_len, grid_meta.side_str);
+         printf("%*s%s\n", SIZE_GRID_SPACE, "",
+            STR_GRID_CORNER);
       }
       else
       {
-         printf("%*u", col_width, row+1);
+         printf("%*u", grid_meta.col_width, row + 1);
          for (uint col = 0; col < GRID_SIZE; col++)
          {
             Grid_State_t p = defense[row*GRID_SIZE + col];
@@ -262,9 +260,6 @@ void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense)
          printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V);
       }
    }
-
-   free(ship_str);
-   free(state_str);
 }
 
 /*void BattleShip_UI_Print_Grid(const Hit_State_t *offense)

@@ -55,6 +55,7 @@ typedef enum
    MENU_OPTION_SHIP_PLACE
 } Ship_Menu_Option_t;
 
+
 void BattleShip_UI_Init();
 
 void BattleShip_UI_Print_Logo();

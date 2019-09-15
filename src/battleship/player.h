@@ -35,7 +35,6 @@ typedef struct
    Scoreboard_t scoreboard_ship_health;
 } Player_t;
 
-Grid_State_t Grid_State_Init(const Ship_Type_t type, const Hit_State_t state);
 Player_t Player_Init();
 
 #endif /* BATTLESHIP_PLAYER_H_ */

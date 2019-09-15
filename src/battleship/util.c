@@ -9,6 +9,7 @@
 
 #include <errno.h>
 #include <limits.h>
+#include <string.h>
 
 void ReadString(char *str, int strlen, FILE *stream)
 {
@@ -71,3 +72,12 @@ int CalcNumWidth(int n)
    return w;
 }
 
+int RepeatChar(String_t line, size_t size_line, char elem)
+{
+   if ( ! memset(line, elem, size_line) )
+   {
+      return -1;
+   }
+   line[size_line - 1] = '\0';
+   return 0;
+}

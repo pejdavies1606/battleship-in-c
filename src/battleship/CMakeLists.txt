@@ -1,6 +1,7 @@
 add_library (battleship STATIC
 	coord.c
 	game.c
+	grid.c
 	menu.c
 	player.c
 	rng.c
