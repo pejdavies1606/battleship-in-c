@@ -5,8 +5,6 @@ project (BattleShip)
 set (BattleShip_VERSION_MAJOR 0)
 set (BattleShip_VERSION_MINOR 0)
 
-add_compile_options("-Werror")
-
 # preprocessor flags
 option(FOR_MSDOS "Use Conio to clear the screen" OFF)
 

@@ -130,7 +130,7 @@ void BattleShip_UI_Init(void)
             String_t ship_name = SHIP_NAME[i-1];
 
             size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
-            size_t length_len = CalcNumWidth(CalcMax(SHIP_LENGTH, NUM_SHIPS)) + 1;
+            size_t length_len = (size_t)CalcNumWidth(CalcMax((int*)SHIP_LENGTH, NUM_SHIPS)) + 1;
 
             ship_menu_data[name_index] = malloc(name_len);
             ship_menu_data[length_index] = malloc(length_len);
@@ -189,7 +189,7 @@ void ShipType2Str(const Ship_Type_t type, char *str, const size_t str_len)
       case SHIP_SUBMARINE:
       case SHIP_BATTLESHIP:
       case SHIP_AIRCRAFT_CARRIER:
-         snprintf(str, str_len, "%s", SHIP_NAME[type][0]);
+         snprintf(str, str_len, "%c", SHIP_NAME[type][0]);
          break;
       case SHIP_NONE:
          snprintf(str, str_len, "%s", STR_STATE_BLANK);
@@ -250,7 +250,7 @@ void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense)
       else
       {
          printf("%*u", grid_meta.col_width, row + 1);
-         for (uint col = 0; col < GRID_SIZE; col++)
+         for (int col = 0; col < GRID_SIZE; col++)
          {
             Grid_State_t p = defense[row*GRID_SIZE + col];
             ShipType2Str(p.ship_type, ship_str, strlen(ship_str));
@@ -384,7 +384,7 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 #else
       printf("Enter option: ");
 #endif
-      ReadString(chosen_option_str, chosen_option_len, stdin);
+      ReadString(chosen_option_str, (int)chosen_option_len, stdin);
       parse_success = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
       if (chosen_option >= menu->num_options) parse_success = false;
       if (!parse_success) retries++;

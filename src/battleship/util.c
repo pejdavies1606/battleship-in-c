@@ -32,10 +32,8 @@ bool ParseUnsignedLong(const char *str, unsigned long *val)
 
     if (str == endstr)
        ret = false; // invalid  (no digits found, 0 returned)
-    else if (errno == ERANGE && *val == LONG_MIN)
-       ret = false; // invalid  (underflow occurred)
-    else if (errno == ERANGE && *val == LONG_MAX)
-       ret = false; // invalid  (overflow occurred)
+    else if (errno == ERANGE)
+       ret = false; // invalid  (underflow or overflow occurred)
     else if (errno == EINVAL)  /* not in all c99 implementations - gcc OK */
        ret = false; // invalid  (base contains unsupported value)
     else if (errno != 0 && *val == 0)
@@ -48,10 +46,10 @@ bool ParseUnsignedLong(const char *str, unsigned long *val)
     return ret;
 }
 
-int CalcMax(const int *data, size_t n)
+int CalcMax(const int *data, uint n)
 {
    int max = data[0];
-   for (int i = 0; i < n; i++)
+   for (uint i = 0; i < n; i++)
    {
       if (data[i] > max)
       {

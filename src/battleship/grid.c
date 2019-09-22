@@ -14,7 +14,7 @@ void Grid_Meta_Init(Grid_Meta_t* meta, size_t grid_size)
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   meta->col_width = CalcNumWidth(grid_size);
+   meta->col_width = (size_t)CalcNumWidth((int)grid_size);
 
    meta->corner_len = meta->col_width + SIZE_GRID_SPACE;
    String_t corner_char = STR_GRID_CORNER;

@@ -17,7 +17,7 @@ void Menu_Meta_Init(Menu_t *menu)
    //printf("\n%s\n", __FUNCTION__);
    //printf("title=%s\n", menu->title );
 #endif
-   menu->meta.column_width_index = CalcNumWidth(menu->num_options);
+   menu->meta.column_width_index = (uint)CalcNumWidth((int)menu->num_options);
 #ifndef NDEBUG
    //printf("index_width=%u\n", index_width );
 #endif
@@ -38,9 +38,7 @@ void Menu_Meta_Init(Menu_t *menu)
          //printf("option_widths[%u](%s)=%u\n", i, IF_NULL_VAL(menu->options[i],""), option_widths[i] );
 #endif
       }
-      uint option_width_max =
-         CalcMax(&option_widths[header_index*menu->num_options],
-               menu->num_options);
+      uint option_width_max = (uint)CalcMax((int*)&option_widths[header_index*menu->num_options], menu->num_options);
       if (option_width_max > header_widths[header_index])
       {
          column_widths[header_index] = option_width_max;
