@@ -1,6 +1,4 @@
 file(GLOB SRC_FILES "*.c")
 add_library (battleship STATIC ${SRC_FILES})
 add_definitions(-Wall -Wextra -Wconversion)
-include_directories (../conio21)
-link_directories (../conio21)
 target_link_libraries (battleship conio)

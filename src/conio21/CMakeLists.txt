@@ -1,3 +1,1 @@
-add_library (conio STATIC
-	conio.c	
-	)
+add_library (conio STATIC conio.c)

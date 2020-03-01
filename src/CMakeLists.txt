@@ -21,8 +21,8 @@ configure_file (
 	BattleShipConfig.h
 	)
 
-include_directories (battleship)
-link_directories (battleship)
+include_directories (battleship conio21)
+link_directories (battleship conio21)
 add_subdirectory (battleship)
 add_subdirectory (conio21)
 
