@@ -31,6 +31,7 @@ typedef enum
    SHIP_NONE
 } Ship_Type_t;
 
+// TODO convert to table in ship.h, see coord.h
 // ensure these arrays correspond with the enum above
 extern const String_t SHIP_NAME[NUM_SHIPS];
 extern const uint SHIP_LENGTH[NUM_SHIPS];

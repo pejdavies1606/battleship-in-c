@@ -50,6 +50,26 @@ void BattleShip_Game_Init(Game_t *game)
    BattleShip_UI_Init();
 }
 
+void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
+{
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
+   switch(choice.option)
+   {
+      case MENU_OPTION_SHIP_RETURN:
+         return;
+      case MENU_OPTION_SHIP_PLACE:
+         {
+            Coord_t location;
+            Heading_t heading;
+            BattleShip_UI_Read_Ship_Location_Heading(&location, &heading);
+            //Player_Place_Ship(player, choice.type);
+         }
+         break;
+   }
+}
+
 void Process_Place_Menu(Game_t *game, Place_Menu_Option_t choice)
 {
 #ifndef NDEBUG
@@ -66,7 +86,8 @@ void Process_Place_Menu(Game_t *game, Place_Menu_Option_t choice)
          //BattleShip_UI_Ship_Auto(); // TODO
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         BattleShip_UI_Ship_Menu(game->players[0].defense);
+         Process_Ship_Menu(&game->players[0],
+               BattleShip_UI_Ship_Menu(game->players[0].defense));
    }
 }
 

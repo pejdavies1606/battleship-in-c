@@ -7,6 +7,8 @@
 
 #include "player.h"
 
+static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_t type);
+
 Player_t Player_Init()
 {
 #ifndef NDEBUG
@@ -46,4 +48,32 @@ Player_t Player_Init()
    };
 
    return player;
+}
+
+void Player_Place_Ship(Player_t *player, Ship_Type_t type, Coord_t location, Heading_t heading)
+{
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
+   Ship_t *ship = Player_Get_Ship(player, type);
+   if (ship)
+   {
+      ship->location = location;
+      ship->heading = heading;
+   }
+}
+
+static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_t type)
+{
+   if (player)
+   {
+      for (uint i = 0; i < NUM_SHIPS; i++)
+      {
+         if (type == player->ships[i].type)
+         {
+            return &player->ships[i];
+         }
+      }
+   }
+   return NULL;
 }

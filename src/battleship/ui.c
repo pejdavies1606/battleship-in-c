@@ -11,6 +11,7 @@
 #include "ship.h"
 #include "grid.h"
 #include "util.h"
+#include "input.h"
 #include "ui.h"
 
 #ifndef NDEBUG
@@ -31,7 +32,12 @@
 #define NUM_PLACE_MENU_HEADERS 1
 #define NUM_SHIP_MENU_HEADERS 2
 
-#define IF_NULL_BLANK(s) ( (NULL == s) ? "" : s)
+static int BattleShip_UI_Read(
+   String_t prompt,
+   size_t option_len,
+   uint option_max,
+   uint *choice,
+   InputParser_t InputParser);
 
 static String_t main_menu_headers[NUM_MAIN_MENU_HEADERS] =
 {
@@ -180,6 +186,7 @@ void BattleShip_UI_Print_Logo(void)
 #endif
 }
 
+// TODO convert to table in ship.h
 void ShipType2Str(const Ship_Type_t type, char *str, const size_t str_len)
 {
    switch(type)
@@ -314,21 +321,25 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu(const Grid_State_t *defense)
    return choice;
 }
 
-Ship_Menu_Option_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense)
+Ship_Menu_Choice_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   Ship_Menu_Option_t choice = MENU_OPTION_SHIP_RETURN;
+   Ship_Menu_Option_t option = MENU_OPTION_SHIP_RETURN;
    bool read_success = false;
    while(!read_success)
    {
       clrscr();
       BattleShip_UI_Print_Defense_Grid(defense);
       BattleShip_UI_Print_Menu(&ship_menu);
-      read_success = BattleShip_UI_Read_Menu(&ship_menu, (uint*) &choice);
+      read_success = BattleShip_UI_Read_Menu(&ship_menu, (uint*) &option);
    }
-   return choice;
+   return (Ship_Menu_Choice_t)
+   {
+      (option == MENU_OPTION_SHIP_RETURN) ? option : MENU_OPTION_SHIP_PLACE,
+      (Ship_Type_t) (option - 1)
+   };
 }
 
 void BattleShip_UI_Print_Menu(Menu_t *menu)
@@ -380,7 +391,7 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
    while (!parse_success && retries < MAX_READ_RETRIES)
    {
 #ifndef NDEBUG
-      printf("[%d]Enter option: ", retries);
+      printf("%d Enter option: ", retries);
 #else
       printf("Enter option: ");
 #endif
@@ -391,5 +402,82 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
    }
    free(chosen_option_str);
    *choice = chosen_option;
+   return !(retries == MAX_READ_RETRIES);
+}
+
+bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *heading)
+{
+#ifndef NDEBUG
+   printf("\n%s\n", __FUNCTION__);
+#endif
+   if (!location || !heading)
+   {
+      return false;
+   }
+   //printf("Enter %s: ", "<A-J> <1-10> <N|E|S|W>");
+   printf("Enter %s: ", "<0+> <0+> <0+>");
+   char buf[8];
+   ReadString(buf, sizeof(buf), stdin);
+   bool parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
+   printf("%d %d %u\n", location->col, location->row, *heading);
+   /*parse_success |= BattleShip_UI_Read("col", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
+         (uint*) &location->col, NULL);
+   parse_success |= BattleShip_UI_Read("row", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
+         (uint*) &location->row, NULL);*/
+   /*parse_success |= BattleShip_UI_Read("hdg", (size_t) LEN_HEADING, NUM_HEADINGS,
+         (uint*) &heading, &ValidateHeading);*/
+   return parse_success;
+}
+
+static int BattleShip_UI_Read(
+   String_t prompt,
+   size_t option_len,
+   uint option_max,
+   uint *choice,
+   InputParser_t InputParser)
+{
+   if (!choice)
+   {
+      return false;
+   }
+   size_t chosen_option_len = option_len + 1;
+   String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );
+   uint chosen_option = UINT_MAX;
+   if (option_max == 0)
+   {
+      option_max = UINT_MAX;
+   }
+   int retries = 0;
+   bool parse_success = false;
+   while (!parse_success && retries < MAX_READ_RETRIES)
+   {
+#ifndef NDEBUG
+      printf("%d Enter %s: ", retries, prompt);
+#else
+      printf("Enter %s: ", prompt);
+#endif
+      ReadString(chosen_option_str, (int) chosen_option_len, stdin);
+      if (InputParser)
+      {
+         parse_success = InputParser(chosen_option_str, (unsigned long*) &chosen_option);
+      }
+      else
+      {
+         parse_success = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
+      }
+      if (chosen_option >= option_max)
+      {
+         parse_success = false;
+      }
+      if (!parse_success)
+      {
+         retries++;
+      }
+   }
+   free(chosen_option_str);
+   if (InputParser)
+   {
+      *choice = chosen_option;
+   }
    return !(retries == MAX_READ_RETRIES);
 }
