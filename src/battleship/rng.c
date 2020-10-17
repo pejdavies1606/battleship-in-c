@@ -6,8 +6,16 @@
  */
 
 #include "rng.h"
+#include <time.h>
 
-void Rng_Init()
+void Rng_Init(uint seed)
 {
-	// TODO
+	if (seed == 0)
+	{
+		srand(time(NULL));
+	}
+	else
+	{
+		srand(seed);
+	}
 }

@@ -5,8 +5,8 @@
  *      Author: pejdavies1606
  */
 
-#ifndef _UTIL_H_
-#define _UTIL_H_
+#ifndef UTIL_H_
+#define UTIL_H_
 
 #include "commondefs.h"
 
@@ -16,4 +16,4 @@ int CalcMax(const int *data, uint n);
 int CalcNumWidth(int n);
 int RepeatChar(String_t line, size_t size_line, char elem);
 
-#endif /* _UTIL_H_ */
+#endif /* UTIL_H_ */

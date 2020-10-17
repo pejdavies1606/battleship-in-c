@@ -11,30 +11,15 @@
 #include "commondefs.h"
 #include "coord.h"
 
-// Ship             Length
-// Destroyer        2
-// Cruiser          3
-// Submarine        3
-// Battleship       4
-// Aircraft Carrier 5
-
-// must match enum below, minus SHIP_NONE
-#define NUM_SHIPS 5
-
 typedef enum
 {
+   SHIP_NONE,
    SHIP_DESTROYER,
    SHIP_CRUISER,
    SHIP_SUBMARINE,
    SHIP_BATTLESHIP,
-   SHIP_AIRCRAFT_CARRIER,
-   SHIP_NONE
+   SHIP_AIRCRAFT_CARRIER
 } Ship_Type_t;
-
-// TODO convert to table in ship.h, see coord.h
-// ensure these arrays correspond with the enum above
-extern const String_t SHIP_NAME[NUM_SHIPS];
-extern const uint SHIP_LENGTH[NUM_SHIPS];
 
 typedef struct
 {
@@ -44,6 +29,78 @@ typedef struct
    uint hits;
 } Ship_t;
 
-Ship_t Ship_Init( Ship_Type_t type );
+typedef struct
+{
+   Ship_Type_t type;
+   String_t name;
+   uint length;
+} Ship_Info_t;
+
+static const Ship_Info_t shipTable[] =
+{
+   { SHIP_DESTROYER,          "Destroyer",         2 },
+   { SHIP_CRUISER,            "Cruiser",           3 },
+   { SHIP_SUBMARINE,          "Submarine",         3 },
+   { SHIP_BATTLESHIP,         "Battleship",        4 },
+   { SHIP_AIRCRAFT_CARRIER,   "Aircraft Carrier",  5 }
+};
+
+#define NUM_SHIPS ARRAY_LEN(shipTable)
+
+static inline const Ship_Info_t * Ship_Get_Info(const Ship_Type_t type)
+{
+   for (uint i = 0; i < NUM_SHIPS; i++)
+   {
+      if (type == shipTable[i].type)
+      {
+         return &shipTable[i];
+      }
+   }
+   return NULL;
+}
+
+static inline const uint * Ship_Get_Length_Array(void)
+{
+   uint *ship_length = malloc(sizeof(uint) * NUM_SHIPS);
+   for (uint i = 0; i < NUM_SHIPS; i++)
+   {
+      ship_length[i] = shipTable[i].length;
+   }
+   return ship_length;
+}
+
+static inline Coord_t Ship_Get_Point(const Ship_t *ship, const uint i)
+{
+   Coord_t point = Coord_Init(0, 0);
+   if (ship)
+   {
+      point = ship->location;
+      switch (ship->heading)
+      {
+      case HEADING_NORTH:
+         point.col -= (int) i;
+         break;
+      case HEADING_EAST:
+         point.row += (int) i;
+         break;
+      case HEADING_SOUTH:
+         point.col += (int) i;
+         break;
+      case HEADING_WEST:
+         point.row -= (int) i;
+         break;
+      }
+   }
+   return point;
+}
+
+static inline Ship_t Ship_Init(const Ship_Type_t type)
+{
+   Ship_t ship =
+   {
+      .type = type
+   };
+   return ship;
+}
 
 #endif /* BATTLESHIP_SHIP_H_ */

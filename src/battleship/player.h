@@ -11,30 +11,18 @@
 #include "ship.h"
 #include "commondefs.h"
 #include "scoreboard.h"
+#include "grid.h"
 
 #define GRID_SIZE 10
 
-typedef enum
-{
-   STATE_BLANK,
-   STATE_HIT,
-   STATE_MISS
-} Hit_State_t;
-
 typedef struct
 {
-   Ship_Type_t ship_type;
-   Hit_State_t hit_state;
-} Grid_State_t;
-
-typedef struct
-{
-   Grid_State_t *defense;
-   Hit_State_t *offense;
+   Grid_t grid;
    Ship_t *ships;
    Scoreboard_t scoreboard_ship_health;
 } Player_t;
 
 Player_t Player_Init();
+Grid_Status_t Player_Place_Ship(Player_t *player, Ship_t *ship);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

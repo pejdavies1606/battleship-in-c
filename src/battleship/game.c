@@ -16,6 +16,7 @@
 #include "game.h"
 #include "window.h"
 #include "ui.h"
+#include "rng.h"
 
 #include <string.h>
 
@@ -29,28 +30,57 @@
 //static _Bool sunk, two_ai = false, configExist;
 //static _Bool p1sunk[NUM_SHIPS], p2sunk[NUM_SHIPS];
 
+static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice);
+static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice);
+static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice);
+
 void BattleShip_Game_Init(Game_t *game)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   Window_Init(POS_WINDOW_X, POS_WINDOW_Y, SIZE_WINDOW_W, SIZE_WINDOW_H);
-   Rng_Init();
+   Window_Init(
+      POS_WINDOW_X, POS_WINDOW_Y,
+      SIZE_WINDOW_W, SIZE_WINDOW_H);
+#ifndef NDEBUG
+   Rng_Init(1606);
+#else
+   Rng_Init(0);
+#endif
 
-   Scoreboard_Init(&game->scoreboard_hit_score,
-                   SCOREBOARD_HITS_TITLE,
-                   NUM_PLAYERS,
-                   SCOREBOARD_HITS_SCORE_WIDTH,
-                   SCOREBOARD_HITS_SCORE_WIDTH);
-
-   for (uint i = 0; i < NUM_PLAYERS; i++)
+   if (game)
    {
-      game->players[i] = Player_Init();
+      memset(game, 0, sizeof(Game_t));
+
+      Scoreboard_Init(
+         &game->scoreboard_hit_score,
+         SCOREBOARD_HITS_TITLE,
+         NUM_PLAYERS,
+         SCOREBOARD_HITS_SCORE_WIDTH,
+         SCOREBOARD_HITS_SCORE_WIDTH);
+
+      game->players = malloc(NUM_PLAYERS * sizeof(Player_t));
+      if (game->players)
+      {
+         for (uint i = 0; i < NUM_PLAYERS; i++)
+         {
+            game->players[i] = Player_Init();
+         }
+      }
    }
    BattleShip_UI_Init();
 }
 
-void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
+void BattleShip_Game_Start(Game_t *game)
+{
+   if (game)
+   {
+      // TODO while loop
+      Process_Main_Menu(&game->players[0], BattleShip_UI_Main_Menu(""));
+   }
+}
+
+static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
@@ -58,40 +88,82 @@ void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
    switch(choice.option)
    {
       case MENU_OPTION_SHIP_RETURN:
-         return;
+         Process_Place_Menu(player,
+            BattleShip_UI_Place_Menu(player->grid.defense));
+         break;
       case MENU_OPTION_SHIP_PLACE:
          {
             Coord_t location;
             Heading_t heading;
             BattleShip_UI_Read_Ship_Location_Heading(&location, &heading);
-            //Player_Place_Ship(player, choice.type);
+            Ship_t ship = (Ship_t)
+            {
+               .type = choice.type,
+               .location = location,
+               .heading = heading
+            };
+            Player_Place_Ship(player, &ship);
          }
          break;
    }
 }
 
-void Process_Place_Menu(Game_t *game, Place_Menu_Option_t choice)
+static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   switch(choice)
+   if (player)
    {
+      switch (choice)
+      {
       case MENU_OPTION_PLACE_RETURN:
          return;
       case MENU_OPTION_PLACE_HELP:
          //BattleShip_UI_Print_Place_Help(); // TODO
          break;
       case MENU_OPTION_PLACE_AUTO:
-         //BattleShip_UI_Ship_Auto(); // TODO
+         //BattleShip_UI_Ship_Auto(player);
+         // TODO confirm yes/no
+         {
+            //Grid_Clear_Defense(player->grid);
+            Grid_t *grid = &player->grid;
+            if (grid)
+            {
+               memset(grid->defense, 0, grid->rows * grid->cols * sizeof(Grid_State_t));
+            }
+            for (uint i = 0; i < NUM_SHIPS; i++)
+            {
+               Grid_Status_t status = GRID_STATUS_UNKNOWN;
+               do
+               {
+                  Coord_t location = Coord_Init_Random(
+                      0, GRID_SIZE,
+                      0, GRID_SIZE);
+                  Heading_t heading = Heading_Init_Random();
+                  Ship_t ship = (Ship_t)
+                  {
+                     .type = shipTable[i].type,
+                     .location = location,
+                     .heading = heading
+                  };
+                  status = Player_Place_Ship(player, &ship);
+               }
+               // TODO add status for null pointer exception
+               while (GRID_STATUS_OK != status);
+            }
+            Process_Place_Menu(player,
+                               BattleShip_UI_Place_Menu(player->grid.defense));
+         }
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         Process_Ship_Menu(&game->players[0],
-               BattleShip_UI_Ship_Menu(game->players[0].defense));
+         Process_Ship_Menu(player,
+                           BattleShip_UI_Ship_Menu_Manual(player->grid.defense));
+      }
    }
 }
 
-void Process_Main_Menu(Game_t *game, Main_Menu_Option_t choice)
+static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
@@ -101,8 +173,8 @@ void Process_Main_Menu(Game_t *game, Main_Menu_Option_t choice)
       case MENU_OPTION_MAIN_RETURN:
          return;
       case MENU_OPTION_MAIN_PLACE:
-         Process_Place_Menu(game,
-               BattleShip_UI_Place_Menu(game->players[0].defense));
+         Process_Place_Menu(player,
+               BattleShip_UI_Place_Menu(player->grid.defense));
          break;
       case MENU_OPTION_MAIN_BEGIN:
          break;
@@ -112,21 +184,6 @@ void Process_Main_Menu(Game_t *game, Main_Menu_Option_t choice)
          break;
    }
 }
-
-void BattleShip_Game_Start(Game_t *game)
-{
-   //while(1) // menu loop
-   //{
-      Process_Main_Menu(game, BattleShip_UI_Main_Menu(""));
-   //}
-}
-
-// set ship data (x,y,z) such that all ships are on the grid and no ships overlap
-// begin with longest ship, and fit others around existing ships
-/*void BattleShip_Set_Random_Ships()
-{
-   // TODO
-}*/
 
 // Identify which ship was hit and determine if it has been sunk.
 /*void BattleShip_Identify_Ship()

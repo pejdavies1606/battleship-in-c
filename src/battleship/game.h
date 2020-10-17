@@ -13,7 +13,6 @@
 
 #include "ship.h"
 #include "commondefs.h"
-#include "rng.h"
 #include "scoreboard.h"
 
 #define NUM_PLAYERS  2
@@ -32,7 +31,7 @@
 
 typedef struct
 {
-   Player_t players[NUM_PLAYERS];
+   Player_t *players;
    Comp_Player_t comps[NUM_PLAYERS];
    Scoreboard_t scoreboard_hit_score;
 } Game_t;

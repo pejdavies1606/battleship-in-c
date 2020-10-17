@@ -5,15 +5,12 @@
  *      Author: pejdavies1606
  */
 
-#ifndef _COORD_H_
-#define _COORD_H_
+#ifndef COORD_H_
+#define COORD_H_
 
 #include <string.h>
 #include "commondefs.h"
 #include "input.h"
-
-#define INIT_ROW 0
-#define INIT_COL 0
 
 typedef struct
 {
@@ -23,10 +20,10 @@ typedef struct
 
 typedef enum
 {
-   NORTH,
-   EAST,
-   SOUTH,
-   WEST
+   HEADING_NORTH,
+   HEADING_EAST,
+   HEADING_SOUTH,
+   HEADING_WEST
 } Heading_t;
 
 typedef struct
@@ -37,19 +34,18 @@ typedef struct
 
 static const HeadingInfo_t headingTable[] =
 {
-   { NORTH, "N" },
-   { EAST,  "E" },
-   { SOUTH, "S" },
-   { WEST,  "W" }
+   { HEADING_NORTH, "N" },
+   { HEADING_EAST,  "E" },
+   { HEADING_SOUTH, "S" },
+   { HEADING_WEST,  "W" }
 };
 
 #define NUM_HEADINGS ARRAY_LEN(headingTable)
 #define LEN_HEADING 1
 
-static inline const String_t Heading_Get_Str(Heading_t hdg)
+static inline String_t Heading_Get_Str(Heading_t hdg)
 {
-   uint i;
-   for (i = 0; i < NUM_HEADINGS; i++)
+   for (uint i = 0; i < NUM_HEADINGS; i++)
    {
       if (hdg == headingTable[i].hdg)
       {
@@ -65,8 +61,7 @@ static inline bool ValidateHeading(const String_t input)
    {
       return false;
    }
-   uint i;
-   for (i = 0; i < NUM_HEADINGS; i++)
+   for (uint i = 0; i < NUM_HEADINGS; i++)
    {
       if (0 == strncmp(input, headingTable[i].str, LEN_HEADING))
       {
@@ -76,6 +71,20 @@ static inline bool ValidateHeading(const String_t input)
    return false;
 }
 
-Coord_t Coord_Init();
+static inline Coord_t Coord_Init(int row, int col)
+{
+   Coord_t coord =
+   {
+      .row = row,
+      .col = col
+   };
+   return coord;
+}
 
-#endif /* _COORD_H_ */
+Coord_t Coord_Init_Random(
+   int row_min, int row_max,
+   int col_min, int col_max);
+
+Heading_t Heading_Init_Random();
+
+#endif /* COORD_H_ */

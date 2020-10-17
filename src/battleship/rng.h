@@ -8,6 +8,8 @@
 #ifndef RNG_H_
 #define RNG_H_
 
-void Rng_Init();
+#include "commondefs.h"
+
+void Rng_Init(uint seed);
 
 #endif /* RNG_H_ */

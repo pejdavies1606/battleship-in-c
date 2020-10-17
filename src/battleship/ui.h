@@ -61,7 +61,6 @@ typedef struct
    Ship_Type_t          type;
 } Ship_Menu_Choice_t;
 
-
 void BattleShip_UI_Init();
 
 void BattleShip_UI_Print_Logo();
@@ -71,7 +70,7 @@ void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense);
 
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message);
 Place_Menu_Option_t BattleShip_UI_Place_Menu();
-Ship_Menu_Choice_t BattleShip_UI_Ship_Menu(const Grid_State_t *defense);
+Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_State_t *defense);
 void BattleShip_UI_Print_Place_Help();
 void BattleShip_UI_Ship_Auto();
 
