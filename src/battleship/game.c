@@ -34,7 +34,7 @@ static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice);
 static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice);
 static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice);
 
-void BattleShip_Game_Init(Game_t *game)
+Game_t * BattleShip_Game_Init(void)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
@@ -48,27 +48,35 @@ void BattleShip_Game_Init(Game_t *game)
    Rng_Init(0);
 #endif
 
-   if (game)
+   Game_t *game = malloc(sizeof(Game_t));
+   if (!game)
    {
-      memset(game, 0, sizeof(Game_t));
-
-      Scoreboard_Init(
-         &game->scoreboard_hit_score,
-         SCOREBOARD_HITS_TITLE,
-         NUM_PLAYERS,
-         SCOREBOARD_HITS_SCORE_WIDTH,
-         SCOREBOARD_HITS_SCORE_WIDTH);
-
-      game->players = malloc(NUM_PLAYERS * sizeof(Player_t));
-      if (game->players)
-      {
-         for (uint i = 0; i < NUM_PLAYERS; i++)
-         {
-            game->players[i] = Player_Init();
-         }
-      }
+      return NULL;
    }
+   memset(game, 0, sizeof(Game_t));
+
+   game->ship_health.title = "Ship Health";
+   Scoreboard_Init(&game->ship_health, NUM_SHIPS);
+   for (uint i = 0; i < NUM_SHIPS; i++)
+   {
+      const Ship_Info_t ship_info = shipTable[i];
+      game->ship_health.entities[i].name = ship_info.name;
+      game->ship_health.entities[i].total = ship_info.length;
+   }
+
+   game->hit_score.title = SCOREBOARD_HITS_TITLE;
+   game->hit_score.num_entities = NUM_PLAYERS;
+   game->hit_score.width_score = SCOREBOARD_HITS_SCORE_WIDTH;
+   game->hit_score.width_total = SCOREBOARD_HITS_SCORE_WIDTH;
+
+   game->players = Player_Init(NUM_PLAYERS);
+   if (!game->players)
+   {
+      return NULL;
+   }
+
    BattleShip_UI_Init();
+   return game;
 }
 
 void BattleShip_Game_Start(Game_t *game)
@@ -89,7 +97,7 @@ static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
    {
       case MENU_OPTION_SHIP_RETURN:
          Process_Place_Menu(player,
-            BattleShip_UI_Place_Menu(player->grid.defense));
+            BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_SHIP_PLACE:
          {
@@ -123,7 +131,7 @@ static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
          //BattleShip_UI_Print_Place_Help(); // TODO
          break;
       case MENU_OPTION_PLACE_AUTO:
-         //BattleShip_UI_Ship_Auto(player);
+         //Player_Place_Ships_Auto(player);
          // TODO confirm yes/no
          {
             //Grid_Clear_Defense(player->grid);
@@ -149,16 +157,17 @@ static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
                   };
                   status = Player_Place_Ship(player, &ship);
                }
-               // TODO add status for null pointer exception
-               while (GRID_STATUS_OK != status);
+               while (
+                  GRID_STATUS_BORDER    == status ||
+                  GRID_STATUS_COLLISION == status );
             }
             Process_Place_Menu(player,
-                               BattleShip_UI_Place_Menu(player->grid.defense));
+                               BattleShip_UI_Place_Menu(&player->grid));
          }
          break;
       case MENU_OPTION_PLACE_MANUAL:
          Process_Ship_Menu(player,
-                           BattleShip_UI_Ship_Menu_Manual(player->grid.defense));
+                           BattleShip_UI_Ship_Menu_Manual(&player->grid));
       }
    }
 }
@@ -174,7 +183,7 @@ static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice)
          return;
       case MENU_OPTION_MAIN_PLACE:
          Process_Place_Menu(player,
-               BattleShip_UI_Place_Menu(player->grid.defense));
+               BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_MAIN_BEGIN:
          break;

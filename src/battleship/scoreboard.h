@@ -26,17 +26,6 @@ typedef struct
    uint width_total;
 } Scoreboard_t;
 
-void Scoreboard_Init(Scoreboard_t *board,
-                     String_t title,
-                     uint num_entities,
-                     uint width_score,
-                     uint width_total);
-
-void Scoreboard_Init_Entities(Scoreboard_t *board,
-                              Scoreboard_Entity_t *const entities);
-
-Scoreboard_Entity_t Scoreboard_Entity_Init(String_t name,
-                                           uint score,
-                                           uint total);
+Status_t Scoreboard_Init(Scoreboard_t *scoreboard, uint num_entities);
 
 #endif /* SCOREBOARD_H_ */

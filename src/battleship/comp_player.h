@@ -12,18 +12,18 @@
 
 typedef struct
 {
-	uint stage;
-	uint pass;
-	uint scan_stage;
-	uint start;
-	int clock;
-	uint pos;
-	int line_pos;
-	Coord_t centre;
-	Coord_t try;
-	Coord_t adjacent[NUM_ADJACENT];
-	Coord_t line[NUM_LINE];
-	_Bool first_time;
+   uint stage;
+   uint pass;
+   uint scan_stage;
+   uint start;
+   int clock;
+   uint pos;
+   int line_pos;
+   Coord_t centre;
+   Coord_t target;
+   Coord_t adjacent[NUM_ADJACENT];
+   Coord_t line[NUM_LINE];
+   bool first_time;
 } Comp_Player_t;
 
 #endif /* BATTLESHIP_COMP_PLAYER_H_ */

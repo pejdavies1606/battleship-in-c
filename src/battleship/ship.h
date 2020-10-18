@@ -94,13 +94,6 @@ static inline Coord_t Ship_Get_Point(const Ship_t *ship, const uint i)
    return point;
 }
 
-static inline Ship_t Ship_Init(const Ship_Type_t type)
-{
-   Ship_t ship =
-   {
-      .type = type
-   };
-   return ship;
-}
+Ship_t * Ship_Init(uint num_ships);
 
 #endif /* BATTLESHIP_SHIP_H_ */

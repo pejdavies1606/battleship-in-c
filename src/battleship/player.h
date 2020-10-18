@@ -19,10 +19,9 @@ typedef struct
 {
    Grid_t grid;
    Ship_t *ships;
-   Scoreboard_t scoreboard_ship_health;
 } Player_t;
 
-Player_t Player_Init();
+Player_t * Player_Init(uint num_players);
 Grid_Status_t Player_Place_Ship(Player_t *player, Ship_t *ship);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

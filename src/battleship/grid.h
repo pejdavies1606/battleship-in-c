@@ -27,8 +27,8 @@ typedef struct
 {
    Grid_State_t *defense;
    Hit_State_t *offense;
-   size_t rows;
-   size_t cols;
+   uint rows;
+   uint cols;
 } Grid_t;
 
 typedef enum
@@ -36,6 +36,7 @@ typedef enum
    GRID_STATUS_OK          = 0x0,
    GRID_STATUS_BORDER      = 0x1,
    GRID_STATUS_COLLISION   = 0x2,
+   GRID_STATUS_NULL        = 0xE,
    GRID_STATUS_UNKNOWN     = 0xF
 } Grid_Status_t;
 
@@ -49,8 +50,13 @@ typedef struct
 } Grid_Meta_t;
 
 void Grid_Meta_Init(Grid_Meta_t* meta, size_t col_size);
-Grid_State_t * Grid_Init_Defense(size_t row_size, size_t col_size);
-Hit_State_t * Grid_Init_Offense(size_t row_size, size_t col_size);
+
+Status_t Grid_Init_Defense(Grid_t *grid);
+Status_t Grid_Init_Offense(Grid_t *grid);
+
+void Grid_Clear_Defense(const Grid_t *grid);
+void Grid_Clear_Offense(const Grid_t *grid);
+
 Grid_Status_t Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship);
 
 #endif /* BATTLESHIP_GRID_H_ */

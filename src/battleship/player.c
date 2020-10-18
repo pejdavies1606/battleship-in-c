@@ -9,47 +9,48 @@
 
 static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_t type);
 
-Player_t Player_Init(void)
+Player_t * Player_Init(uint num_players)
 {
 #ifndef NDEBUG
    printf("\n%s\n", __FUNCTION__);
 #endif
-   Ship_t *ships =
-      malloc(NUM_SHIPS * sizeof(Ship_t));
-   memset(ships, 0, NUM_SHIPS * sizeof(Ship_t));
-   Scoreboard_Entity_t *ship_health =
-      malloc(NUM_SHIPS * sizeof(Scoreboard_Entity_t));
-   memset(ships, 0, NUM_SHIPS * sizeof(Scoreboard_Entity_t));
-   for (uint i = 0; i < NUM_SHIPS; i++)
+
+   Player_t *players = malloc(num_players * sizeof(Player_t));
+   if (!players)
    {
-      const Ship_Info_t ship_info = shipTable[i];
-      ships[i].type = ship_info.type;
-      ship_health[i] = Scoreboard_Entity_Init(
-         ship_info.name, 0, ship_info.length);
+      return NULL;
+   }
+   memset(players, 0, num_players * sizeof(Player_t));
+
+   for (uint p = 0; p < num_players; p++)
+   {
+      Player_t *player = &players[p];
+      player->ships = Ship_Init(NUM_SHIPS);
+      if (!player->ships)
+      {
+         return NULL;
+      }
+
+      for (uint i = 0; i < NUM_SHIPS; i++)
+      {
+         player->ships[i].type = shipTable[i].type;
+      }
+
+      player->grid.rows = GRID_SIZE;
+      player->grid.cols = GRID_SIZE;
+
+      if (STATUS_OK != Grid_Init_Defense(&player->grid))
+      {
+         return NULL;
+      }
+
+      if (STATUS_OK != Grid_Init_Offense(&player->grid))
+      {
+         return NULL;
+      }
    }
 
-   Scoreboard_t scoreboard_ship_health =
-   {
-      .num_entities = NUM_SHIPS,
-      .entities = ship_health
-   };
-
-   Grid_t grid =
-   {
-      .defense = Grid_Init_Defense(GRID_SIZE, GRID_SIZE),
-      .offense = Grid_Init_Offense(GRID_SIZE, GRID_SIZE),
-      .rows = GRID_SIZE,
-      .cols = GRID_SIZE,
-   };
-
-   Player_t player =
-   {
-      .grid = grid,
-      .ships = ships,
-      .scoreboard_ship_health = scoreboard_ship_health
-   };
-
-   return player;
+   return players;
 }
 
 Grid_Status_t Player_Place_Ship(Player_t *player, Ship_t *ship)

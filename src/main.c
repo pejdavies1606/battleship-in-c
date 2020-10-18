@@ -20,9 +20,12 @@ int main(int argc, char *argv[])
 #endif
    setvbuf(stdout, NULL, _IONBF, 0); // No buffering
 
-   Game_t game;
-   BattleShip_Game_Init(&game);
-   BattleShip_Game_Start(&game);
+   Game_t *game = BattleShip_Game_Init();
+   if (!game)
+   {
+      return STATUS_ERROR;
+   }
+   BattleShip_Game_Start(game);
 
    puts("done");
    getchar();

@@ -32,11 +32,12 @@
 typedef struct
 {
    Player_t *players;
-   Comp_Player_t comps[NUM_PLAYERS];
-   Scoreboard_t scoreboard_hit_score;
+   Comp_Player_t *comps;
+   Scoreboard_t ship_health;
+   Scoreboard_t hit_score;
 } Game_t;
 
-void BattleShip_Game_Init();
+Game_t * BattleShip_Game_Init();
 void BattleShip_Game_Start();
 
 #endif /* BATTLESHIP_GAME_H_ */

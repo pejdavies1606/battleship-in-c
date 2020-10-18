@@ -12,7 +12,7 @@ void Rng_Init(uint seed)
 {
 	if (seed == 0)
 	{
-		srand(time(NULL));
+		srand((uint) time(NULL));
 	}
 	else
 	{

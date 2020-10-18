@@ -64,15 +64,12 @@ typedef struct
 void BattleShip_UI_Init();
 
 void BattleShip_UI_Print_Logo();
-void BattleShip_UI_Print_Defense_Grid(const Grid_State_t *defense);
-//void BattleShip_UI_Print_Offense_Grid(const Hit_State_t *offense);
-//void BattleShip_UI_Print_Both_Grids(const Grid_State_t *defense, const Hit_State_t *offense);
+Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid);
 
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message);
 Place_Menu_Option_t BattleShip_UI_Place_Menu();
-Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_State_t *defense);
+Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid);
 void BattleShip_UI_Print_Place_Help();
-void BattleShip_UI_Ship_Auto();
 
 void BattleShip_UI_Print_Menu(Menu_t *menu);
 void BattleShip_UI_Print_Ship_Menu(Menu_t *menu);

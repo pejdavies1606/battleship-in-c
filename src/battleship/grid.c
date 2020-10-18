@@ -11,18 +11,62 @@
 
 static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship);
 
-Grid_State_t * Grid_Init_Defense(size_t row_size, size_t col_size)
+Status_t Grid_Init_Defense(Grid_t *grid)
 {
-   Grid_State_t *defense = malloc(row_size * col_size * sizeof(Grid_State_t));
-   memset(defense, 0, row_size * col_size * sizeof(Grid_State_t));
-   return defense;
+   Status_t status = STATUS_OK;
+   if (grid)
+   {
+      grid->defense = malloc(
+         grid->rows *
+         grid->cols *
+         sizeof(Grid_State_t));
+      if (!grid->defense)
+      {
+         status = STATUS_ERROR;
+      }
+      else
+      {
+         Grid_Clear_Defense(grid);
+      }
+   }
+   return status;
 }
 
-Hit_State_t * Grid_Init_Offense(size_t row_size, size_t col_size)
+Status_t Grid_Init_Offense(Grid_t *grid)
 {
-   Hit_State_t *offense = malloc(row_size * col_size * sizeof(Hit_State_t));
-   memset(offense, 0, row_size * col_size * sizeof(Hit_State_t));
-   return offense;
+   Status_t status = STATUS_OK;
+   if (grid)
+   {
+      grid->offense = malloc(
+         grid->rows *
+         grid->cols *
+         sizeof(Hit_State_t));
+      if (!grid->offense)
+      {
+         status = STATUS_ERROR;
+      }
+      else
+      {
+         Grid_Clear_Offense(grid);
+      }
+   }
+   return status;
+}
+
+void Grid_Clear_Defense(const Grid_t *grid)
+{
+   if (grid && grid->defense)
+   {
+      memset(grid->defense, 0, grid->rows * grid->cols * sizeof(Grid_State_t));
+   }
+}
+
+void Grid_Clear_Offense(const Grid_t *grid)
+{
+   if (grid && grid->offense)
+   {
+      memset(grid->offense, 0, grid->rows * grid->cols * sizeof(Hit_State_t));
+   }
 }
 
 void Grid_Meta_Init(Grid_Meta_t* meta, size_t col_size)
