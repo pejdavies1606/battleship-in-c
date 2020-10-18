@@ -51,6 +51,7 @@ typedef struct
 
 void Grid_Meta_Init(Grid_Meta_t* meta, size_t col_size);
 
+Status_t Grid_Init(Grid_t *grid, uint rows, uint cols);
 Status_t Grid_Init_Defense(Grid_t *grid);
 Status_t Grid_Init_Offense(Grid_t *grid);
 

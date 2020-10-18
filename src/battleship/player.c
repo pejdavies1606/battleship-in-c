@@ -36,15 +36,7 @@ Player_t * Player_Init(uint num_players)
          player->ships[i].type = shipTable[i].type;
       }
 
-      player->grid.rows = GRID_SIZE;
-      player->grid.cols = GRID_SIZE;
-
-      if (STATUS_OK != Grid_Init_Defense(&player->grid))
-      {
-         return NULL;
-      }
-
-      if (STATUS_OK != Grid_Init_Offense(&player->grid))
+      if (STATUS_OK != Grid_Init(&player->grid, GRID_SIZE, GRID_SIZE))
       {
          return NULL;
       }
