@@ -11,10 +11,6 @@ static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_t type);
 
 Player_t * Player_Init(uint num_players)
 {
-#ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
-#endif
-
    Player_t *players = malloc(num_players * sizeof(Player_t));
    if (!players)
    {
@@ -47,7 +43,7 @@ Player_t * Player_Init(uint num_players)
 
 Grid_Status_t Player_Place_Ship(Player_t *player, Ship_t *ship)
 {
-  Grid_Status_t status = GRID_STATUS_UNKNOWN;
+  Grid_Status_t status = GRID_STATUS_NULL;
    if (player && ship)
    {
       Ship_t *player_ship = Player_Get_Ship(player, ship->type);
@@ -58,6 +54,38 @@ Grid_Status_t Player_Place_Ship(Player_t *player, Ship_t *ship)
       }
    }
    return status;
+}
+
+Status_t Player_Place_Ships_Auto(Player_t *player)
+{
+   if (!player)
+   {
+      return STATUS_ERROR;
+   }
+   Grid_Clear_Defense(&player->grid);
+   for (uint i = 0; i < NUM_SHIPS; i++)
+   {
+      Grid_Status_t status = GRID_STATUS_UNKNOWN;
+      do
+      {
+         Coord_t location = Coord_Init_Random(
+             0, (int) player->grid.rows,
+             0, (int) player->grid.cols);
+         Heading_t heading = Heading_Init_Random();
+         Ship_t ship = (Ship_t){
+             .type = shipTable[i].type,
+             .location = location,
+             .heading = heading};
+         status = Player_Place_Ship(player, &ship);
+      } while (
+          GRID_STATUS_BORDER    & status ||
+          GRID_STATUS_COLLISION & status);
+      if (GRID_STATUS_NULL == status)
+      {
+         return STATUS_ERROR;
+      }
+   }
+   return STATUS_OK;
 }
 
 static Ship_t * Player_Get_Ship(Player_t *player, Ship_Type_t type)

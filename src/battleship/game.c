@@ -37,7 +37,7 @@ static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice);
 Game_t * BattleShip_Game_Init(void)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    Window_Init(
       POS_WINDOW_X, POS_WINDOW_Y,
@@ -91,7 +91,7 @@ void BattleShip_Game_Start(Game_t *game)
 static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    switch(choice.option)
    {
@@ -119,7 +119,7 @@ static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
 static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    if (player)
    {
@@ -131,43 +131,16 @@ static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
          //BattleShip_UI_Print_Place_Help(); // TODO
          break;
       case MENU_OPTION_PLACE_AUTO:
-         //Player_Place_Ships_Auto(player);
          // TODO confirm yes/no
-         {
-            //Grid_Clear_Defense(player->grid);
-            Grid_t *grid = &player->grid;
-            if (grid)
-            {
-               memset(grid->defense, 0, grid->rows * grid->cols * sizeof(Grid_State_t));
-            }
-            for (uint i = 0; i < NUM_SHIPS; i++)
-            {
-               Grid_Status_t status = GRID_STATUS_UNKNOWN;
-               do
-               {
-                  Coord_t location = Coord_Init_Random(
-                      0, GRID_SIZE,
-                      0, GRID_SIZE);
-                  Heading_t heading = Heading_Init_Random();
-                  Ship_t ship = (Ship_t)
-                  {
-                     .type = shipTable[i].type,
-                     .location = location,
-                     .heading = heading
-                  };
-                  status = Player_Place_Ship(player, &ship);
-               }
-               while (
-                  GRID_STATUS_BORDER    == status ||
-                  GRID_STATUS_COLLISION == status );
-            }
-            Process_Place_Menu(player,
-                               BattleShip_UI_Place_Menu(&player->grid));
-         }
+         Player_Place_Ships_Auto(player);
+         Process_Place_Menu(
+            player,
+            BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         Process_Ship_Menu(player,
-                           BattleShip_UI_Ship_Menu_Manual(&player->grid));
+         Process_Ship_Menu(
+            player,
+            BattleShip_UI_Ship_Menu_Manual(&player->grid));
       }
    }
 }
@@ -175,7 +148,7 @@ static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
 static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    switch(choice)
    {

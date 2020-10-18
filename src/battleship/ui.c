@@ -156,7 +156,7 @@ void BattleShip_UI_Init(void)
 void BattleShip_UI_Print_Logo(void)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #else
    // ASCII font 'cybermedium' http://www.topster.de/text-to-ascii/cybermedium.html
    puts("                       |                           ");
@@ -218,9 +218,6 @@ void HitState2Str(const Hit_State_t state, char *str, size_t str_len)
 // TODO replace GRID_SIZE with grid params
 Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
 {
-#ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
-#endif
    Grid_State_t *defense = grid->defense;
    if (!defense)
    {
@@ -290,7 +287,7 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    Main_Menu_Option_t choice = MENU_OPTION_MAIN_RETURN;
    bool read_success = false;
@@ -308,7 +305,7 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 Place_Menu_Option_t BattleShip_UI_Place_Menu(const Grid_t *grid)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    Place_Menu_Option_t choice = MENU_OPTION_PLACE_RETURN;
    bool read_success = false;
@@ -325,7 +322,7 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu(const Grid_t *grid)
 Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    Ship_Menu_Option_t option = MENU_OPTION_SHIP_RETURN;
    bool read_success = false;
@@ -346,7 +343,7 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
 void BattleShip_UI_Print_Menu(Menu_t *menu)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    puts("");
    printf("%*s%s\n", menu->meta.column_width_index, "", menu->title);
@@ -382,7 +379,7 @@ void BattleShip_UI_Print_Menu(Menu_t *menu)
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    size_t chosen_option_len = menu->meta.column_width_index + 1;
    String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );
@@ -409,7 +406,7 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *heading)
 {
 #ifndef NDEBUG
-   printf("\n%s\n", __FUNCTION__);
+   printf("%s\n", __FUNCTION__);
 #endif
    if (!location || !heading)
    {
