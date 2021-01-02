@@ -10,7 +10,7 @@
 
 #include "commondefs.h"
 
-void ReadString(char *str, int strlen, FILE *stream);
+void ReadString(char *str, size_t strlen, FILE *stream);
 bool ParseUnsignedLong(const char *str, unsigned long *val);
 int CalcMax(const int *data, uint n);
 int CalcNumWidth(int n);

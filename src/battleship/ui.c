@@ -393,7 +393,7 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 #else
       printf("Enter option: ");
 #endif
-      ReadString(chosen_option_str, (int)chosen_option_len, stdin);
+      ReadString(chosen_option_str, chosen_option_len, stdin);
       parse_success = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
       if (chosen_option >= menu->num_options) parse_success = false;
       if (!parse_success) retries++;
@@ -454,7 +454,7 @@ static int BattleShip_UI_Read(
 #else
       printf("Enter %s: ", prompt);
 #endif
-      ReadString(chosen_option_str, (int) chosen_option_len, stdin);
+      ReadString(chosen_option_str, chosen_option_len, stdin);
       if (InputParser)
       {
          parse_success = InputParser(chosen_option_str, (unsigned long*) &chosen_option);

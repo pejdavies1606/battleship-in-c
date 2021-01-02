@@ -11,15 +11,53 @@
 #include <limits.h>
 #include <string.h>
 
-void ReadString(char *str, int strlen, FILE *stream)
+String_t rtrim(String_t str, size_t str_size)
 {
-   fgets(str, strlen, stream); // includes newline
-   // Clear input buffer to prevent type-ahead
-   // https://stackoverflow.com/questions/7898215/how-to-clear-input-buffer-in-c/9750394
-   if (str[0] != '\n')
+   size_t str_len = strnlen(str, str_size);
+   if (str && str_size > 0 && str_len > 0 && str_len < str_size)
    {
-      int c;
-      while ((c = getchar()) != '\n' && c != EOF);
+      String_t c;
+      // truncate on newlines and carriage returns
+      // "foo\n" -> "foo\0" -> "foo"
+      while ((c = strpbrk(str, "\n\r")))
+      {
+         *c = 0;
+      }
+      // recalculate length
+      // "foo \n " -> "foo \0 " -> "foo "
+      str_len = strnlen(str, str_size);
+      // truncate on trailing spaces and tabs
+      // "foo " -> "foo\0" -> "foo"
+      if (str_len > 0 && str_len < str_size)
+      {
+         c = &str[str_len - 1];
+         while (*c == ' ' || *c == '\t')
+         {
+            *c = 0;
+            c--;
+         }
+      }
+   }
+   return str;
+}
+
+void ReadString(String_t str, size_t str_size, FILE *stream)
+{
+   // Type-ahead cannot be avoided by attempting to 'flush' stdin.
+   // http://c-faq.com/stdio/gets_flush2.html
+   // http://c-faq.com/stdio/stdinflush2.html
+   //int c; while ((c = getchar()) != '\n' && c != EOF);
+   memset(str, 0, str_size);
+   size_t line_size = str_size + 1; // to account for newline from fgets
+   String_t line = malloc(line_size * sizeof(*line));
+   if (fgets(line, (int) line_size, stream))
+   {
+      line = rtrim(line, line_size);
+      strncpy(str, line, str_size);
+#ifndef NDEBUG
+      //printf("%s '%s'\n", __FUNCTION__, str);
+#endif
+      free(line);
    }
 }
 
