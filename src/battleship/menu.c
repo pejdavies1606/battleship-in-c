@@ -26,14 +26,14 @@ void Menu_Meta_Init(Menu_t *menu)
    uint *option_widths = malloc( menu->num_options * menu->num_headers * sizeof(*option_widths) );
    for (uint header_index=0; header_index<menu->num_headers; header_index++)
    {
-      header_widths[header_index] = strlens(menu->headers[header_index]);
+      header_widths[header_index] = (uint) strlens(menu->headers[header_index]);
 #ifndef NDEBUG
       //printf("header_widths[%u](%s)=%u\n", header_index, IF_NULL_VAL(menu->headers[header_index],""), header_widths[header_index] );
 #endif
       for (uint option_index=0; option_index<menu->num_options; option_index++)
       {
          uint i = header_index*menu->num_options+option_index;
-         option_widths[i] = strlens(menu->options[i]);
+         option_widths[i] = (uint) strlens(menu->options[i]);
 #ifndef NDEBUG
          //printf("option_widths[%u](%s)=%u\n", i, IF_NULL_VAL(menu->options[i],""), option_widths[i] );
 #endif

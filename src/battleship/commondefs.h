@@ -23,6 +23,8 @@
 #define IF_NULL_BLANK(s) ( (NULL == s) ? "" : s)
 #define strlens(s) IF_NULL(s,0,strlen(s))
 
+#define UNUSED(x) (void)(x)
+
 typedef unsigned int uint;
 typedef char *String_t;
 

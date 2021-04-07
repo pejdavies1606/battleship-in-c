@@ -21,10 +21,15 @@ configure_file (
 	BattleShipConfig.h
 	)
 
-include_directories (battleship conio21)
-link_directories (battleship conio21)
+include_directories (battleship)
+link_directories (battleship)
 add_subdirectory (battleship)
-add_subdirectory (conio21)
+
+if (WIN32)
+	include_directories (conio21)
+	link_directories (conio21)
+	add_subdirectory (conio21)
+endif (WIN32)
 
 add_executable (BattleShip main.c)
 target_link_libraries (BattleShip battleship)
