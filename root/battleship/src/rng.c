@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "rng.h"
+#include "battleship/rng.h"
 #include <time.h>
 
 void Rng_Init(uint seed)

@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "util.h"
+#include "battleship/util.h"
 
 #include <errno.h>
 #include <limits.h>

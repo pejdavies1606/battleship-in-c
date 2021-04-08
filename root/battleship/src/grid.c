@@ -5,9 +5,9 @@
  *      Author: pejdavies1606
  */
 
-#include "ui.h"
-#include "util.h"
-#include "grid.h"
+#include "battleship/ui.h"
+#include "battleship/util.h"
+#include "battleship/grid.h"
 
 static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship);
 

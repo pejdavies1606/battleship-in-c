@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "scoreboard.h"
+#include "battleship/scoreboard.h"
 #include <string.h>
 
 Status_t Scoreboard_Init(Scoreboard_t *scoreboard, uint num_entities)

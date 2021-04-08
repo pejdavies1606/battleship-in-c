@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "window.h"
+#include "battleship/window.h"
 
 #ifdef _WIN32
 #include <windows.h>

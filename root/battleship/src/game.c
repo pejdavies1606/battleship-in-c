@@ -13,10 +13,10 @@
 // add limited number of shots, regain ammo when an enemy's ship is sunk, and lose ammo when one of your ships is sunk, equal to the length of that ship multiplied by a scale factor
 // replace symbols for blank space, miss and hit: "-" -> " ", "M" -> ".", "H"-> "*"
 
-#include "game.h"
-#include "window.h"
-#include "ui.h"
-#include "rng.h"
+#include "battleship/game.h"
+#include "battleship/window.h"
+#include "battleship/ui.h"
+#include "battleship/rng.h"
 
 #include <string.h>
 

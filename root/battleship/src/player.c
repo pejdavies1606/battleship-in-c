@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "player.h"
+#include "battleship/player.h"
 
 static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_t type);
 

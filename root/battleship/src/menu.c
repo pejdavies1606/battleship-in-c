@@ -5,8 +5,8 @@
  *      Author: pejdavies1606
  */
 
-#include "menu.h"
-#include "util.h"
+#include "battleship/menu.h"
+#include "battleship/util.h"
 
 #include <string.h>
 #include <stdarg.h>

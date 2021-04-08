@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "ship.h"
+#include "battleship/ship.h"
 
 Ship_t * Ship_Init(uint num_ships)
 {

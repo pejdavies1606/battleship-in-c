@@ -5,7 +5,7 @@
  *      Author: pejdavies1606
  */
 
-#include "coord.h"
+#include "battleship/coord.h"
 
 Coord_t Coord_Init_Random(
    int row_min, int row_max,

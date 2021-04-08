@@ -1,4 +1,4 @@
-#include "input.h"
+#include "battleship/input.h"
 
 bool ParseHeading(const String_t input, void *output)
 {
