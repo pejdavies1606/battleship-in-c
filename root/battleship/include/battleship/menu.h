@@ -8,7 +8,7 @@
 #ifndef MENU_H_
 #define MENU_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 typedef struct
 {

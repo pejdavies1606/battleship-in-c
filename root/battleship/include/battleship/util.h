@@ -8,7 +8,7 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 void ReadString(char *str, size_t strlen, FILE *stream);
 bool ParseUnsignedLong(const char *str, unsigned long *val);

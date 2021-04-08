@@ -9,8 +9,8 @@
 #define COORD_H_
 
 #include <string.h>
-#include "commondefs.h"
-#include "input.h"
+#include "battleship/commondefs.h"
+#include "battleship/input.h"
 
 typedef struct
 {

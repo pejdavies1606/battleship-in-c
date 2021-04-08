@@ -8,9 +8,9 @@
 #ifndef BATTLESHIP_UI_H_
 #define BATTLESHIP_UI_H_
 
-#include "scoreboard.h"
-#include "menu.h"
-#include "player.h"
+#include "battleship/scoreboard.h"
+#include "battleship/menu.h"
+#include "battleship/player.h"
 
 #include <stdio.h>
 

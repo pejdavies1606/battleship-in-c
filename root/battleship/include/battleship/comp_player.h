@@ -8,7 +8,7 @@
 #ifndef BATTLESHIP_COMP_PLAYER_H_
 #define BATTLESHIP_COMP_PLAYER_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 typedef struct
 {

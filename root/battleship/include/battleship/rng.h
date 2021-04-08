@@ -8,7 +8,7 @@
 #ifndef RNG_H_
 #define RNG_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 void Rng_Init(uint seed);
 

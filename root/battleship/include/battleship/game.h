@@ -11,9 +11,9 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#include "ship.h"
-#include "commondefs.h"
-#include "scoreboard.h"
+#include "battleship/ship.h"
+#include "battleship/commondefs.h"
+#include "battleship/scoreboard.h"
 
 #define NUM_PLAYERS  2
 #define NUM_ADJACENT 4
@@ -25,9 +25,9 @@
 #define SCOREBOARD_HITS_SCORE_WIDTH 1
 #define SCOREBOARD_HITS_TOTAL_WIDTH 1
 
-#include "convert.h"
-#include "player.h"
-#include "comp_player.h"
+#include "battleship/convert.h"
+#include "battleship/player.h"
+#include "battleship/comp_player.h"
 
 typedef struct
 {

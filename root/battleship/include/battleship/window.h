@@ -8,7 +8,7 @@
 #ifndef WINDOW_H_
 #define WINDOW_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 void Window_Init(uint pos_x, uint pos_y, uint size_w, uint size_h);
 

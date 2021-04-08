@@ -8,7 +8,7 @@
 #ifndef BATTLESHIP_GRID_H_
 #define BATTLESHIP_GRID_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 typedef enum
 {

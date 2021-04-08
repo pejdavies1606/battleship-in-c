@@ -8,10 +8,10 @@
 #ifndef BATTLESHIP_PLAYER_H_
 #define BATTLESHIP_PLAYER_H_
 
-#include "ship.h"
-#include "commondefs.h"
-#include "scoreboard.h"
-#include "grid.h"
+#include "battleship/ship.h"
+#include "battleship/commondefs.h"
+#include "battleship/scoreboard.h"
+#include "battleship/grid.h"
 
 #define GRID_SIZE 10
 

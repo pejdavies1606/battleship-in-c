@@ -8,7 +8,7 @@
 #ifndef SCOREBOARD_H_
 #define SCOREBOARD_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 typedef struct
 {

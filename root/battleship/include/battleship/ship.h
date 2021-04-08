@@ -8,8 +8,8 @@
 #ifndef BATTLESHIP_SHIP_H_
 #define BATTLESHIP_SHIP_H_
 
-#include "commondefs.h"
-#include "coord.h"
+#include "battleship/commondefs.h"
+#include "battleship/coord.h"
 
 typedef enum
 {

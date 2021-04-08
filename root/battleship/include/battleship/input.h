@@ -8,7 +8,7 @@
 #ifndef _INPUT_H_
 #define _INPUT_H_
 
-#include "commondefs.h"
+#include "battleship/commondefs.h"
 
 typedef bool (*InputParser_t)(const String_t input, void *output);
 
