@@ -42,6 +42,7 @@ typedef enum
 
 typedef struct
 {
+   size_t row_width;
    size_t col_width;
    String_t corner_str;
    size_t corner_len;
@@ -49,7 +50,9 @@ typedef struct
    size_t side_len;
 } Grid_Meta_t;
 
-void Grid_Meta_Init(Grid_Meta_t* meta, size_t col_size);
+void Grid_Meta_Init(Grid_Meta_t* meta,
+		size_t row_size, size_t col_size,
+		size_t row_width, size_t col_width);
 
 Status_t Grid_Init(Grid_t *grid, uint rows, uint cols);
 Status_t Grid_Init_Defense(Grid_t *grid);

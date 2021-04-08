@@ -71,11 +71,17 @@ void Grid_Clear_Offense(const Grid_t *grid)
    }
 }
 
-void Grid_Meta_Init(Grid_Meta_t* meta, size_t col_size)
+void Grid_Meta_Init(Grid_Meta_t* meta,
+		size_t row_size, size_t col_size,
+		size_t row_width, size_t col_width)
 {
    if (meta)
    {
-      meta->col_width = (size_t)CalcNumWidth((int)col_size);
+      meta->row_width = (row_width)
+         ? row_width : (size_t)CalcNumWidth((int)row_size);
+
+      meta->col_width = (col_width)
+         ? col_width : (size_t)CalcNumWidth((int)col_size);
 
       meta->corner_len = meta->col_width + SIZE_GRID_SPACE;
       String_t corner_char = STR_GRID_CORNER;

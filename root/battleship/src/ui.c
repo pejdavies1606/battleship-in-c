@@ -151,7 +151,7 @@ void BattleShip_UI_Init(void)
       ship_menu.options = ship_menu_data;
    }
    Menu_Meta_Init( &ship_menu );
-   Grid_Meta_Init( &grid_meta, GRID_SIZE );
+   Grid_Meta_Init( &grid_meta, GRID_SIZE, GRID_SIZE, 0, 1 );
 }
 
 void BattleShip_UI_Print_Logo(void)
@@ -230,7 +230,7 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
    memset(state_str, 0, sizeof(state_str));
 
    printf("%*s%s\n",
-      (int)((GRID_SIZE/2)*(grid_meta.col_width + SIZE_GRID_SPACE)), "",
+      (int)(grid_meta.row_width - 1), "",
       STR_DEF);
 
    for (int row = -1; row < GRID_SIZE+1; row++)
@@ -238,7 +238,7 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
       if (row == -1)
       {
          // style choice: SIZE_GRID_SPACE instead of corner_len
-         printf("%*s%.*s", (int)(grid_meta.col_width - 1), "",
+         printf("%*s%.*s", (int)(grid_meta.row_width - 1), "",
             SIZE_GRID_SPACE, grid_meta.corner_str);
          for (uint col = 0; col < GRID_SIZE; col++)
          {
@@ -250,7 +250,7 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
       else if(row == GRID_SIZE)
       {
          // style choice: SIZE_GRID_SPACE instead of corner_len
-         printf("%*s%.*s", (int)(grid_meta.col_width - 1), "",
+         printf("%*s%.*s", (int)(grid_meta.row_width - 1), "",
             SIZE_GRID_SPACE, grid_meta.corner_str);
          printf("%*s%.*s", SIZE_GRID_SPACE, "",
             (int)grid_meta.side_len, grid_meta.side_str);
@@ -259,13 +259,16 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
       }
       else
       {
-         printf("%*u", (int)grid_meta.col_width, row + 1);
+         printf("%*u", (int)grid_meta.row_width, row + 1);
          for (int col = 0; col < GRID_SIZE; col++)
          {
             Grid_State_t p = defense[row*GRID_SIZE + col];
             ShipType2Str(p.ship_type, ship_str, sizeof(ship_str));
             HitState2Str(p.hit_state, state_str, sizeof(state_str));
-            printf("%*s%s%s", SIZE_GRID_SPACE, "", ship_str, state_str);
+            printf("%*s%*s",
+                  SIZE_GRID_SPACE, "",
+                  (int)grid_meta.col_width,
+                  (p.hit_state == STATE_HIT) ? state_str : ship_str);
          }
          printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V);
       }
