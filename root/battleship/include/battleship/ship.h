@@ -78,16 +78,16 @@ static inline Coord_t Ship_Get_Point(const Ship_t *ship, const uint i)
       switch (ship->heading)
       {
       case HEADING_NORTH:
-         point.col -= (int) i;
+         point.row -= (int) i;
          break;
       case HEADING_EAST:
-         point.row += (int) i;
-         break;
-      case HEADING_SOUTH:
          point.col += (int) i;
          break;
+      case HEADING_SOUTH:
+         point.row += (int) i;
+         break;
       case HEADING_WEST:
-         point.row -= (int) i;
+         point.col -= (int) i;
          break;
       }
    }

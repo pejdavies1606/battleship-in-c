@@ -63,7 +63,7 @@ Status_t Player_Place_Ships_Auto(Player_t *player)
       return STATUS_ERROR;
    }
    Grid_Clear_Defense(&player->grid);
-   for (uint i = 0; i < NUM_SHIPS; i++)
+   for (uint i = NUM_SHIPS; i > 0; i--)
    {
       Grid_Status_t status = GRID_STATUS_UNKNOWN;
       do
@@ -73,7 +73,7 @@ Status_t Player_Place_Ships_Auto(Player_t *player)
              0, (int) player->grid.cols);
          Heading_t heading = Heading_Init_Random();
          Ship_t ship = (Ship_t){
-             .type = shipTable[i].type,
+             .type = shipTable[i-1].type,
              .location = location,
              .heading = heading};
          status = Player_Place_Ship(player, &ship);

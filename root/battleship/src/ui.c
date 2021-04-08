@@ -21,7 +21,7 @@
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
 #if defined(MSDOS) && MSDOS == 1
 // Borland-style CONIO implementation for MinGW/Dev-C++ (http://conio.sourceforge.net/)
-#include "battleship/../conio21/conio2.h"
+#include "conio21/conio2.h"
 #else
 #define clrscr() printf("\e[1;1H\e[2J")
 #endif
