@@ -21,7 +21,7 @@ configure_file (
 	BattleShipConfig.h
 	)
 
-include_directories (battleship)
+include_directories (battleship/include)
 link_directories (battleship)
 add_subdirectory (battleship)
 

@@ -1,16 +1,16 @@
 set (SRC_FILES
-   "coord.c"
-   "game.c"
-   "grid.c"
-   "input.c"
-   "menu.c"
-   "player.c"
-   "rng.c"
-   "scoreboard.c"
-   "ship.c"
-   "ui.c"
-   "util.c"
-   "window.c"
+   "src/coord.c"
+   "src/game.c"
+   "src/grid.c"
+   "src/input.c"
+   "src/menu.c"
+   "src/player.c"
+   "src/rng.c"
+   "src/scoreboard.c"
+   "src/ship.c"
+   "src/ui.c"
+   "src/util.c"
+   "src/window.c"
 )
 add_library (battleship STATIC ${SRC_FILES})
 add_definitions(-Wall -Wextra -Wconversion)
