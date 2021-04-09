@@ -147,14 +147,12 @@ static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship)
          }
       }
    }
-#ifndef NDEBUG
-   printf("%s (n,r,c,h,s)=(%c,%d,%d,%s,%c%c)\n", __FUNCTION__,
-   ship_info->name[0],
-   ship->location.row,
-   ship->location.col,
-   Heading_Get_Str(ship->heading),
-   (status & GRID_STATUS_COLLISION ? '1' : '0'),
-   (status & GRID_STATUS_BORDER) ? '1' : '0');
-#endif
+   debug_print("(n,r,c,h,s)=(%c,%d,%d,%s,%c%c)\n",
+         ship_info->name[0],
+         ship->location.row,
+         ship->location.col,
+         Heading_Get_Str(ship->heading),
+         (status & GRID_STATUS_COLLISION ? '1' : '0'),
+         (status & GRID_STATUS_BORDER) ? '1' : '0');
    return status;
 }

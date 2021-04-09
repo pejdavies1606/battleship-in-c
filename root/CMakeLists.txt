@@ -29,6 +29,7 @@ if (WIN32)
 	include_directories (conio21)
 	link_directories (conio21)
 	add_subdirectory (conio21)
+   #add_subdirectory (pdcurses)
 endif (WIN32)
 
 add_executable (BattleShip main.c)

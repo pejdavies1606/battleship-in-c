@@ -12,8 +12,6 @@
 #include "battleship/menu.h"
 #include "battleship/player.h"
 
-#include <stdio.h>
-
 #define NUM_MAIN_MENU_OPTIONS 5 // must match enum below
 #define NUM_PLACE_MENU_OPTIONS 4 // must match enum below
 #define NUM_SHIP_MENU_OPTIONS 2 // must match enum below
@@ -31,6 +29,8 @@
 
 #define STR_DEF "DEFENSE"
 #define STR_OFF "OFFENSE"
+
+#define MAX_READ_RETRIES 3
 
 typedef enum
 {
@@ -61,8 +61,12 @@ typedef struct
    Ship_Type_t          type;
 } Ship_Menu_Choice_t;
 
+Grid_Meta_t* BattleShip_UI_Get_Grid_Meta(void);
+
 void BattleShip_UI_Init();
 
+void BattleShip_UI_Clear_Screen(void);
+void BattleShip_UI_Print_Message(String_t message);
 void BattleShip_UI_Print_Logo();
 Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid);
 
@@ -77,5 +81,8 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice);
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *heading);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
+
+void ShipType2Str(const Ship_Type_t type, char *str, const size_t str_len);
+void HitState2Str(const Hit_State_t state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_UI_H_ */

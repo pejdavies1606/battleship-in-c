@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
       argv[0],
       BattleShip_VERSION_MAJOR,
       BattleShip_VERSION_MINOR);
-#ifndef NDEBUG
+#ifdef DEBUG
    puts("DEBUG");
 #endif
    setvbuf(stdout, NULL, _IONBF, 0); // No buffering
