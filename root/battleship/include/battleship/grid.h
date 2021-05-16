@@ -10,6 +10,10 @@
 
 #include "battleship/commondefs.h"
 
+#define STR_STATE_BLANK " "
+#define STR_STATE_HIT   "*"
+#define STR_STATE_MISS  "."
+
 typedef enum
 {
    STATE_BLANK,
@@ -62,5 +66,8 @@ void Grid_Clear_Defense(const Grid_t *grid);
 void Grid_Clear_Offense(const Grid_t *grid);
 
 Grid_Status_t Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship);
+
+void ShipTypeToStr(const Ship_Type_t type, char *str, const size_t str_len);
+void HitStateToStr(const Hit_State_t state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_GRID_H_ */

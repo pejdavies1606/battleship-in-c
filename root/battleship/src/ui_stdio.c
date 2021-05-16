@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include "battleship/util.h"
 #include "battleship/ui.h"
 
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
@@ -14,6 +15,8 @@
 #if defined(MSDOS) && MSDOS == 1
 #include "conio21/conio2.h"
 #endif
+
+static void ReadString(String_t str, size_t str_size, FILE *stream);
 
 void BattleShip_UI_Clear_Screen(void)
 {
@@ -112,8 +115,8 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
          for (int col = 0; col < GRID_SIZE; col++)
          {
             Grid_State_t p = defense[row*GRID_SIZE + col];
-            ShipType2Str(p.ship_type, ship_str, sizeof(ship_str));
-            HitState2Str(p.hit_state, state_str, sizeof(state_str));
+            ShipTypeToStr(p.ship_type, ship_str, sizeof(ship_str));
+            HitStateToStr(p.hit_state, state_str, sizeof(state_str));
             printf("%*s%*s",
                   SIZE_GRID_SPACE, "",
                   (int)grid_meta->col_width,
@@ -175,7 +178,7 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
    bool parse_success = false;
    while (!parse_success && retries < MAX_READ_RETRIES)
    {
-#ifndef NDEBUG
+#ifdef DEBUG
       printf("%d Enter option: ", retries);
 #else
       printf("Enter option: ");
@@ -233,7 +236,7 @@ static int BattleShip_UI_Read(
    bool parse_success = false;
    while (!parse_success && retries < MAX_READ_RETRIES)
    {
-#ifndef NDEBUG
+#ifdef DEBUG
       printf("%d Enter %s: ", retries, prompt);
 #else
       printf("Enter %s: ", prompt);
@@ -262,5 +265,22 @@ static int BattleShip_UI_Read(
       *choice = chosen_option;
    }
    return !(retries == MAX_READ_RETRIES);
+}
+
+static void ReadString(String_t str, size_t str_size, FILE *stream)
+{
+   // Type-ahead cannot be avoided by attempting to 'flush' stdin.
+   // http://c-faq.com/stdio/gets_flush2.html
+   // http://c-faq.com/stdio/stdinflush2.html
+   //int c; while ((c = getchar()) != '\n' && c != EOF);
+   memset(str, 0, str_size);
+   size_t line_size = str_size + 1; // to account for newline from fgets
+   String_t line = malloc(line_size * sizeof(*line));
+   if (fgets(line, (int) line_size, stream))
+   {
+      line = TrimStr(line, line_size);
+      strncpy(str, line, str_size);
+      free(line);
+   }
 }
 

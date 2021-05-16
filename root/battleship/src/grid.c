@@ -156,3 +156,36 @@ static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship)
          (status & GRID_STATUS_BORDER) ? '1' : '0');
    return status;
 }
+
+void ShipTypeToStr(const Ship_Type_t type, char *str, const size_t str_len)
+{
+   if (SHIP_NONE == type)
+   {
+      snprintf(str, str_len, "%s", STR_STATE_BLANK);
+   }
+   else
+   {
+      const Ship_Info_t *ship_info = Ship_Get_Info(type);
+      if (ship_info)
+      {
+         snprintf(str, str_len, "%c", ship_info->name[0]);
+      }
+   }
+}
+
+void HitStateToStr(const Hit_State_t state, char *str, size_t str_len)
+{
+   switch(state)
+   {
+      case STATE_BLANK:
+         snprintf(str, str_len, "%s", STR_STATE_BLANK);
+         break;
+      case STATE_HIT:
+         snprintf(str, str_len, "%s", STR_STATE_HIT);
+         break;
+      case STATE_MISS:
+         snprintf(str, str_len, "%s", STR_STATE_MISS);
+         break;
+   }
+}
+

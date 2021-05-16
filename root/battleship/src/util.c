@@ -11,7 +11,7 @@
 #include <limits.h>
 #include <string.h>
 
-String_t rtrim(String_t str, size_t str_size)
+String_t TrimStr(String_t str, size_t str_size)
 {
    size_t str_len = strnlen(str, str_size);
    if (str && str_size > 0 && str_len > 0 && str_len < str_size)
@@ -39,26 +39,6 @@ String_t rtrim(String_t str, size_t str_size)
       }
    }
    return str;
-}
-
-void ReadString(String_t str, size_t str_size, FILE *stream)
-{
-   // Type-ahead cannot be avoided by attempting to 'flush' stdin.
-   // http://c-faq.com/stdio/gets_flush2.html
-   // http://c-faq.com/stdio/stdinflush2.html
-   //int c; while ((c = getchar()) != '\n' && c != EOF);
-   memset(str, 0, str_size);
-   size_t line_size = str_size + 1; // to account for newline from fgets
-   String_t line = malloc(line_size * sizeof(*line));
-   if (fgets(line, (int) line_size, stream))
-   {
-      line = rtrim(line, line_size);
-      strncpy(str, line, str_size);
-#ifndef NDEBUG
-      //printf("%s '%s'\n", __FUNCTION__, str);
-#endif
-      free(line);
-   }
 }
 
 bool ParseUnsignedLong(const char *str, unsigned long *val)

@@ -143,38 +143,6 @@ void BattleShip_UI_Init(void)
    Grid_Meta_Init( &grid_meta, GRID_SIZE, GRID_SIZE, 0, 1 );
 }
 
-void ShipType2Str(const Ship_Type_t type, char *str, const size_t str_len)
-{
-   if (SHIP_NONE == type)
-   {
-      snprintf(str, str_len, "%s", STR_STATE_BLANK);
-   }
-   else
-   {
-      const Ship_Info_t *ship_info = Ship_Get_Info(type);
-      if (ship_info)
-      {
-         snprintf(str, str_len, "%c", ship_info->name[0]);
-      }
-   }
-}
-
-void HitState2Str(const Hit_State_t state, char *str, size_t str_len)
-{
-   switch(state)
-   {
-      case STATE_BLANK:
-         snprintf(str, str_len, "%s", STR_STATE_BLANK);
-         break;
-      case STATE_HIT:
-         snprintf(str, str_len, "%s", STR_STATE_HIT);
-         break;
-      case STATE_MISS:
-         snprintf(str, str_len, "%s", STR_STATE_MISS);
-         break;
-   }
-}
-
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
 {
    Main_Menu_Option_t choice = MENU_OPTION_MAIN_RETURN;

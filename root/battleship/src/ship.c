@@ -17,3 +17,4 @@ Ship_t * Ship_Init(uint num_ships)
    memset(ships, 0, num_ships * sizeof(Ship_t));
    return ships;
 }
+

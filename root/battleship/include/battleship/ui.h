@@ -18,10 +18,6 @@
 
 #define SIZE_STATE_STR 1 // not including null terminator
 
-#define STR_STATE_BLANK " "
-#define STR_STATE_HIT   "*"
-#define STR_STATE_MISS  "."
-
 #define STR_GRID_SIDE_V "|"
 #define STR_GRID_SIDE_H "="
 #define STR_GRID_CORNER "+"
@@ -81,8 +77,5 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice);
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *heading);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
-
-void ShipType2Str(const Ship_Type_t type, char *str, const size_t str_len);
-void HitState2Str(const Hit_State_t state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_UI_H_ */

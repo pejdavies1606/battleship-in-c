@@ -10,7 +10,7 @@
 
 #include "battleship/commondefs.h"
 
-void ReadString(char *str, size_t strlen, FILE *stream);
+String_t TrimStr(String_t str, size_t str_size);
 bool ParseUnsignedLong(const char *str, unsigned long *val);
 int CalcMax(const int *data, uint n);
 int CalcNumWidth(int n);

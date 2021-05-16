@@ -36,13 +36,10 @@ static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice);
 
 Game_t * BattleShip_Game_Init(void)
 {
-#ifndef NDEBUG
-   printf("%s\n", __FUNCTION__);
-#endif
    Window_Init(
       POS_WINDOW_X, POS_WINDOW_Y,
       SIZE_WINDOW_W, SIZE_WINDOW_H);
-#ifndef NDEBUG
+#ifdef DEBUG
    Rng_Init(1606);
 #else
    Rng_Init(0);
@@ -90,9 +87,6 @@ void BattleShip_Game_Start(Game_t *game)
 
 static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
 {
-#ifndef NDEBUG
-   printf("%s\n", __FUNCTION__);
-#endif
    switch(choice.option)
    {
       case MENU_OPTION_SHIP_RETURN:
@@ -118,9 +112,6 @@ static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
 
 static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
 {
-#ifndef NDEBUG
-   printf("%s\n", __FUNCTION__);
-#endif
    if (player)
    {
       switch (choice)
@@ -147,9 +138,6 @@ static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
 
 static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice)
 {
-#ifndef NDEBUG
-   printf("%s\n", __FUNCTION__);
-#endif
    switch(choice)
    {
       case MENU_OPTION_MAIN_RETURN:
