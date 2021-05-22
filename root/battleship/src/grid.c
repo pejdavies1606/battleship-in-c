@@ -13,15 +13,18 @@ static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship);
 
 Status_t Grid_Init(Grid_t *grid, uint rows, uint cols)
 {
-   Status_t status = STATUS_OK;
-   if (!grid)
+   Status_t status = STATUS_ERROR;
+   if (grid)
    {
-      return STATUS_ERROR;
+      grid->rows = rows;
+      grid->cols = cols;
+      if (Grid_Init_Defense(grid) &&
+          Grid_Init_Offense(grid) &&
+          Grid_Meta_Init(&grid->meta, rows, cols, 0, 1))
+      {
+         status = STATUS_OK;
+      }
    }
-   grid->rows = rows;
-   grid->cols = cols;
-   status |= Grid_Init_Defense(grid);
-   status |= Grid_Init_Offense(grid);
    return status;
 }
 
@@ -71,10 +74,12 @@ void Grid_Clear_Offense(const Grid_t *grid)
    }
 }
 
-void Grid_Meta_Init(Grid_Meta_t* meta,
-		size_t row_size, size_t col_size,
-		size_t row_width, size_t col_width)
+Status_t Grid_Meta_Init(Grid_Meta_t* meta,
+   size_t row_size, size_t col_size,
+   size_t row_width, size_t col_width)
 {
+   Status_t result = STATUS_ERROR;
+   meta = malloc(sizeof(Grid_Meta_t));
    if (meta)
    {
       meta->row_width = (row_width)
@@ -92,7 +97,10 @@ void Grid_Meta_Init(Grid_Meta_t* meta,
       String_t side_char = STR_GRID_SIDE_H;
       meta->side_str = malloc(meta->side_len);
       RepeatChar(meta->side_str, meta->side_len, side_char[0]);
+
+      result = STATUS_OK;
    }
+   return result;
 }
 
 Grid_Status_t Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship)

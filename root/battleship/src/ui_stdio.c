@@ -16,6 +16,13 @@
 #include "conio21/conio2.h"
 #endif
 
+static int BattleShip_UI_Read(
+   String_t prompt,
+   size_t option_len,
+   uint option_max,
+   uint *choice,
+   InputParser_t InputParser);
+
 static void ReadString(String_t str, size_t str_size, FILE *stream);
 
 void BattleShip_UI_Clear_Screen(void)
@@ -66,66 +73,72 @@ void BattleShip_UI_Print_Message(String_t message)
    puts(message);
 }
 
-// TODO replace GRID_SIZE with grid params
 Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
 {
-   Grid_State_t *defense = grid->defense;
-   Grid_Meta_t *grid_meta = BattleShip_UI_Get_Grid_Meta();
+   Status_t result = STATUS_ERROR;
+   Grid_State_t *defense = NULL;
+   const Grid_Meta_t *grid_meta = NULL;
 
-   if (!defense || !grid_meta)
+   if (grid)
    {
-      return STATUS_ERROR;
-   }
-   char ship_str[SIZE_STATE_STR + 1];
-   char state_str[SIZE_STATE_STR + 1];
-   memset(ship_str, 0, sizeof(ship_str));
-   memset(state_str, 0, sizeof(state_str));
+      defense = grid->defense;
+      grid_meta = &grid->meta;
 
-   printf("%*s%s\n",
-      (int)(grid_meta->row_width - 1), "",
-      STR_DEF);
+      if (defense && grid_meta)
+      {
+         char ship_str[SIZE_STATE_STR + 1];
+         char state_str[SIZE_STATE_STR + 1];
+         memset(ship_str, 0, sizeof(ship_str));
+         memset(state_str, 0, sizeof(state_str));
 
-   for (int row = -1; row < GRID_SIZE+1; row++)
-   {
-      if (row == -1)
-      {
-         // style choice: SIZE_GRID_SPACE instead of corner_len
-         printf("%*s%.*s", (int)(grid_meta->row_width - 1), "",
-            SIZE_GRID_SPACE, grid_meta->corner_str);
-         for (uint col = 0; col < GRID_SIZE; col++)
+         printf("%*s%s\n",
+               (int)(grid_meta->row_width - 1), "",
+               STR_DEF);
+
+         for (int row = -1; row < (int)(grid->rows + 1); row++)
          {
-            printf("%*s%-*c", SIZE_GRID_SPACE, "", 
-               (int)grid_meta->col_width, col + 65); // ASCII
+            if (row == -1)
+            {
+               // style choice: SIZE_GRID_SPACE instead of corner_len
+               printf("%*s%.*s", (int)(grid_meta->row_width - 1), "",
+                     SIZE_GRID_SPACE, grid_meta->corner_str);
+               for (uint col = 0; col < grid->cols; col++)
+               {
+                  printf("%*s%-*c", SIZE_GRID_SPACE, "", 
+                        (int)grid_meta->col_width, col + 65); // ASCII
+               }
+               printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
+            }
+            else if(row == (int) grid->rows)
+            {
+               // style choice: SIZE_GRID_SPACE instead of corner_len
+               printf("%*s%.*s", (int)(grid_meta->row_width - 1), "",
+                     SIZE_GRID_SPACE, grid_meta->corner_str);
+               printf("%*s%.*s", SIZE_GRID_SPACE, "",
+                     (int)grid_meta->side_len, grid_meta->side_str);
+               printf("%*s%s\n", SIZE_GRID_SPACE, "",
+                     STR_GRID_CORNER);
+            }
+            else
+            {
+               printf("%*u", (int)grid_meta->row_width, row + 1);
+               for (int col = 0; col < (int) grid->cols; col++)
+               {
+                  Grid_State_t p = defense[row*(int)(grid->cols) + col];
+                  ShipTypeToStr(p.ship_type, ship_str, sizeof(ship_str));
+                  HitStateToStr(p.hit_state, state_str, sizeof(state_str));
+                  printf("%*s%*s",
+                        SIZE_GRID_SPACE, "",
+                        (int)grid_meta->col_width,
+                        (p.hit_state == STATE_HIT) ? state_str : ship_str);
+               }
+               printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V);
+            }
          }
-         printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
-      }
-      else if(row == GRID_SIZE)
-      {
-         // style choice: SIZE_GRID_SPACE instead of corner_len
-         printf("%*s%.*s", (int)(grid_meta->row_width - 1), "",
-            SIZE_GRID_SPACE, grid_meta->corner_str);
-         printf("%*s%.*s", SIZE_GRID_SPACE, "",
-            (int)grid_meta->side_len, grid_meta->side_str);
-         printf("%*s%s\n", SIZE_GRID_SPACE, "",
-            STR_GRID_CORNER);
-      }
-      else
-      {
-         printf("%*u", (int)grid_meta->row_width, row + 1);
-         for (int col = 0; col < GRID_SIZE; col++)
-         {
-            Grid_State_t p = defense[row*GRID_SIZE + col];
-            ShipTypeToStr(p.ship_type, ship_str, sizeof(ship_str));
-            HitStateToStr(p.hit_state, state_str, sizeof(state_str));
-            printf("%*s%*s",
-                  SIZE_GRID_SPACE, "",
-                  (int)grid_meta->col_width,
-                  (p.hit_state == STATE_HIT) ? state_str : ship_str);
-         }
-         printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V);
+         result = STATUS_OK;
       }
    }
-   return STATUS_OK;
+   return result;
 }
 
 /*void BattleShip_UI_Print_Grid(const Hit_State_t *offense)
@@ -205,6 +218,7 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *head
    ReadString(buf, sizeof(buf), stdin);
    bool parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
    printf("%d %d %u\n", location->col, location->row, *heading);
+   UNUSED(BattleShip_UI_Read);
    /*parse_success |= BattleShip_UI_Read("col", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
          (uint*) &location->col, NULL);
    parse_success |= BattleShip_UI_Read("row", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
@@ -214,7 +228,7 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *head
    return parse_success;
 }
 
-static int BattleShip_UI_Read(
+int BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
    uint option_max,
@@ -267,7 +281,7 @@ static int BattleShip_UI_Read(
    return !(retries == MAX_READ_RETRIES);
 }
 
-static void ReadString(String_t str, size_t str_size, FILE *stream)
+void ReadString(String_t str, size_t str_size, FILE *stream)
 {
    // Type-ahead cannot be avoided by attempting to 'flush' stdin.
    // http://c-faq.com/stdio/gets_flush2.html

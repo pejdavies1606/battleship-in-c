@@ -89,13 +89,6 @@ static Menu_t ship_menu =
    .headers = ship_menu_headers,
 };
 
-static Grid_Meta_t grid_meta;
-
-Grid_Meta_t* BattleShip_UI_Get_Grid_Meta(void)
-{
-   return &grid_meta;
-}
-
 void BattleShip_UI_Init(void)
 {
    Menu_Meta_Init( &main_menu );
@@ -140,7 +133,6 @@ void BattleShip_UI_Init(void)
       ship_menu.options = ship_menu_data;
    }
    Menu_Meta_Init( &ship_menu );
-   Grid_Meta_Init( &grid_meta, GRID_SIZE, GRID_SIZE, 0, 1 );
 }
 
 Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)

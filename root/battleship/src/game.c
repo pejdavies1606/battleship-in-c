@@ -156,15 +156,13 @@ static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice)
 }
 
 // Identify which ship was hit and determine if it has been sunk.
-/*void BattleShip_Identify_Ship()
+/*void BattleShip_Identify_Ship() // TODO
 {
-   // TODO
 }*/
 
 // state machine
-/*void BattleShip_Ai()
+/*void BattleShip_Ai() // TODO
 {
-   // TODO
 }*/
 
 // TODO define these

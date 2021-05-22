@@ -27,14 +27,6 @@ typedef struct
    Hit_State_t hit_state;
 } Grid_State_t;
 
-typedef struct
-{
-   Grid_State_t *defense;
-   Hit_State_t *offense;
-   uint rows;
-   uint cols;
-} Grid_t;
-
 typedef enum
 {
    GRID_STATUS_OK          = 0x0,
@@ -54,7 +46,16 @@ typedef struct
    size_t side_len;
 } Grid_Meta_t;
 
-void Grid_Meta_Init(Grid_Meta_t* meta,
+typedef struct
+{
+   Grid_State_t *defense;
+   Hit_State_t *offense;
+   uint rows;
+   uint cols;
+   Grid_Meta_t meta;
+} Grid_t;
+
+Status_t Grid_Meta_Init(Grid_Meta_t* meta,
 		size_t row_size, size_t col_size,
 		size_t row_width, size_t col_width);
 
