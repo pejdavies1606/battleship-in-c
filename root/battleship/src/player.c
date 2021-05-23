@@ -7,7 +7,7 @@
 
 #include "battleship/player.h"
 
-static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_t type);
+static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_e type);
 
 Player_t * Player_Init(uint num_players)
 {
@@ -71,7 +71,7 @@ Status_t Player_Place_Ships_Auto(Player_t *player)
          Coord_t location = Coord_Init_Random(
              0, (int) player->grid.rows,
              0, (int) player->grid.cols);
-         Heading_t heading = Heading_Init_Random();
+         Heading_e heading = Heading_Init_Random();
          Ship_t ship = (Ship_t){
              .type = shipTable[i-1].type,
              .location = location,
@@ -88,7 +88,7 @@ Status_t Player_Place_Ships_Auto(Player_t *player)
    return STATUS_OK;
 }
 
-static Ship_t * Player_Get_Ship(Player_t *player, Ship_Type_t type)
+static Ship_t * Player_Get_Ship(Player_t *player, Ship_Type_e type)
 {
    if (player)
    {

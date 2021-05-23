@@ -17,5 +17,11 @@ void Window_Init(uint pos_x, uint pos_y, uint size_w, uint size_h)
    // https://batchloaf.wordpress.com/2012/04/17/how-a-console-application-can-set-the-size-of-its-window/
    HWND wh = GetConsoleWindow();
    MoveWindow(wh, (int)pos_x, (int)pos_y, (int)size_w, (int)size_h, TRUE);
+#else
+   UNUSED(pos_x);
+   UNUSED(pos_y);
+   UNUSED(size_w);
+   UNUSED(size_h);
 #endif
 }
+

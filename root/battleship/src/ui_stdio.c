@@ -16,12 +16,14 @@
 #include "conio21/conio2.h"
 #endif
 
+#if 0
 static int BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
    uint option_max,
    uint *choice,
    InputParser_t InputParser);
+#endif
 
 static void ReadString(String_t str, size_t str_size, FILE *stream);
 
@@ -206,7 +208,7 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
    return !(retries == MAX_READ_RETRIES);
 }
 
-bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *heading)
+bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading)
 {
    if (!location || !heading)
    {
@@ -218,7 +220,6 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *head
    ReadString(buf, sizeof(buf), stdin);
    bool parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
    printf("%d %d %u\n", location->col, location->row, *heading);
-   UNUSED(BattleShip_UI_Read);
    /*parse_success |= BattleShip_UI_Read("col", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
          (uint*) &location->col, NULL);
    parse_success |= BattleShip_UI_Read("row", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
@@ -228,6 +229,7 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_t *head
    return parse_success;
 }
 
+#if 0
 int BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
@@ -280,6 +282,7 @@ int BattleShip_UI_Read(
    }
    return !(retries == MAX_READ_RETRIES);
 }
+#endif
 
 void ReadString(String_t str, size_t str_size, FILE *stream)
 {

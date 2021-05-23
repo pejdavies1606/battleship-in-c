@@ -31,8 +31,8 @@
 //static _Bool p1sunk[NUM_SHIPS], p2sunk[NUM_SHIPS];
 
 static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice);
-static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice);
-static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice);
+static void Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice);
+static void Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice);
 
 Game_t * BattleShip_Game_Init(void)
 {
@@ -96,7 +96,7 @@ static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
       case MENU_OPTION_SHIP_PLACE:
          {
             Coord_t location;
-            Heading_t heading;
+            Heading_e heading;
             BattleShip_UI_Read_Ship_Location_Heading(&location, &heading);
             Ship_t ship = (Ship_t)
             {
@@ -110,7 +110,7 @@ static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
    }
 }
 
-static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
+static void Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
 {
    if (player)
    {
@@ -136,7 +136,7 @@ static void Process_Place_Menu(Player_t *player, Place_Menu_Option_t choice)
    }
 }
 
-static void Process_Main_Menu(Player_t *player, Main_Menu_Option_t choice)
+static void Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
 {
    switch(choice)
    {

@@ -17,13 +17,6 @@
 #define NUM_PLACE_MENU_HEADERS 1
 #define NUM_SHIP_MENU_HEADERS 2
 
-static int BattleShip_UI_Read(
-   String_t prompt,
-   size_t option_len,
-   uint option_max,
-   uint *choice,
-   InputParser_t InputParser);
-
 static String_t main_menu_headers[NUM_MAIN_MENU_HEADERS] =
 {
    "Option"
@@ -135,9 +128,9 @@ void BattleShip_UI_Init(void)
    Menu_Meta_Init( &ship_menu );
 }
 
-Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
+Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message)
 {
-   Main_Menu_Option_t choice = MENU_OPTION_MAIN_RETURN;
+   Main_Menu_Option_e choice = MENU_OPTION_MAIN_RETURN;
    bool read_success = false;
    while(!read_success)
    {
@@ -150,9 +143,9 @@ Main_Menu_Option_t BattleShip_UI_Main_Menu(String_t message)
    return choice;
 }
 
-Place_Menu_Option_t BattleShip_UI_Place_Menu(const Grid_t *grid)
+Place_Menu_Option_e BattleShip_UI_Place_Menu(const Grid_t *grid)
 {
-   Place_Menu_Option_t choice = MENU_OPTION_PLACE_RETURN;
+   Place_Menu_Option_e choice = MENU_OPTION_PLACE_RETURN;
    bool read_success = false;
    while(!read_success)
    {
@@ -166,7 +159,7 @@ Place_Menu_Option_t BattleShip_UI_Place_Menu(const Grid_t *grid)
 
 Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
 {
-   Ship_Menu_Option_t option = MENU_OPTION_SHIP_RETURN;
+   Ship_Menu_Option_e option = MENU_OPTION_SHIP_RETURN;
    bool read_success = false;
    while(!read_success)
    {
@@ -178,7 +171,7 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
    return (Ship_Menu_Choice_t)
    {
       (option == MENU_OPTION_SHIP_RETURN) ? option : MENU_OPTION_SHIP_PLACE,
-      (Ship_Type_t) (option - 1)
+      (Ship_Type_e) (option - 1)
    };
 }
 

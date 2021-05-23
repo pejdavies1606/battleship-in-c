@@ -26,7 +26,7 @@ Coord_t Coord_Init_Random(
    }
 }
 
-Heading_t Heading_Init_Random()
+Heading_e Heading_Init_Random()
 {
    int i = rand() % (int) NUM_HEADINGS;
    return headingTable[i].hdg;

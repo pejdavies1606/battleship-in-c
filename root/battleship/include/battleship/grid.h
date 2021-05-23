@@ -19,12 +19,12 @@ typedef enum
    STATE_BLANK,
    STATE_HIT,
    STATE_MISS
-} Hit_State_t;
+} Hit_State_e;
 
 typedef struct
 {
-   Ship_Type_t ship_type;
-   Hit_State_t hit_state;
+   Ship_Type_e ship_type;
+   Hit_State_e hit_state;
 } Grid_State_t;
 
 typedef enum
@@ -49,7 +49,7 @@ typedef struct
 typedef struct
 {
    Grid_State_t *defense;
-   Hit_State_t *offense;
+   Hit_State_e *offense;
    uint rows;
    uint cols;
    Grid_Meta_t meta;
@@ -68,7 +68,7 @@ void Grid_Clear_Offense(const Grid_t *grid);
 
 Grid_Status_t Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship);
 
-void ShipTypeToStr(const Ship_Type_t type, char *str, const size_t str_len);
-void HitStateToStr(const Hit_State_t state, char *str, size_t str_len);
+void ShipTypeToStr(const Ship_Type_e type, char *str, const size_t str_len);
+void HitStateToStr(const Hit_State_e state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_GRID_H_ */

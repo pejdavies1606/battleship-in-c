@@ -24,11 +24,11 @@ typedef enum
    HEADING_EAST,
    HEADING_SOUTH,
    HEADING_WEST
-} Heading_t;
+} Heading_e;
 
 typedef struct
 {
-   Heading_t hdg;
+   Heading_e hdg;
    String_t str;
 } HeadingInfo_t;
 
@@ -43,7 +43,7 @@ static const HeadingInfo_t headingTable[] =
 #define NUM_HEADINGS ARRAY_LEN(headingTable)
 #define LEN_HEADING 1
 
-static inline String_t Heading_Get_Str(Heading_t hdg)
+static inline String_t Heading_Get_Str(Heading_e hdg)
 {
    for (uint i = 0; i < NUM_HEADINGS; i++)
    {
@@ -85,6 +85,6 @@ Coord_t Coord_Init_Random(
    int row_min, int row_max,
    int col_min, int col_max);
 
-Heading_t Heading_Init_Random();
+Heading_e Heading_Init_Random();
 
 #endif /* COORD_H_ */

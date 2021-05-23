@@ -19,19 +19,19 @@ typedef enum
    SHIP_SUBMARINE,
    SHIP_BATTLESHIP,
    SHIP_AIRCRAFT_CARRIER
-} Ship_Type_t;
+} Ship_Type_e;
 
 typedef struct
 {
-   Ship_Type_t type;
+   Ship_Type_e type;
    Coord_t location;
-   Heading_t heading;
+   Heading_e heading;
    uint hits;
 } Ship_t;
 
 typedef struct
 {
-   Ship_Type_t type;
+   Ship_Type_e type;
    String_t name;
    uint length;
 } Ship_Info_t;
@@ -47,7 +47,7 @@ static const Ship_Info_t shipTable[] =
 
 #define NUM_SHIPS ARRAY_LEN(shipTable)
 
-static inline const Ship_Info_t * Ship_Get_Info(const Ship_Type_t type)
+static inline const Ship_Info_t * Ship_Get_Info(const Ship_Type_e type)
 {
    for (uint i = 0; i < NUM_SHIPS; i++)
    {

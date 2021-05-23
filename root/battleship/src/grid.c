@@ -49,7 +49,7 @@ Status_t Grid_Init_Offense(Grid_t *grid)
    {
       return STATUS_ERROR;
    }
-   grid->offense = malloc(grid->rows * grid->cols * sizeof(Hit_State_t));
+   grid->offense = malloc(grid->rows * grid->cols * sizeof(Hit_State_e));
    if (!grid->offense)
    {
       return STATUS_ERROR;
@@ -70,7 +70,7 @@ void Grid_Clear_Offense(const Grid_t *grid)
 {
    if (grid && grid->offense)
    {
-      memset(grid->offense, 0, grid->rows * grid->cols * sizeof(Hit_State_t));
+      memset(grid->offense, 0, grid->rows * grid->cols * sizeof(Hit_State_e));
    }
 }
 
@@ -145,7 +145,7 @@ static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship)
       }
       else
       {
-         Ship_Type_t ship_type =
+         Ship_Type_e ship_type =
             grid->defense[
                point.row * (int) grid->cols +
                point.col].ship_type;
@@ -165,7 +165,7 @@ static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship)
    return status;
 }
 
-void ShipTypeToStr(const Ship_Type_t type, char *str, const size_t str_len)
+void ShipTypeToStr(const Ship_Type_e type, char *str, const size_t str_len)
 {
    if (SHIP_NONE == type)
    {
@@ -181,7 +181,7 @@ void ShipTypeToStr(const Ship_Type_t type, char *str, const size_t str_len)
    }
 }
 
-void HitStateToStr(const Hit_State_t state, char *str, size_t str_len)
+void HitStateToStr(const Hit_State_e state, char *str, size_t str_len)
 {
    switch(state)
    {
