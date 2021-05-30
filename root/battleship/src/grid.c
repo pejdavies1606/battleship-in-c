@@ -18,9 +18,9 @@ Status_t Grid_Init(Grid_t *grid, uint rows, uint cols)
    {
       grid->rows = rows;
       grid->cols = cols;
-      if (Grid_Init_Defense(grid) &&
-          Grid_Init_Offense(grid) &&
-          Grid_Meta_Init(&grid->meta, rows, cols, 0, 1))
+      if ((STATUS_OK == Grid_Init_Defense(grid)) &&
+          (STATUS_OK == Grid_Init_Offense(grid)) &&
+          (STATUS_OK == Grid_Meta_Init(&grid->meta, rows, cols, 0, 1)))
       {
          status = STATUS_OK;
       }
@@ -79,7 +79,6 @@ Status_t Grid_Meta_Init(Grid_Meta_t* meta,
    size_t row_width, size_t col_width)
 {
    Status_t result = STATUS_ERROR;
-   meta = malloc(sizeof(Grid_Meta_t));
    if (meta)
    {
       meta->row_width = (row_width)
