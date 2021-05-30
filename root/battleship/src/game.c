@@ -39,6 +39,7 @@ Game_t * BattleShip_Game_Init(void)
    Window_Init(
       POS_WINDOW_X, POS_WINDOW_Y,
       SIZE_WINDOW_W, SIZE_WINDOW_H);
+
 #ifdef DEBUG
    Rng_Init(1606);
 #else
@@ -46,33 +47,36 @@ Game_t * BattleShip_Game_Init(void)
 #endif
 
    Game_t *game = malloc(sizeof(Game_t));
-   if (!game)
+   if (game)
    {
-      return NULL;
+      memset(game, 0, sizeof(Game_t));
+
+      game->players = Player_Init(NUM_PLAYERS);
+      if (!game->players)
+      {
+         free(game);
+         game = NULL;
+      }
+      else
+      {
+         game->ship_health.title = "Ship Health";
+         Scoreboard_Init(&game->ship_health, NUM_SHIPS);
+         for (uint i = 0; i < NUM_SHIPS; i++)
+         {
+            const Ship_Info_t ship_info = shipTable[i];
+            game->ship_health.entities[i].name = ship_info.name;
+            game->ship_health.entities[i].total = ship_info.length;
+         }
+
+         game->hit_score.title = SCOREBOARD_HITS_TITLE;
+         game->hit_score.num_entities = NUM_PLAYERS;
+         game->hit_score.width_score = SCOREBOARD_HITS_SCORE_WIDTH;
+         game->hit_score.width_total = SCOREBOARD_HITS_SCORE_WIDTH;
+
+         BattleShip_UI_Init();
+      }
    }
-   memset(game, 0, sizeof(Game_t));
 
-   game->ship_health.title = "Ship Health";
-   Scoreboard_Init(&game->ship_health, NUM_SHIPS);
-   for (uint i = 0; i < NUM_SHIPS; i++)
-   {
-      const Ship_Info_t ship_info = shipTable[i];
-      game->ship_health.entities[i].name = ship_info.name;
-      game->ship_health.entities[i].total = ship_info.length;
-   }
-
-   game->hit_score.title = SCOREBOARD_HITS_TITLE;
-   game->hit_score.num_entities = NUM_PLAYERS;
-   game->hit_score.width_score = SCOREBOARD_HITS_SCORE_WIDTH;
-   game->hit_score.width_total = SCOREBOARD_HITS_SCORE_WIDTH;
-
-   game->players = Player_Init(NUM_PLAYERS);
-   if (!game->players)
-   {
-      return NULL;
-   }
-
-   BattleShip_UI_Init();
    return game;
 }
 

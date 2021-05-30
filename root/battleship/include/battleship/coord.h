@@ -32,16 +32,15 @@ typedef struct
    String_t str;
 } HeadingInfo_t;
 
-static const HeadingInfo_t headingTable[] =
+#define LEN_HEADING 1
+#define NUM_HEADINGS 4
+static const HeadingInfo_t headingTable[NUM_HEADINGS] =
 {
    { HEADING_NORTH, "N" },
    { HEADING_EAST,  "E" },
    { HEADING_SOUTH, "S" },
    { HEADING_WEST,  "W" }
 };
-
-#define NUM_HEADINGS ARRAY_LEN(headingTable)
-#define LEN_HEADING 1
 
 static inline String_t Heading_Get_Str(Heading_e hdg)
 {
@@ -55,20 +54,23 @@ static inline String_t Heading_Get_Str(Heading_e hdg)
    return NULL;
 }
 
-static inline bool ValidateHeading(const String_t input)
+static inline bool Validate_Heading(const String_t input, void *output)
 {
-   if (!input || strlens(input) > LEN_HEADING)
+   bool result = false;
+   uint *heading = (uint*) output; // Heading_e might not be same size as uint
+   if (input && output && strlens(input) <= LEN_HEADING)
    {
-      return false;
-   }
-   for (uint i = 0; i < NUM_HEADINGS; i++)
-   {
-      if (0 == strncmp(input, headingTable[i].str, LEN_HEADING))
+      for (uint i = 0; i < NUM_HEADINGS; i++)
       {
-         return true;
+         if (0 == strncmp(input, headingTable[i].str, LEN_HEADING))
+         {
+            *heading = (uint) headingTable[i].hdg;
+            result = true;
+            break;
+         }
       }
    }
-   return false;
+   return result;
 }
 
 static inline Coord_t Coord_Init(int row, int col)

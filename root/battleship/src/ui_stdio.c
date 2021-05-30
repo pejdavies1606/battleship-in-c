@@ -16,14 +16,12 @@
 #include "conio21/conio2.h"
 #endif
 
-#if 0
-static int BattleShip_UI_Read(
+static bool BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
    uint option_max,
    uint *choice,
    InputParser_t InputParser);
-#endif
 
 static void ReadString(String_t str, size_t str_size, FILE *stream);
 
@@ -210,79 +208,79 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading)
 {
-   if (!location || !heading)
+   //char buf[8];
+   bool parse_success = false;
+   if (location && heading)
    {
-      return false;
+      //printf("Enter %s: ", "<A-J> <1-10> <N|E|S|W>");
+      //printf("Enter %s: ", "<0+> <0+> <0+>");
+      //ReadString(buf, sizeof(buf), stdin);
+      //parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
+      parse_success = true;
+      parse_success |= BattleShip_UI_Read("col <A-J>",
+            (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
+            (uint*) &location->col, NULL);
+      parse_success |= BattleShip_UI_Read("row <1-10>",
+            (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
+            (uint*) &location->row, NULL);
+      parse_success |= BattleShip_UI_Read("hdg <N|E|S|W>",
+            (size_t) LEN_HEADING, NUM_HEADINGS,
+            (uint*) heading, &Validate_Heading);
+      printf("%d %d %u\n", location->col, location->row, *heading);
    }
-   //printf("Enter %s: ", "<A-J> <1-10> <N|E|S|W>");
-   printf("Enter %s: ", "<0+> <0+> <0+>");
-   char buf[8];
-   ReadString(buf, sizeof(buf), stdin);
-   bool parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
-   printf("%d %d %u\n", location->col, location->row, *heading);
-   /*parse_success |= BattleShip_UI_Read("col", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
-         (uint*) &location->col, NULL);
-   parse_success |= BattleShip_UI_Read("row", (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
-         (uint*) &location->row, NULL);*/
-   /*parse_success |= BattleShip_UI_Read("hdg", (size_t) LEN_HEADING, NUM_HEADINGS,
-         (uint*) &heading, &ValidateHeading);*/
    return parse_success;
 }
 
-#if 0
-int BattleShip_UI_Read(
+bool BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
    uint option_max,
    uint *choice,
    InputParser_t InputParser)
 {
-   if (!choice)
-   {
-      return false;
-   }
    size_t chosen_option_len = option_len + 1;
-   String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );
+   String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(char) );
    uint chosen_option = UINT_MAX;
-   if (option_max == 0)
+   uint retries = 0;
+   bool result = false;
+
+   if (choice)
    {
-      option_max = UINT_MAX;
-   }
-   int retries = 0;
-   bool parse_success = false;
-   while (!parse_success && retries < MAX_READ_RETRIES)
-   {
+      if (option_max == 0)
+      {
+         option_max = UINT_MAX;
+      }
+
+      while (!result && retries < MAX_READ_RETRIES)
+      {
 #ifdef DEBUG
-      printf("%d Enter %s: ", retries, prompt);
+         printf("%d Enter %s: ", retries, prompt);
 #else
-      printf("Enter %s: ", prompt);
+         printf("Enter %s: ", prompt);
 #endif
-      ReadString(chosen_option_str, chosen_option_len, stdin);
-      if (InputParser)
-      {
-         parse_success = InputParser(chosen_option_str, (unsigned long*) &chosen_option);
+         ReadString(chosen_option_str, chosen_option_len, stdin);
+         if (InputParser)
+         {
+            result = InputParser(chosen_option_str, (void*) &chosen_option);
+         }
+         else
+         {
+            result = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
+         }
+         if (chosen_option >= option_max)
+         {
+            result = false;
+            retries++;
+         }
       }
-      else
+      free(chosen_option_str);
+      if (result)
       {
-         parse_success = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
-      }
-      if (chosen_option >= option_max)
-      {
-         parse_success = false;
-      }
-      if (!parse_success)
-      {
-         retries++;
+         *choice = chosen_option;
       }
    }
-   free(chosen_option_str);
-   if (InputParser)
-   {
-      *choice = chosen_option;
-   }
-   return !(retries == MAX_READ_RETRIES);
+   return result;
 }
-#endif
 
 void ReadString(String_t str, size_t str_size, FILE *stream)
 {

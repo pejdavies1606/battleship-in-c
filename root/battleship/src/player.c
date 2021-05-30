@@ -12,29 +12,36 @@ static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_e type);
 Player_t * Player_Init(uint num_players)
 {
    Player_t *players = malloc(num_players * sizeof(Player_t));
-   if (!players)
+
+   if (players)
    {
-      return NULL;
-   }
-   memset(players, 0, num_players * sizeof(Player_t));
+      memset(players, 0, num_players * sizeof(Player_t));
 
-   for (uint p = 0; p < num_players; p++)
-   {
-      Player_t *player = &players[p];
-      player->ships = Ship_Init(NUM_SHIPS);
-      if (!player->ships)
+      for (uint p = 0; p < num_players; p++)
       {
-         return NULL;
-      }
+         Player_t *player = &players[p];
 
-      for (uint i = 0; i < NUM_SHIPS; i++)
-      {
-         player->ships[i].type = shipTable[i].type;
-      }
-
-      if (STATUS_OK != Grid_Init(&player->grid, GRID_SIZE, GRID_SIZE))
-      {
-         return NULL;
+         if (STATUS_OK != Grid_Init(&player->grid, GRID_SIZE, GRID_SIZE))
+         {
+            free(players);
+            players = NULL;
+         }
+         else
+         {
+            player->ships = Ship_Init(NUM_SHIPS);
+            if (!player->ships)
+            {
+               free(players);
+               players = NULL;
+            }
+            else
+            {
+               for (uint i = 0; i < NUM_SHIPS; i++)
+               {
+                  player->ships[i].type = shipTable[i].type;
+               }
+            }
+         }
       }
    }
 
