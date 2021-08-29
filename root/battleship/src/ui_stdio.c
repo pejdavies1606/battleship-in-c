@@ -12,7 +12,7 @@
 
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
 // Borland-style CONIO implementation for MinGW/Dev-C++ (http://conio.sourceforge.net/)
-#if defined(MSDOS) && MSDOS == 1
+#if defined(CONIO)
 #include "conio21/conio2.h"
 #endif
 
@@ -30,7 +30,7 @@ void BattleShip_UI_Clear_Screen(void)
 #ifdef DEBUG
    puts("clrscr");
 #else
-#if defined(MSDOS) && MSDOS == 1
+#if defined(CONIO)
    clrscr();
 #else
    printf("\e[1;1H\e[2J")

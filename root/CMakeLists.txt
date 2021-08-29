@@ -6,12 +6,10 @@ set (BattleShip_VERSION_MAJOR 0)
 set (BattleShip_VERSION_MINOR 0)
 
 # preprocessor flags
-option(FOR_MSDOS "Use Conio to clear the screen" OFF)
+option(USE_CONIO "Use Conio to clear the screen" OFF)
 
-if (FOR_MSDOS)
-	add_definitions(-DMSDOS=1)
-else ()
-	add_definitions(-DMSDOS=0)
+if (USE_CONIO)
+	add_definitions(-DCONIO=1)
 endif ()
 
 # configure a header file to pass some of the CMake settings
