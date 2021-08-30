@@ -9,6 +9,7 @@
 #include <limits.h>
 #include "battleship/util.h"
 #include "battleship/ui.h"
+#include "battleship/input.h"
 
 // https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
 // Borland-style CONIO implementation for MinGW/Dev-C++ (http://conio.sourceforge.net/)
@@ -20,8 +21,7 @@ static bool BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
    uint option_max,
-   uint *choice,
-   InputParser_t InputParser);
+   InputData_t *data);
 
 static bool ReadString(String_t str, size_t str_size, FILE *stream);
 
@@ -185,14 +185,19 @@ void BattleShip_UI_Print_Menu(Menu_t *menu)
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 {
    bool result = false;
+   InputData_t option = { 0 };
    if (menu && choice)
    {
+      option.type = INPUT_ULONG;
       result = BattleShip_UI_Read(
           "option",
           menu->meta.column_width_index,
           menu->num_options,
-          choice,
-          NULL);
+          &option);
+      if (result)
+      {
+         *choice = option.val.ul;
+      }
    }
    return result;
 }
@@ -201,41 +206,41 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *head
 {
    bool result = false;
    bool parse_success[3] = { false };
-   uint col = 0;
-   uint row = 0;
-   uint hdg = 0;
+   InputData_t col = { 0 };
+   InputData_t row = { 0 };
+   InputData_t hdg = { 0 };
    int len = CalcNumWidth(GRID_SIZE);
    if (location && heading && len > 0)
    {
+      col.type = INPUT_ULONG;
+      row.type = INPUT_ULONG;
+      hdg.type = INPUT_HEADING;
       //printf("Enter %s: ", "<0+> <0+> <0+>");
       //parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
       parse_success[0] = BattleShip_UI_Read(
          "col <A-J>",
          (size_t) len,
          GRID_SIZE,
-         &col,
-         NULL);
+         &col);
       parse_success[1] = BattleShip_UI_Read(
          "row <1-10>",
          (size_t) len,
          GRID_SIZE,
-         &row,
-         NULL);
+         &row);
       parse_success[2] = BattleShip_UI_Read(
          "hdg <N|E|S|W>",
          LEN_HEADING,
          NUM_HEADINGS,
-         &hdg,
-         &Validate_Heading);
+         &hdg);
       result = (
          parse_success[0] &&
          parse_success[1] && 
          parse_success[2]);
       if (result)
       {
-         location->col = (int) col;
-         location->row = (int) row;
-         *heading = (Heading_e) hdg;
+         location->col = (int) col.val.ul;
+         location->row = (int) row.val.ul;
+         *heading = (Heading_e) hdg.val.hdg;
          printf("%d %d %u\n", location->col, location->row, *heading);
       }
    }
@@ -246,22 +251,19 @@ bool BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
    uint option_max,
-   uint *choice,
-   InputParser_t InputParser)
+   InputData_t *data)
 {
    size_t chosen_option_len = option_len + 1;
    String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(char) );
    uint chosen_option = UINT_MAX;
    uint retries = 0;
    bool result = false;
-
-   if (choice)
+   if (data)
    {
       if (option_max == 0)
       {
          option_max = UINT_MAX;
       }
-
       while (!result && retries < MAX_READ_RETRIES)
       {
 #ifdef DEBUG
@@ -269,30 +271,28 @@ bool BattleShip_UI_Read(
 #else
          printf("Enter %s: ", prompt);
 #endif
-         ReadString(chosen_option_str, chosen_option_len, stdin);
-         if (InputParser)
+         result = ReadString(
+            chosen_option_str,
+            chosen_option_len,
+            stdin);
+         if (result)
          {
-            result = InputParser(
+            result = ParseInput(
                chosen_option_str,
-               &chosen_option);
+               data);
+            if (result && data->type == INPUT_ULONG)
+            {
+               // TODO move into input.c
+               // use InputData_t::min/max
+               result = (data->val.ul < option_max);
+            }
          }
-         else
+         if (!result)
          {
-            result = ParseUnsignedLong(
-               chosen_option_str,
-               &chosen_option);
-         }
-         if (chosen_option >= option_max)
-         {
-            result = false;
             retries++;
          }
       }
       free(chosen_option_str);
-      if (result)
-      {
-         *choice = chosen_option;
-      }
    }
    return result;
 }

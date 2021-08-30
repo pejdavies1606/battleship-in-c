@@ -9,9 +9,34 @@
 #define _INPUT_H_
 
 #include "battleship/commondefs.h"
+#include "battleship/coord.h"
 
-typedef bool (*InputParser_t)(const String_t input, void *output);
+typedef enum InputType
+{
+  INPUT_ULONG,
+  INPUT_COORD_COL,
+  INPUT_COORD_ROW,
+  INPUT_HEADING
+} InputType_e;
 
-bool ParseHeading(const String_t input, void *output);
+typedef union InputVal
+{
+  unsigned long ul;
+  Coord_t loc;
+  Heading_e hdg;
+} InputVal_t;
+
+typedef struct InputData
+{
+  InputType_e type;
+  InputVal_t val;
+  InputVal_t min;
+  InputVal_t max;
+} InputData_t;
+
+bool ParseInput(const char *input, InputData_t *output);
+
+bool ParseUnsignedLong(const char *input, unsigned long *output);
+bool ParseHeading(const char *input, Heading_e *output);
 
 #endif /* _INPUT_H_ */

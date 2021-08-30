@@ -10,7 +10,6 @@
 
 #include <string.h>
 #include "battleship/commondefs.h"
-#include "battleship/input.h"
 
 typedef struct
 {
@@ -69,7 +68,5 @@ Coord_t Coord_Init_Random(
    int col_min, int col_max);
 
 Heading_e Heading_Init_Random();
-
-bool Validate_Heading(const String_t input, void *output);
 
 #endif /* COORD_H_ */
