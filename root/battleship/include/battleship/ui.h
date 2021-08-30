@@ -67,7 +67,7 @@ void BattleShip_UI_Print_Logo();
 Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid);
 
 Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message);
-Place_Menu_Option_e BattleShip_UI_Place_Menu();
+Place_Menu_Option_e BattleShip_UI_Place_Menu(const Grid_t *grid);
 Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid);
 void BattleShip_UI_Print_Place_Help();
 
