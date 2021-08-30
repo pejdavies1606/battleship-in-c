@@ -184,62 +184,62 @@ void BattleShip_UI_Print_Menu(Menu_t *menu)
 
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 {
-   size_t chosen_option_len = menu->meta.column_width_index + 1;
-   String_t chosen_option_str = malloc((chosen_option_len) * sizeof(char));
-   uint chosen_option = menu->num_options;
-   int retries = 0;
-   bool parse_success = false;
-   while (!parse_success && retries < MAX_READ_RETRIES)
+   bool result = false;
+   if (menu && choice)
    {
-#ifdef DEBUG
-      printf("%d Enter option: ", retries);
-#else
-      printf("Enter option: ");
-#endif
-      ReadString(
-         chosen_option_str,
-         chosen_option_len,
-         stdin);
-      parse_success = ParseUnsignedLong(
-          chosen_option_str,
-          &chosen_option);
-      if (chosen_option >= menu->num_options)
-      {
-         parse_success = false;
-      }
-      if (!parse_success)
-      {
-         retries++;
-      }
+      result = BattleShip_UI_Read(
+          "option",
+          menu->meta.column_width_index,
+          menu->num_options,
+          choice,
+          NULL);
    }
-   free(chosen_option_str);
-   *choice = chosen_option;
-   return !(retries == MAX_READ_RETRIES);
+   return result;
 }
 
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading)
 {
-   //char buf[8];
-   bool parse_success = false;
-   if (location && heading)
+   bool result = false;
+   bool parse_success[3] = { false };
+   uint col = 0;
+   uint row = 0;
+   uint hdg = 0;
+   int len = CalcNumWidth(GRID_SIZE);
+   if (location && heading && len > 0)
    {
-      //printf("Enter %s: ", "<A-J> <1-10> <N|E|S|W>");
       //printf("Enter %s: ", "<0+> <0+> <0+>");
-      //ReadString(buf, sizeof(buf), stdin);
       //parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
-      parse_success = true;
-      parse_success |= BattleShip_UI_Read("col <A-J>",
-            (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
-            (uint*) &location->col, NULL);
-      parse_success |= BattleShip_UI_Read("row <1-10>",
-            (size_t) CalcNumWidth((int) GRID_SIZE), GRID_SIZE,
-            (uint*) &location->row, NULL);
-      parse_success |= BattleShip_UI_Read("hdg <N|E|S|W>",
-            (size_t) LEN_HEADING, NUM_HEADINGS,
-            (uint*) heading, &Validate_Heading);
-      printf("%d %d %u\n", location->col, location->row, *heading);
+      parse_success[0] = BattleShip_UI_Read(
+         "col <A-J>",
+         (size_t) len,
+         GRID_SIZE,
+         &col,
+         NULL);
+      parse_success[1] = BattleShip_UI_Read(
+         "row <1-10>",
+         (size_t) len,
+         GRID_SIZE,
+         &row,
+         NULL);
+      parse_success[2] = BattleShip_UI_Read(
+         "hdg <N|E|S|W>",
+         LEN_HEADING,
+         NUM_HEADINGS,
+         &hdg,
+         &Validate_Heading);
+      result = (
+         parse_success[0] &&
+         parse_success[1] && 
+         parse_success[2]);
+      if (result)
+      {
+         location->col = (int) col;
+         location->row = (int) row;
+         *heading = (Heading_e) hdg;
+         printf("%d %d %u\n", location->col, location->row, *heading);
+      }
    }
-   return parse_success;
+   return result;
 }
 
 bool BattleShip_UI_Read(
