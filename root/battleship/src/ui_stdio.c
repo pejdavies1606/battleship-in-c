@@ -23,7 +23,7 @@ static bool BattleShip_UI_Read(
    uint *choice,
    InputParser_t InputParser);
 
-static void ReadString(String_t str, size_t str_size, FILE *stream);
+static bool ReadString(String_t str, size_t str_size, FILE *stream);
 
 void BattleShip_UI_Clear_Screen(void)
 {
@@ -185,7 +185,7 @@ void BattleShip_UI_Print_Menu(Menu_t *menu)
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 {
    size_t chosen_option_len = menu->meta.column_width_index + 1;
-   String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(*chosen_option_str) );
+   String_t chosen_option_str = malloc((chosen_option_len) * sizeof(char));
    uint chosen_option = menu->num_options;
    int retries = 0;
    bool parse_success = false;
@@ -196,10 +196,21 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
 #else
       printf("Enter option: ");
 #endif
-      ReadString(chosen_option_str, chosen_option_len, stdin);
-      parse_success = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
-      if (chosen_option >= menu->num_options) parse_success = false;
-      if (!parse_success) retries++;
+      ReadString(
+         chosen_option_str,
+         chosen_option_len,
+         stdin);
+      parse_success = ParseUnsignedLong(
+          chosen_option_str,
+          &chosen_option);
+      if (chosen_option >= menu->num_options)
+      {
+         parse_success = false;
+      }
+      if (!parse_success)
+      {
+         retries++;
+      }
    }
    free(chosen_option_str);
    *choice = chosen_option;
@@ -261,11 +272,15 @@ bool BattleShip_UI_Read(
          ReadString(chosen_option_str, chosen_option_len, stdin);
          if (InputParser)
          {
-            result = InputParser(chosen_option_str, (void*) &chosen_option);
+            result = InputParser(
+               chosen_option_str,
+               &chosen_option);
          }
          else
          {
-            result = ParseUnsignedLong(chosen_option_str, (unsigned long*) &chosen_option);
+            result = ParseUnsignedLong(
+               chosen_option_str,
+               &chosen_option);
          }
          if (chosen_option >= option_max)
          {
@@ -282,20 +297,28 @@ bool BattleShip_UI_Read(
    return result;
 }
 
-void ReadString(String_t str, size_t str_size, FILE *stream)
+bool ReadString(String_t str, size_t str_size, FILE *stream)
 {
+   bool result = false;
    // Type-ahead cannot be avoided by attempting to 'flush' stdin.
    // http://c-faq.com/stdio/gets_flush2.html
    // http://c-faq.com/stdio/stdinflush2.html
    //int c; while ((c = getchar()) != '\n' && c != EOF);
-   memset(str, 0, str_size);
-   size_t line_size = str_size + 1; // to account for newline from fgets
-   String_t line = malloc(line_size * sizeof(*line));
-   if (fgets(line, (int) line_size, stream))
+   if (str && str_size > 0 && stream)
    {
-      line = TrimStr(line, line_size);
-      strncpy(str, line, str_size);
-      free(line);
+      memset(str, 0, str_size);
+      size_t line_size = str_size + 1; // to account for newline from fgets
+      String_t line = malloc(line_size * sizeof(*line));
+      if (line)
+      {
+         if (fgets(line, (int)line_size, stream))
+         {
+            line = TrimStr(line, line_size);
+            strncpy(str, line, str_size);
+            free(line);
+            result = true;
+         }
+      }
    }
+   return result;
 }
-
