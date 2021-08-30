@@ -54,25 +54,6 @@ static inline String_t Heading_Get_Str(Heading_e hdg)
    return NULL;
 }
 
-static inline bool Validate_Heading(const String_t input, void *output)
-{
-   bool result = false;
-   uint *heading = (uint*) output; // Heading_e might not be same size as uint
-   if (input && output && strlens(input) <= LEN_HEADING)
-   {
-      for (uint i = 0; i < NUM_HEADINGS; i++)
-      {
-         if (0 == strncmp(input, headingTable[i].str, LEN_HEADING))
-         {
-            *heading = (uint) headingTable[i].hdg;
-            result = true;
-            break;
-         }
-      }
-   }
-   return result;
-}
-
 static inline Coord_t Coord_Init(int row, int col)
 {
    Coord_t coord =
@@ -88,5 +69,7 @@ Coord_t Coord_Init_Random(
    int col_min, int col_max);
 
 Heading_e Heading_Init_Random();
+
+bool Validate_Heading(const String_t input, void *output);
 
 #endif /* COORD_H_ */

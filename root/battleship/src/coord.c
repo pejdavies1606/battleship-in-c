@@ -31,3 +31,22 @@ Heading_e Heading_Init_Random()
    int i = rand() % (int) NUM_HEADINGS;
    return headingTable[i].hdg;
 }
+
+bool Validate_Heading(const String_t input, void *output)
+{
+   bool result = false;
+   uint *heading = (uint*) output; // Heading_e might not be same size as uint
+   if (input && output && strlens(input) <= LEN_HEADING)
+   {
+      for (uint i = 0; i < NUM_HEADINGS; i++)
+      {
+         if (0 == strncmp(input, headingTable[i].str, LEN_HEADING))
+         {
+            *heading = (uint) headingTable[i].hdg;
+            result = true;
+            break;
+         }
+      }
+   }
+   return result;
+}
