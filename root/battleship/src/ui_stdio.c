@@ -20,7 +20,6 @@
 static bool BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
-   uint option_max,
    InputData_t *data);
 
 static bool ReadString(String_t str, size_t str_size, FILE *stream);
@@ -78,6 +77,9 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
    Status_t result = STATUS_ERROR;
    Grid_State_t *defense = NULL;
    const Grid_Meta_t *grid_meta = NULL;
+   char ship_str[SIZE_STATE_STR + 1] = { 0 };
+   char state_str[SIZE_STATE_STR + 1] = { 0 };
+   char col_char = '\0';
 
    if (grid)
    {
@@ -86,11 +88,6 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
 
       if (defense && grid_meta)
       {
-         char ship_str[SIZE_STATE_STR + 1];
-         char state_str[SIZE_STATE_STR + 1];
-         memset(ship_str, 0, sizeof(ship_str));
-         memset(state_str, 0, sizeof(state_str));
-
          printf("%*s%s\n",
                (int)(grid_meta->row_width - 1), "",
                STR_DEF);
@@ -104,8 +101,9 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
                      SIZE_GRID_SPACE, grid_meta->corner_str);
                for (uint col = 0; col < grid->cols; col++)
                {
+                  Coord_ColToChar((int) col, &col_char);
                   printf("%*s%-*c", SIZE_GRID_SPACE, "", 
-                        (int)grid_meta->col_width, col + 65); // ASCII
+                        (int)grid_meta->col_width, col_char);
                }
                printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
             }
@@ -188,15 +186,15 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
    InputData_t option = { 0 };
    if (menu && choice)
    {
-      option.type = INPUT_ULONG;
+      option.type = INPUT_INT;
+      option.max.ival = (int) menu->num_options;
       result = BattleShip_UI_Read(
           "option",
           menu->meta.column_width_index,
-          menu->num_options,
           &option);
       if (result)
       {
-         *choice = option.val.ul;
+         *choice = (uint) option.val.ival;
       }
    }
    return result;
@@ -206,31 +204,25 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *head
 {
    bool result = false;
    bool parse_success[3] = { false };
-   InputData_t col = { 0 };
-   InputData_t row = { 0 };
+   InputData_t loc = { 0 };
    InputData_t hdg = { 0 };
-   int len = CalcNumWidth(GRID_SIZE);
+   int len = 1 + CalcNumWidth(GRID_SIZE); // J10
    if (location && heading && len > 0)
    {
-      col.type = INPUT_ULONG;
-      row.type = INPUT_ULONG;
+      loc.type = INPUT_COORD;
+      loc.max.loc.col = GRID_SIZE;
+      loc.max.loc.row = GRID_SIZE;
       hdg.type = INPUT_HEADING;
       //printf("Enter %s: ", "<0+> <0+> <0+>");
       //parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
       parse_success[0] = BattleShip_UI_Read(
-         "col <A-J>",
+         "loc <A1-J10>",
          (size_t) len,
-         GRID_SIZE,
-         &col);
-      parse_success[1] = BattleShip_UI_Read(
-         "row <1-10>",
-         (size_t) len,
-         GRID_SIZE,
-         &row);
+         &loc);
+      parse_success[1] = true;
       parse_success[2] = BattleShip_UI_Read(
          "hdg <N|E|S|W>",
          LEN_HEADING,
-         NUM_HEADINGS,
          &hdg);
       result = (
          parse_success[0] &&
@@ -238,8 +230,8 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *head
          parse_success[2]);
       if (result)
       {
-         location->col = (int) col.val.ul;
-         location->row = (int) row.val.ul;
+         location->col = (int) loc.val.loc.col;
+         location->row = (int) loc.val.loc.row;
          *heading = (Heading_e) hdg.val.hdg;
          printf("%d %d %u\n", location->col, location->row, *heading);
       }
@@ -250,20 +242,14 @@ bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *head
 bool BattleShip_UI_Read(
    String_t prompt,
    size_t option_len,
-   uint option_max,
    InputData_t *data)
 {
    size_t chosen_option_len = option_len + 1;
    String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(char) );
-   uint chosen_option = UINT_MAX;
    uint retries = 0;
    bool result = false;
    if (data)
    {
-      if (option_max == 0)
-      {
-         option_max = UINT_MAX;
-      }
       while (!result && retries < MAX_READ_RETRIES)
       {
 #ifdef DEBUG
@@ -274,19 +260,10 @@ bool BattleShip_UI_Read(
          result = ReadString(
             chosen_option_str,
             chosen_option_len,
-            stdin);
-         if (result)
-         {
-            result = ParseInput(
+            stdin) &&
+            ParseInput(
                chosen_option_str,
                data);
-            if (result && data->type == INPUT_ULONG)
-            {
-               // TODO move into input.c
-               // use InputData_t::min/max
-               result = (data->val.ul < option_max);
-            }
-         }
          if (!result)
          {
             retries++;

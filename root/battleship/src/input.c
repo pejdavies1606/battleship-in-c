@@ -5,6 +5,11 @@
 #include <limits.h>
 #include <string.h>
 
+static bool ParseLocation(const char *input, Coord_t *output);
+static bool ParseHeading(const char *input, Heading_e *output);
+
+static bool ValidateRange(int val, int min, int max);
+
 bool ParseInput(const char *str, InputData_t *data)
 {
    bool result = false;
@@ -12,12 +17,23 @@ bool ParseInput(const char *str, InputData_t *data)
    {
       switch (data->type)
       {
-      case INPUT_ULONG:
-         result = ParseUnsignedLong(str, &data->val.ul);
+      case INPUT_INT:
+         result = ParseInt(str, &data->val.ival) &&
+            ValidateRange(
+               (int) data->val.ival,
+               (int) data->min.ival,
+               (int) data->max.ival);
          break;
-      case INPUT_COORD_ROW:
-         break;
-      case INPUT_COORD_COL:
+      case INPUT_COORD:
+         result = ParseLocation(str, &data->val.loc) &&
+            ValidateRange(
+               data->val.loc.col,
+               0,
+               data->max.loc.col) &&
+            ValidateRange(
+               data->val.loc.row,
+               0,
+               data->max.loc.row);
          break;
       case INPUT_HEADING:
          result = ParseHeading(str, &data->val.hdg);
@@ -29,14 +45,15 @@ bool ParseInput(const char *str, InputData_t *data)
    return result;
 }
 
-bool ParseUnsignedLong(const char *str, unsigned long *val)
+bool ParseInt(const char *str, int *val)
 {
    bool result = false;
    char *endstr = NULL;
+   long lval = 0;
    if (str && val)
    {
       errno = 0;
-      *val = strtoul(str, &endstr, 10); // radix 10 = decimal
+      lval = strtol(str, &endstr, 10); // radix 10 = decimal
       if (endstr == str)
       {
          result = false; // invalid  (no digits found, 0 returned)
@@ -49,7 +66,7 @@ bool ParseUnsignedLong(const char *str, unsigned long *val)
       {
          result = false; // invalid  (base contains unsupported value)
       }
-      else if (errno != 0 && *val == 0)
+      else if (errno != 0 && lval == 0)
       {
          result = false; // invalid  (unspecified error occurred)
       }
@@ -61,6 +78,23 @@ bool ParseUnsignedLong(const char *str, unsigned long *val)
       {
          result = true; // valid  (but additional characters remain)
       }
+      if (result)
+      {
+         *val = (int)lval;
+      }
+   }
+   return result;
+}
+
+bool ParseLocation(const char *str, Coord_t *loc)
+{
+   bool result = false;
+   if (str && loc)
+   {
+      // [A-Z][0-9][0-9]
+      result =
+         Coord_ColFromChar(str[0], &loc->col) &&
+         Coord_RowFromStr(&str[1], &loc->row);
    }
    return result;
 }
@@ -68,20 +102,24 @@ bool ParseUnsignedLong(const char *str, unsigned long *val)
 bool ParseHeading(const char *str, Heading_e *hdg)
 {
    bool result = false;
-   if (str && hdg && strlens(str) <= LEN_HEADING)
+   if (str && hdg)
    {
       for (uint i = 0; i < NUM_HEADINGS; i++)
       {
-         if (0 == strncmp(
-            str,
-            headingTable[i].str,
-            LEN_HEADING))
+         if (str[0] == headingTable[i].c)
          {
-            *hdg = headingTable[i].hdg;
+            *hdg = headingTable[i].h;
             result = true;
             break;
          }
       }
    }
+   return result;
+}
+
+bool ValidateRange(int val, int min, int max)
+{
+   bool result = false;
+   result = (val >= min) && (val < max);
    return result;
 }

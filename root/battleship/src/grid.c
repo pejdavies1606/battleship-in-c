@@ -154,11 +154,11 @@ static Grid_Status_t Grid_Check_Ship(const Grid_t *grid, const Ship_t *ship)
          }
       }
    }
-   debug_print("(n,r,c,h,s)=(%c,%d,%d,%s,%c%c)\n",
+   debug_print("(n,r,c,h,s)=(%c,%d,%d,%c,%c%c)\n",
          ship_info->name[0],
          ship->location.row,
          ship->location.col,
-         Heading_Get_Str(ship->heading),
+         Heading_Get_Char(ship->heading),
          (status & GRID_STATUS_COLLISION ? '1' : '0'),
          (status & GRID_STATUS_BORDER) ? '1' : '0');
    return status;

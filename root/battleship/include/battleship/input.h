@@ -13,15 +13,14 @@
 
 typedef enum InputType
 {
-  INPUT_ULONG,
-  INPUT_COORD_COL,
-  INPUT_COORD_ROW,
+  INPUT_INT,
+  INPUT_COORD,
   INPUT_HEADING
 } InputType_e;
 
 typedef union InputVal
 {
-  unsigned long ul;
+  int ival;
   Coord_t loc;
   Heading_e hdg;
 } InputVal_t;
@@ -35,8 +34,6 @@ typedef struct InputData
 } InputData_t;
 
 bool ParseInput(const char *input, InputData_t *output);
-
-bool ParseUnsignedLong(const char *input, unsigned long *output);
-bool ParseHeading(const char *input, Heading_e *output);
+bool ParseInt(const char *input, int *output);
 
 #endif /* _INPUT_H_ */

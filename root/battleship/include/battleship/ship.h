@@ -71,7 +71,7 @@ static inline const uint * Ship_Get_Length_Array(void)
 
 static inline Coord_t Ship_Get_Point(const Ship_t *ship, const uint i)
 {
-   Coord_t point = Coord_Init(0, 0);
+   Coord_t point = { 0 };
    if (ship)
    {
       point = ship->location;
@@ -88,6 +88,8 @@ static inline Coord_t Ship_Get_Point(const Ship_t *ship, const uint i)
          break;
       case HEADING_WEST:
          point.col -= (int) i;
+         break;
+      case HEADING_UNKNOWN:
          break;
       }
    }
