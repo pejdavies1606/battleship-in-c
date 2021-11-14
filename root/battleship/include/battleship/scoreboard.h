@@ -26,6 +26,6 @@ typedef struct
    uint width_total;
 } Scoreboard_t;
 
-Status_t Scoreboard_Init(Scoreboard_t *scoreboard, uint num_entities);
+bool Scoreboard_Init(Scoreboard_t *scoreboard, uint num_entities);
 
 #endif /* SCOREBOARD_H_ */

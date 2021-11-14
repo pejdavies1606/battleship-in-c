@@ -34,7 +34,7 @@ typedef enum
    GRID_STATUS_COLLISION   = 0x2,
    GRID_STATUS_NULL        = 0xE,
    GRID_STATUS_UNKNOWN     = 0xF
-} Grid_Status_t;
+} Grid_Status_e;
 
 typedef struct
 {
@@ -55,20 +55,20 @@ typedef struct
    Grid_Meta_t meta;
 } Grid_t;
 
-Status_t Grid_Meta_Init(Grid_Meta_t* meta,
+bool Grid_Meta_Init(Grid_Meta_t* meta,
 		size_t row_size, size_t col_size,
 		size_t row_width, size_t col_width);
 
-Status_t Grid_Init(Grid_t *grid, uint rows, uint cols);
-Status_t Grid_Init_Defense(Grid_t *grid);
-Status_t Grid_Init_Offense(Grid_t *grid);
+bool Grid_Init(Grid_t *grid, uint rows, uint cols);
+bool Grid_Init_Defense(Grid_t *grid);
+bool Grid_Init_Offense(Grid_t *grid);
 
-void Grid_Clear_Defense(const Grid_t *grid);
-void Grid_Clear_Offense(const Grid_t *grid);
+bool Grid_Clear_Defense(const Grid_t *grid);
+bool Grid_Clear_Offense(const Grid_t *grid);
 
-Grid_Status_t Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship);
+Grid_Status_e Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship);
 
-void ShipTypeToStr(const Ship_Type_e type, char *str, const size_t str_len);
-void HitStateToStr(const Hit_State_e state, char *str, size_t str_len);
+bool ShipTypeToStr(const Ship_Type_e type, char *str, const size_t str_len);
+bool HitStateToStr(const Hit_State_e state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_GRID_H_ */

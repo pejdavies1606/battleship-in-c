@@ -59,20 +59,18 @@ typedef struct
 
 Grid_Meta_t* BattleShip_UI_Get_Grid_Meta(void);
 
-void BattleShip_UI_Init();
+bool BattleShip_UI_Init();
 
 void BattleShip_UI_Clear_Screen(void);
-void BattleShip_UI_Print_Message(String_t message);
+bool BattleShip_UI_Print_Message(String_t message);
 void BattleShip_UI_Print_Logo();
-Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid);
+bool BattleShip_UI_Print_Grid_Defense(const Grid_t *grid);
 
 Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message);
 Place_Menu_Option_e BattleShip_UI_Place_Menu(const Grid_t *grid);
 Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid);
-void BattleShip_UI_Print_Place_Help();
 
-void BattleShip_UI_Print_Menu(Menu_t *menu);
-void BattleShip_UI_Print_Ship_Menu(Menu_t *menu);
+bool BattleShip_UI_Print_Menu(Menu_t *menu);
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice);
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading);
 

@@ -28,6 +28,6 @@ typedef struct
    Menu_Meta_t meta;
 } Menu_t;
 
-void Menu_Meta_Init(Menu_t *menu);
+bool Menu_Meta_Init(Menu_t *menu);
 
 #endif /* MENU_H_ */

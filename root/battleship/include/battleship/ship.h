@@ -59,12 +59,15 @@ static inline const Ship_Info_t * Ship_Get_Info(const Ship_Type_e type)
    return NULL;
 }
 
-static inline const uint * Ship_Get_Length_Array(void)
+static inline uint * Ship_Get_Length_Array(void)
 {
    uint *ship_length = malloc(sizeof(uint) * NUM_SHIPS);
-   for (uint i = 0; i < NUM_SHIPS; i++)
+   if (ship_length)
    {
-      ship_length[i] = shipTable[i].length;
+      for (uint i = 0; i < NUM_SHIPS; i++)
+      {
+         ship_length[i] = shipTable[i].length;
+      }
    }
    return ship_length;
 }

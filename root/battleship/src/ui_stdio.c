@@ -67,31 +67,34 @@ void BattleShip_UI_Print_Logo(void)
 #endif
 }
 
-void BattleShip_UI_Print_Message(String_t message)
+bool BattleShip_UI_Print_Message(String_t message)
 {
-   puts(message);
+   bool result = false;
+   if (message)
+   {
+      puts(message);
+      result = true;
+   }
+   return result;
 }
 
-Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
+bool BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
 {
-   Status_t result = STATUS_ERROR;
+   bool result = false;
    Grid_State_t *defense = NULL;
    const Grid_Meta_t *grid_meta = NULL;
    char ship_str[SIZE_STATE_STR + 1] = { 0 };
    char state_str[SIZE_STATE_STR + 1] = { 0 };
    char col_char = '\0';
-
    if (grid)
    {
       defense = grid->defense;
       grid_meta = &grid->meta;
-
       if (defense && grid_meta)
       {
          printf("%*s%s\n",
                (int)(grid_meta->row_width - 1), "",
                STR_DEF);
-
          for (int row = -1; row < (int)(grid->rows + 1); row++)
          {
             if (row == -1)
@@ -133,7 +136,7 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
                printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V);
             }
          }
-         result = STATUS_OK;
+         result = true;
       }
    }
    return result;
@@ -147,37 +150,43 @@ Status_t BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
 {
 }*/
 
-void BattleShip_UI_Print_Menu(Menu_t *menu)
+bool BattleShip_UI_Print_Menu(Menu_t *menu)
 {
-   puts("");
-   printf("%*s%s\n", menu->meta.column_width_index, "", menu->title);
-   printf("%*s%s", menu->meta.column_width_index, "", "#");
-   for (uint col=0; col < menu->num_headers; col++)
+   bool result = false;
+   if (menu)
    {
-      uint column_width = (col == 0) ? 1 :
-         (menu->meta.column_width_data[col-1] - menu->meta.header_width_data[
-          (col-1)
-         ] + 1);
-      printf("%*s%s", column_width, "",
-            IF_NULL_VAL(menu->headers[col],"")
-            );
-   }
-   printf("\n");
-   for (uint row=0; row < menu->num_options; row++)
-   {
-      printf("%*s%d", menu->meta.column_width_index, "", row);
-      for (uint col=0; col < menu->num_headers; col++)
+      puts("");
+      printf("%*s%s\n", menu->meta.column_width_index, "", menu->title);
+      printf("%*s%s", menu->meta.column_width_index, "", "#");
+      for (uint col = 0; col < menu->num_headers; col++)
       {
-         uint column_width = (col == 0) ? 1 :
-            (menu->meta.column_width_data[col-1] - menu->meta.option_width_data[
-             row + (col-1)*menu->num_options
-            ] + 1);
+         uint column_width =
+             (col == 0)
+                 ? 1
+                 : (menu->meta.column_width_data[col - 1] -
+                    menu->meta.header_width_data[(col - 1)] + 1);
          printf("%*s%s", column_width, "",
-               IF_NULL_VAL(menu->options[row + col*menu->num_options],"")
-               );
+                IF_NULL_VAL(menu->headers[col], ""));
       }
       printf("\n");
+      for (uint row = 0; row < menu->num_options; row++)
+      {
+         printf("%*s%d", menu->meta.column_width_index, "", row);
+         for (uint col = 0; col < menu->num_headers; col++)
+         {
+            uint column_width =
+                (col == 0)
+                    ? 1
+                    : (menu->meta.column_width_data[col - 1] -
+                       menu->meta.option_width_data[row + (col - 1) * menu->num_options] + 1);
+            printf("%*s%s", column_width, "",
+                   IF_NULL_VAL(menu->options[row + col * menu->num_options], ""));
+         }
+         printf("\n");
+      }
+      result = true;
    }
+   return result;
 }
 
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)

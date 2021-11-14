@@ -30,9 +30,9 @@
 //static _Bool sunk, two_ai = false, configExist;
 //static _Bool p1sunk[NUM_SHIPS], p2sunk[NUM_SHIPS];
 
-static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice);
-static void Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice);
-static void Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice);
+static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice);
+static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice);
+static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice);
 
 Game_t * BattleShip_Game_Init(void)
 {
@@ -80,75 +80,92 @@ Game_t * BattleShip_Game_Init(void)
    return game;
 }
 
-void BattleShip_Game_Start(Game_t *game)
+bool BattleShip_Game_Start(Game_t *game)
 {
+   bool result = false;
    if (game)
    {
       // TODO while loop
-      Process_Main_Menu(&game->players[0], BattleShip_UI_Main_Menu(""));
+      result = Process_Main_Menu(&game->players[0], BattleShip_UI_Main_Menu(""));
    }
+   return result;
 }
 
-static void Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
+static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
 {
-   switch(choice.option)
+   bool result = false;
+   if (player)
    {
+      switch (choice.option)
+      {
       case MENU_OPTION_SHIP_RETURN:
-         Process_Place_Menu(player,
-            BattleShip_UI_Place_Menu(&player->grid));
+         result = Process_Place_Menu(
+             player,
+             BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_SHIP_PLACE:
+      {
+         Coord_t location;
+         Heading_e heading;
+         if (BattleShip_UI_Read_Ship_Location_Heading(&location, &heading))
          {
-            Coord_t location;
-            Heading_e heading;
-            BattleShip_UI_Read_Ship_Location_Heading(&location, &heading);
-            Ship_t ship = (Ship_t)
-            {
-               .type = choice.type,
-               .location = location,
-               .heading = heading
-            };
-            Player_Place_Ship(player, &ship);
+            Ship_t ship = (Ship_t){
+                .type = choice.type,
+                .location = location,
+                .heading = heading};
+            result = (GRID_STATUS_OK == Player_Place_Ship(player, &ship));
          }
-         break;
+      }
+      break;
+      }
    }
+   return result;
 }
 
-static void Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
+static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
 {
+   bool result = false;
    if (player)
    {
       switch (choice)
       {
       case MENU_OPTION_PLACE_RETURN:
-         return;
+         result = true;
+         break;
       case MENU_OPTION_PLACE_HELP:
          //BattleShip_UI_Print_Place_Help(); // TODO
          break;
       case MENU_OPTION_PLACE_AUTO:
          // TODO confirm yes/no
-         Player_Place_Ships_Auto(player);
-         Process_Place_Menu(
-            player,
-            BattleShip_UI_Place_Menu(&player->grid));
+         result = Player_Place_Ships_Auto(player) &&
+                  Process_Place_Menu(
+                      player,
+                      BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         Process_Ship_Menu(
+         result = Process_Ship_Menu(
             player,
             BattleShip_UI_Ship_Menu_Manual(&player->grid));
+         break;
       }
    }
+   return result;
 }
 
-static void Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
+static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
 {
-   switch(choice)
+   bool result = false;
+   if (player)
    {
+      switch (choice)
+      {
       case MENU_OPTION_MAIN_RETURN:
-         return;
+         result = true;
+         break;
       case MENU_OPTION_MAIN_PLACE:
-         Process_Place_Menu(player,
-               BattleShip_UI_Place_Menu(&player->grid));
+         result = Process_Place_Menu(
+             player,
+             BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_MAIN_BEGIN:
          break;
@@ -156,7 +173,9 @@ static void Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
          break;
       case MENU_OPTION_MAIN_ABOUT:
          break;
+      }
    }
+   return result;
 }
 
 // Identify which ship was hit and determine if it has been sunk.

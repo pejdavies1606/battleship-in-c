@@ -82,50 +82,82 @@ static Menu_t ship_menu =
    .headers = ship_menu_headers,
 };
 
-void BattleShip_UI_Init(void)
+bool BattleShip_UI_Init(void)
 {
-   Menu_Meta_Init( &main_menu );
-   Menu_Meta_Init( &place_menu );
-
-   // complete ship menu at runtime
+   bool result = false;
+   if (Menu_Meta_Init(&main_menu) &&
+       Menu_Meta_Init(&place_menu))
    {
+      // complete ship menu at runtime
       uint num_options = NUM_SHIPS + 1;
-      String_t *ship_menu_data = malloc(sizeof(String_t) * num_options * NUM_SHIP_MENU_HEADERS);
-      String_t return_str = ship_menu_options[MENU_OPTION_SHIP_RETURN];
-      String_t place_prefix = ship_menu_options[MENU_OPTION_SHIP_PLACE];
-      uint length_len = (uint)CalcNumWidth(CalcMax((int *)Ship_Get_Length_Array(), NUM_SHIPS)) + 1;
-
-      for (uint i = 0; i < num_options; i++)
+      size_t ship_menu_size = sizeof(String_t) * num_options * NUM_SHIP_MENU_HEADERS;
+      String_t *ship_menu_data = malloc(ship_menu_size);
+      if (ship_menu_data)
       {
-         uint name_index = i;
-         uint length_index = i + num_options;
-         if ( i == 0 )
+         memset(ship_menu_data, 0, ship_menu_size);
+         String_t return_str = ship_menu_options[MENU_OPTION_SHIP_RETURN];
+         String_t place_prefix = ship_menu_options[MENU_OPTION_SHIP_PLACE];
+         uint length_len = 0;
+         uint *ship_length = Ship_Get_Length_Array();
+         if (ship_length)
          {
-            size_t return_len = strlen(return_str) + 1;
-            ship_menu_data[name_index] = malloc(return_len);
-            snprintf(ship_menu_data[name_index], return_len, "%s", return_str);
-            ship_menu_data[length_index] = ""; // blank entry
+            length_len = (uint)CalcNumWidth(CalcMax((int *)ship_length, NUM_SHIPS)) + 1;
+            free(ship_length);
+            ship_length = NULL;
          }
-         else
+         result = true;
+         for (uint i = 0; i < num_options; i++)
          {
-            const Ship_Info_t *ship_info = &shipTable[i-1];
-            if (ship_info)
+            uint name_index = i;
+            uint length_index = i + num_options;
+            if (i == 0)
             {
-               String_t ship_name = ship_info->name;
-               uint ship_length = ship_info->length;
-               size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
-               ship_menu_data[name_index] = malloc(name_len);
-               ship_menu_data[length_index] = malloc(length_len);
-               snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, ship_name);
-               snprintf(ship_menu_data[length_index], length_len, "%u", ship_length);
+               size_t return_len = strlen(return_str) + 1;
+               ship_menu_data[name_index] = malloc(return_len);
+               if (ship_menu_data[name_index])
+               {
+                  snprintf(ship_menu_data[name_index], return_len, "%s", return_str);
+                  ship_menu_data[length_index] = ""; // blank entry
+               }
+               else
+               {
+                  result = false;
+                  break;
+               }
+            }
+            else
+            {
+               const Ship_Info_t *ship_info = &shipTable[i - 1];
+               if (ship_info)
+               {
+                  String_t ship_name = ship_info->name;
+                  uint ship_length = ship_info->length;
+                  size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
+                  ship_menu_data[name_index] = malloc(name_len);
+                  ship_menu_data[length_index] = malloc(length_len);
+                  if (ship_menu_data[name_index] && ship_menu_data[length_index])
+                  {
+                     snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, ship_name);
+                     snprintf(ship_menu_data[length_index], length_len, "%u", ship_length);
+                  }
+                  else
+                  {
+                     result = false;
+                     break;
+                  }
+               }
             }
          }
+         if (result)
+         {
+            // redefine template options table in menu with new, completed options table
+            ship_menu.num_options = num_options;
+            ship_menu.options = ship_menu_data;
+            result = Menu_Meta_Init(&ship_menu);
+         }
       }
-      // redefine template options table in menu with new, completed options table
-      ship_menu.num_options = num_options;
-      ship_menu.options = ship_menu_data;
    }
-   Menu_Meta_Init( &ship_menu );
+   return result;
 }
 
 Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message)
@@ -174,4 +206,3 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
       (Ship_Type_e) (option - 1)
    };
 }
-

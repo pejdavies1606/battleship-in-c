@@ -63,12 +63,14 @@ int CalcNumWidth(int n)
    return w;
 }
 
-int RepeatChar(String_t line, size_t size_line, char elem)
+bool RepeatChar(String_t line, size_t size_line, char elem)
 {
-   if ( ! memset(line, elem, size_line) )
+   bool result = false;
+   if (line && size_line > 0)
    {
-      return -1;
+      memset(line, elem, size_line);
+      line[size_line - 1] = '\0';
+      result = true;
    }
-   line[size_line - 1] = '\0';
-   return 0;
+   return result;
 }

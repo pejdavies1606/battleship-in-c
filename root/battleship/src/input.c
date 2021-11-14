@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+#include <ctype.h>
 
 static bool ParseLocation(const char *input, Coord_t *output);
 static bool ParseHeading(const char *input, Heading_e *output);
@@ -106,7 +107,7 @@ bool ParseHeading(const char *str, Heading_e *hdg)
    {
       for (uint i = 0; i < NUM_HEADINGS; i++)
       {
-         if (str[0] == headingTable[i].c)
+         if (toupper(str[0]) == headingTable[i].c)
          {
             *hdg = headingTable[i].h;
             result = true;

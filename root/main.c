@@ -11,6 +11,8 @@
 
 int main(int argc, char *argv[])
 {
+   bool result = false;
+
    printf("%s Version %d.%d\n",
       argv[0],
       BattleShip_VERSION_MAJOR,
@@ -21,11 +23,10 @@ int main(int argc, char *argv[])
    setvbuf(stdout, NULL, _IONBF, 0); // No buffering
 
    Game_t *game = BattleShip_Game_Init();
-   if (!game)
+   if (game)
    {
-      return STATUS_ERROR;
+      result = BattleShip_Game_Start(game);
    }
-   BattleShip_Game_Start(game);
 
    puts("done");
    getchar();

@@ -38,6 +38,6 @@ typedef struct
 } Game_t;
 
 Game_t * BattleShip_Game_Init();
-void BattleShip_Game_Start();
+bool BattleShip_Game_Start();
 
 #endif /* BATTLESHIP_GAME_H_ */

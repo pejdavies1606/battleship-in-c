@@ -38,10 +38,4 @@
 typedef unsigned int uint;
 typedef char *String_t;
 
-typedef enum
-{
-    STATUS_OK,
-    STATUS_ERROR
-} Status_t;
-
 #endif /* COMMONDEFS_H_ */
