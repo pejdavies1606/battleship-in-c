@@ -11,6 +11,9 @@
 #include <string.h>
 #include "battleship/commondefs.h"
 
+#define COORD_ROW_MAX 10
+#define COORD_COL_MAX 10
+
 typedef struct
 {
    int row;

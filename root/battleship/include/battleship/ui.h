@@ -28,6 +28,8 @@
 
 #define MAX_READ_RETRIES 3
 
+#define MAX_BUFFER_SIZE 80
+
 typedef enum
 {
    MENU_OPTION_MAIN_RETURN,

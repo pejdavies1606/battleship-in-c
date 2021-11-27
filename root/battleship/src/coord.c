@@ -38,9 +38,10 @@ Heading_e Heading_Init_Random()
 bool Coord_ColToChar(int col, char *c)
 {
    bool result = false;
-   if (c)
+   if (c && col >= 0 && col < COORD_COL_MAX)
    {
       *c = (char) (col + 'A'); // ASCII
+      result = true;
    }
    return result;
 }
@@ -66,10 +67,12 @@ bool Coord_RowFromStr(const char *str, int *row)
    int rowval = 0;
    if (row)
    {
-      result = ParseInt(str, &rowval);
-      if (result)
+      if (ParseInt(str, &rowval) &&
+         rowval > 0 &&
+         rowval <= COORD_ROW_MAX)
       {
          *row = rowval - 1;
+         result = true;
       }
    }
    return result;

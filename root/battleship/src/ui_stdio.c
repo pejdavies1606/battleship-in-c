@@ -80,63 +80,37 @@ bool BattleShip_UI_Print_Message(String_t message)
 
 bool BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
 {
+   Grid_Meta_t const * meta = NULL;
+   char * line = NULL;
+   size_t line_size = MAX_BUFFER_SIZE * sizeof(char);
    bool result = false;
-   Grid_State_t *defense = NULL;
-   const Grid_Meta_t *grid_meta = NULL;
-   char ship_str[SIZE_STATE_STR + 1] = { 0 };
-   char state_str[SIZE_STATE_STR + 1] = { 0 };
-   char col_char = '\0';
    if (grid)
    {
-      defense = grid->defense;
-      grid_meta = &grid->meta;
-      if (defense && grid_meta)
+      meta = &grid->meta;
+      line = malloc(line_size);
+      if (line)
       {
+         // title
          printf("%*s%s\n",
-               (int)(grid_meta->row_width - 1), "",
+               (int)(meta->row_width - 1), "",
                STR_DEF);
+         // iterate rows
+         result = true;
          for (int row = -1; row < (int)(grid->rows + 1); row++)
          {
-            if (row == -1)
+            memset(line, 0, line_size);
+            if (Grid_Get_Row_Defense(grid, row, line, line_size))
             {
-               // style choice: SIZE_GRID_SPACE instead of corner_len
-               printf("%*s%.*s", (int)(grid_meta->row_width - 1), "",
-                     SIZE_GRID_SPACE, grid_meta->corner_str);
-               for (uint col = 0; col < grid->cols; col++)
-               {
-                  Coord_ColToChar((int) col, &col_char);
-                  printf("%*s%-*c", SIZE_GRID_SPACE, "", 
-                        (int)grid_meta->col_width, col_char);
-               }
-               printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_CORNER);
-            }
-            else if(row == (int) grid->rows)
-            {
-               // style choice: SIZE_GRID_SPACE instead of corner_len
-               printf("%*s%.*s", (int)(grid_meta->row_width - 1), "",
-                     SIZE_GRID_SPACE, grid_meta->corner_str);
-               printf("%*s%.*s", SIZE_GRID_SPACE, "",
-                     (int)grid_meta->side_len, grid_meta->side_str);
-               printf("%*s%s\n", SIZE_GRID_SPACE, "",
-                     STR_GRID_CORNER);
+               printf("%s\n", line);
             }
             else
             {
-               printf("%*u", (int)grid_meta->row_width, row + 1);
-               for (int col = 0; col < (int) grid->cols; col++)
-               {
-                  Grid_State_t p = defense[row*(int)(grid->cols) + col];
-                  ShipTypeToStr(p.ship_type, ship_str, sizeof(ship_str));
-                  HitStateToStr(p.hit_state, state_str, sizeof(state_str));
-                  printf("%*s%*s",
-                        SIZE_GRID_SPACE, "",
-                        (int)grid_meta->col_width,
-                        (p.hit_state == STATE_HIT) ? state_str : ship_str);
-               }
-               printf("%*s%s\n", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V);
+               result = false;
+               break;
             }
          }
-         result = true;
+         free(line);
+         line = NULL;
       }
    }
    return result;

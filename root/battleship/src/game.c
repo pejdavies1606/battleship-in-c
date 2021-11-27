@@ -152,6 +152,30 @@ static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
    return result;
 }
 
+static bool Process_Begin_Game()
+{
+   /* screen
+    *    defense + offense grids
+    *    scoreboards
+    *    round counter
+    *    player turns
+    *       hit/miss
+    *       ship sunk
+    *       all ships sunk
+    */
+   /* loop
+    *    round counter
+    *    player turns
+    *       manual
+    *          read location
+    *       auto
+    *          random stage
+    *          circle stage
+    *             line stage
+    */
+   return false;
+}
+
 static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
 {
    bool result = false;
@@ -168,6 +192,7 @@ static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
              BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_MAIN_BEGIN:
+         result = Process_Begin_Game();
          break;
       case MENU_OPTION_MAIN_WATCH:
          break;
