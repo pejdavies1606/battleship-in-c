@@ -1,0 +1,26 @@
+@startuml
+package BattleShipLib {
+  [Game]
+  [Grid]
+  [Menu]
+  [Player]
+  [Ship]
+  [LibUI]
+}
+[Game] <-left- [Player]
+[Player] <-left- [Grid]
+[Player] <-down- [Ship]
+[Game] -[hidden]down- [LibUI]
+[LibUI] <-left- [Menu]
+package "BattleShipApp" {
+  [Main]
+  [AppUI]
+  [Window]
+}
+[AppUI] <-down- Stdio
+[AppUI] <-down- Curses
+[Window] -left-> [AppUI]
+[LibUI] -right-> [AppUI]
+[Game] -right-> [Main]
+[AppUI] -up-> [Main]
+@enduml
