@@ -31,8 +31,13 @@ Coord_t Coord_Init_Random(
 
 Heading_e Heading_Init_Random()
 {
-   int i = rand() % (int) NUM_HEADINGS - 1;
-   return headingTable[i + 1].h;
+   Heading_e h = HEADING_UNKNOWN;
+   int i = rand() % (NUM_HEADINGS - 1);
+   if (i >= 0 && i < NUM_HEADINGS)
+   {
+      h = headingTable[i].h;
+   }
+   return h;
 }
 
 bool Coord_ColToChar(int col, char *c)

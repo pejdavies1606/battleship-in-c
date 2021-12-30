@@ -61,23 +61,22 @@ Grid_Status_e Player_Place_Ship(Player_t *player, Ship_t *ship)
 
 bool Player_Place_Ships_Auto(Player_t *player)
 {
+   Ship_t ship = {0};
+   Grid_Status_e status = GRID_STATUS_UNKNOWN;
    bool result = false;
    if (player)
    {
       Grid_Clear_Defense(&player->grid);
       for (uint i = NUM_SHIPS; i > 0; i--)
       {
-         Grid_Status_e status = GRID_STATUS_UNKNOWN;
+         status = GRID_STATUS_UNKNOWN;
          do
          {
-            Coord_t location = Coord_Init_Random(
+            ship.type = shipTable[i - 1].type;
+            ship.location = Coord_Init_Random(
                 0, (int)player->grid.rows,
                 0, (int)player->grid.cols);
-            Heading_e heading = Heading_Init_Random();
-            Ship_t ship = (Ship_t){
-                .type = shipTable[i - 1].type,
-                .location = location,
-                .heading = heading};
+            ship.heading = Heading_Init_Random();
             status = Player_Place_Ship(player, &ship);
          } while (
              GRID_STATUS_BORDER & status ||

@@ -40,11 +40,11 @@ typedef struct
 #define HEADING_UNKNOWN_INDEX 0
 static const HeadingInfo_t headingTable[NUM_HEADINGS] =
 {
-   { HEADING_UNKNOWN, '\0'},
    { HEADING_NORTH,   'N' },
    { HEADING_EAST,    'E' },
    { HEADING_SOUTH,   'S' },
-   { HEADING_WEST,    'W' }
+   { HEADING_WEST,    'W' },
+   { HEADING_UNKNOWN, '0'}
 };
 
 static inline char Heading_Get_Char(Heading_e h)
