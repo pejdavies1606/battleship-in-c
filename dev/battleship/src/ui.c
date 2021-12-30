@@ -218,7 +218,7 @@ Place_Menu_Option_e BattleShip_UI_Place_Menu(const Grid_t *grid)
    while(!read_success)
    {
       BattleShip_UI_Clear_Screen();
-      BattleShip_UI_Print_Grid_Defense(grid);
+      BattleShip_UI_Print_Grid(grid, false);
       BattleShip_UI_Print_Menu(&place_menu);
       read_success = BattleShip_UI_Read_Menu(&place_menu, (uint*) &choice);
    }
@@ -232,7 +232,7 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
    while(!read_success)
    {
       BattleShip_UI_Clear_Screen();
-      BattleShip_UI_Print_Grid_Defense(grid);
+      BattleShip_UI_Print_Grid(grid, false);
       BattleShip_UI_Print_Menu(&ship_menu);
       read_success = BattleShip_UI_Read_Menu(&ship_menu, (uint*) &option);
    }
@@ -241,4 +241,10 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
       (option == MENU_OPTION_SHIP_RETURN) ? option : MENU_OPTION_SHIP_PLACE,
       (Ship_Type_e) (option - 1)
    };
+}
+
+void BattleShip_UI_Game_Menu(const Grid_t *grid)
+{
+   BattleShip_UI_Clear_Screen();
+   BattleShip_UI_Print_Grid(grid, true);
 }

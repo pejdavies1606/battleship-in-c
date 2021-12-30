@@ -25,8 +25,9 @@
 #define STR_GRID_CORNER "+"
 #define SIZE_GRID_SPACE 1
 
-#define STR_DEF "DEFENSE"
-#define STR_OFF "OFFENSE"
+#define STR_TITLE_DEFENSE "DEFENSE"
+#define STR_TITLE_OFFENSE "OFFENSE"
+#define SIZE_TITLE_STR 7
 
 #define MAX_READ_RETRIES 3
 
@@ -69,7 +70,7 @@ bool BattleShip_UI_Init();
 void BattleShip_UI_Clear_Screen(void);
 bool BattleShip_UI_Print_Message(String_t message);
 void BattleShip_UI_Print_Logo();
-bool BattleShip_UI_Print_Grid_Defense(const Grid_t *grid);
+bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense);
 
 Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message);
 Place_Menu_Option_e BattleShip_UI_Place_Menu(const Grid_t *grid);
@@ -78,6 +79,8 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid);
 bool BattleShip_UI_Print_Menu(Menu_t *menu);
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice);
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading);
+
+void BattleShip_UI_Game_Menu(const Grid_t *grid);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 

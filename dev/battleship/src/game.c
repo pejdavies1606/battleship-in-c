@@ -152,8 +152,9 @@ static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
    return result;
 }
 
-static bool Process_Begin_Game()
+static bool Process_Begin_Game(Player_t *player)
 {
+   BattleShip_UI_Game_Menu(&player->grid);
    /* screen
     *    defense + offense grids
     *    scoreboards
@@ -171,7 +172,7 @@ static bool Process_Begin_Game()
     *       auto
     *          random stage
     *          circle stage
-    *             line stage
+    *            line stage
     */
    return false;
 }
@@ -192,7 +193,7 @@ static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
              BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_MAIN_BEGIN:
-         result = Process_Begin_Game();
+         result = Process_Begin_Game(player);
          break;
       case MENU_OPTION_MAIN_WATCH:
          break;

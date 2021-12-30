@@ -10,6 +10,7 @@
 
 #include "battleship/commondefs.h"
 
+#define GRID_ROW_TITLE -2
 #define GRID_ROW_HEADER -1
 
 typedef enum
@@ -67,8 +68,9 @@ bool Grid_Init_Offense(Grid_t *grid);
 bool Grid_Clear_Defense(const Grid_t *grid);
 bool Grid_Clear_Offense(const Grid_t *grid);
 
-bool Grid_Get_Row_Defense(
+bool Grid_Get_Row(
    Grid_t const * const grid,
+   bool showOffense,
    int row,
    char * const line,
    size_t line_size);

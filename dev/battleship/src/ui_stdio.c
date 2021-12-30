@@ -68,7 +68,7 @@ bool BattleShip_UI_Print_Message(String_t message)
    return result;
 }
 
-bool BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
+bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
 {
    Grid_Meta_t const * meta = NULL;
    char * line = NULL;
@@ -80,16 +80,12 @@ bool BattleShip_UI_Print_Grid_Defense(const Grid_t *grid)
       line = malloc(line_size);
       if (line)
       {
-         // title
-         printf("%*s%s\n",
-               (int)(meta->row_width - 1), "",
-               STR_DEF);
          // iterate rows
          result = true;
-         for (int row = -1; row < (int)(grid->rows + 1); row++)
+         for (int row = GRID_ROW_TITLE; row < (int)(grid->rows + 1); row++)
          {
             memset(line, 0, line_size);
-            if (Grid_Get_Row_Defense(grid, row, line, line_size))
+            if (Grid_Get_Row(grid, showOffense, row, line, line_size))
             {
                printf("%s\n", line);
             }

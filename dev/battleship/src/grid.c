@@ -104,180 +104,234 @@ bool Grid_Clear_Offense(const Grid_t *grid)
    return result;
 }
 
-bool Grid_Get_Row_Defense(
+bool Grid_Get_Row(
    Grid_t const * const grid,
+   bool showOffense,
    int row,
    char * const line,
    size_t line_size)
 {
    Grid_State_t * defense = NULL;
+   Hit_State_e * offense = NULL;
    Grid_Meta_t const * meta = NULL;
    char ship_str[SIZE_STATE_STR + 1] = { 0 };
    char state_str[SIZE_STATE_STR + 1] = { 0 };
    char col_char = '\0';
-   Grid_State_t cell = { 0 };
+   Grid_State_t cell_defense = { 0 };
+   Hit_State_e cell_offense = HIT_STATE_BLANK;
    size_t line_pos = 0;
+   int i = 0;
    bool result = false;
 
    if (NULL != grid &&
-       NULL != grid->defense &&
        Grid_Meta_Is_Valid(&grid->meta) &&
        NULL != line &&
        line_size > 0)
    {
-      defense = grid->defense;
-      meta = &grid->meta;
-      if (row == GRID_ROW_HEADER)
+      if (showOffense)
       {
-         // header row
-         result = true;
-         // grid corner
-         if (snprintf(
-                 line + line_pos, line_size - line_pos,
-                 "%*s%.*s", (int)(meta->row_width - 1), "",
-                 SIZE_GRID_SPACE, meta->corner_str) > 0)
-         {
-            line_pos += (meta->row_width - 1 + SIZE_GRID_SPACE);
-         }
-         else
-         {
-            result = false;
-         }
-         if (result)
-         {
-            // column labels
-            for (uint col = 0; col < grid->cols; col++)
-            {
-               col_char = '\0';
-               if (Coord_ColToChar((int)col, &col_char) &&
-                   (snprintf(
-                             line + line_pos, line_size - line_pos,
-                             "%*s%-*c", SIZE_GRID_SPACE, "",
-                             (int)meta->col_width, col_char) > 0))
-               {
-                  line_pos += (SIZE_GRID_SPACE + meta->col_width);
-               }
-               else
-               {
-                  result = false;
-                  break;
-               }
-            }
-         }
-         if (result)
-         {
-            // grid corner
-            if (snprintf(
-                         line + line_pos, line_size - line_pos,
-                         "%*s%s", SIZE_GRID_SPACE, "",
-                         STR_GRID_CORNER) > 0)
-            {
-               line_pos += (SIZE_GRID_SPACE + 1);
-            }
-            else
-            {
-               result = false;
-            }
-         }
-      }
-      else if (row == (int) grid->rows)
-      {
-         // footer row
-         result = true;
-         // grid corner
-         if (snprintf(
-                      line + line_pos, line_size - line_pos,
-                      "%*s%.*s", (int)(meta->row_width - 1), "",
-                      SIZE_GRID_SPACE, meta->corner_str) > 0)
-         {
-            line_pos += (meta->row_width - 1 + SIZE_GRID_SPACE);
-         }
-         else
-         {
-            result = false;
-         }
-         if (result)
-         {
-            // row filler
-            if (snprintf(
-                         line + line_pos, line_size - line_pos,
-                         "%*s%.*s", SIZE_GRID_SPACE, "",
-                         (int)meta->side_len, meta->side_str) > 0)
-            {
-               line_pos += (SIZE_GRID_SPACE + meta->side_len - 1);
-            }
-            else
-            {
-               result = false;
-            }
-         }
-         if (result)
-         {
-            // grid corner
-            if (snprintf(
-                         line + line_pos, line_size - line_pos,
-                         "%*s%s", SIZE_GRID_SPACE, "",
-                         STR_GRID_CORNER) > 0)
-            {
-               line_pos += (SIZE_GRID_SPACE + 1);
-            }
-            else
-            {
-               result = false;
-            }
-         }
+         offense = grid->offense;
       }
       else
       {
-         // numbered rows
-         result = true;
-         // row label
-         if (snprintf(
-                      line + line_pos, line_size - line_pos,
-                      "%*u", (int)meta->row_width, row + 1) > 0)
+         defense = grid->defense;
+      }
+
+      if (defense || offense)
+      {
+         meta = &grid->meta;
+
+         if (row == GRID_ROW_TITLE)
          {
-            line_pos += (meta->row_width);
-         }
-         else
-         {
-            result = false;
-         }
-         if (result)
-         {
-            // cell states
-            for (int col = 0; col < (int)grid->cols; col++)
-            {
-               cell = defense[row * (int)(grid->cols) + col];
-               if (Ship_Type_To_Str(cell.ship_type, ship_str, SIZE_STATE_STR + 1) &&
-                   Hit_State_To_Str(cell.hit_state, state_str, SIZE_STATE_STR + 1) &&
-                  (snprintf(
-                      line + line_pos, line_size - line_pos,
-                      "%*s%*s",
-                      SIZE_GRID_SPACE, "",
-                      (int)meta->col_width,
-                      (cell.hit_state == HIT_STATE_HIT) ? state_str : ship_str) > 0))
-               {
-                  line_pos += (SIZE_GRID_SPACE + meta->col_width);
-               }
-               else
-               {
-                  result = false;
-                  break;
-               }
-            }
-         }
-         if (result)
-         {
-            // column filler
+            // title row
+            result = true;
             if (snprintf(
-                         line + line_pos, line_size - line_pos,
-                         "%*s%s", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V) > 0)
+                    line + line_pos, line_size - line_pos,
+                    "%*s%s", (int)(meta->row_width - 1), "",
+                    (showOffense) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE) > 0)
             {
-               line_pos += (SIZE_GRID_SPACE + 1);
+               line_pos += (meta->row_width - 1 + SIZE_TITLE_STR);
             }
             else
             {
                result = false;
+            }
+         }
+         else if (row == GRID_ROW_HEADER)
+         {
+            // header row
+            result = true;
+            // grid corner
+            if (snprintf(
+                    line + line_pos, line_size - line_pos,
+                    "%*s%.*s", (int)(meta->row_width - 1), "",
+                    SIZE_GRID_SPACE, meta->corner_str) > 0)
+            {
+               line_pos += (meta->row_width - 1 + SIZE_GRID_SPACE);
+            }
+            else
+            {
+               result = false;
+            }
+            if (result)
+            {
+               // column labels
+               for (uint col = 0; col < grid->cols; col++)
+               {
+                  col_char = '\0';
+                  if (Coord_ColToChar((int)col, &col_char) &&
+                      (snprintf(
+                           line + line_pos, line_size - line_pos,
+                           "%*s%-*c", SIZE_GRID_SPACE, "",
+                           (int)meta->col_width, col_char) > 0))
+                  {
+                     line_pos += (SIZE_GRID_SPACE + meta->col_width);
+                  }
+                  else
+                  {
+                     result = false;
+                     break;
+                  }
+               }
+            }
+            if (result)
+            {
+               // grid corner
+               if (snprintf(
+                       line + line_pos, line_size - line_pos,
+                       "%*s%s", SIZE_GRID_SPACE, "",
+                       STR_GRID_CORNER) > 0)
+               {
+                  line_pos += (SIZE_GRID_SPACE + 1);
+               }
+               else
+               {
+                  result = false;
+               }
+            }
+         }
+         else if (row == (int)grid->rows)
+         {
+            // footer row
+            result = true;
+            // grid corner
+            if (snprintf(
+                    line + line_pos, line_size - line_pos,
+                    "%*s%.*s", (int)(meta->row_width - 1), "",
+                    SIZE_GRID_SPACE, meta->corner_str) > 0)
+            {
+               line_pos += (meta->row_width - 1 + SIZE_GRID_SPACE);
+            }
+            else
+            {
+               result = false;
+            }
+            if (result)
+            {
+               // row filler
+               if (snprintf(
+                       line + line_pos, line_size - line_pos,
+                       "%*s%.*s", SIZE_GRID_SPACE, "",
+                       (int)meta->side_len, meta->side_str) > 0)
+               {
+                  line_pos += (SIZE_GRID_SPACE + meta->side_len - 1);
+               }
+               else
+               {
+                  result = false;
+               }
+            }
+            if (result)
+            {
+               // grid corner
+               if (snprintf(
+                       line + line_pos, line_size - line_pos,
+                       "%*s%s", SIZE_GRID_SPACE, "",
+                       STR_GRID_CORNER) > 0)
+               {
+                  line_pos += (SIZE_GRID_SPACE + 1);
+               }
+               else
+               {
+                  result = false;
+               }
+            }
+         }
+         else
+         {
+            // numbered rows
+            result = true;
+            // row label
+            if (snprintf(
+                    line + line_pos, line_size - line_pos,
+                    "%*u", (int)meta->row_width, row + 1) > 0)
+            {
+               line_pos += (meta->row_width);
+            }
+            else
+            {
+               result = false;
+            }
+            if (result)
+            {
+               // cell states
+               for (int col = 0; col < (int)grid->cols; col++)
+               {
+                  i = row * (int)(grid->cols) + col;
+                  if (showOffense)
+                  {
+                     cell_offense = offense[i];
+                     if (Hit_State_To_Str(cell_offense, state_str, SIZE_STATE_STR + 1) &&
+                         (snprintf(
+                              line + line_pos, line_size - line_pos,
+                              "%*s%*s",
+                              SIZE_GRID_SPACE, "",
+                              (int)meta->col_width,
+                              state_str) > 0))
+                     {
+                        line_pos += (SIZE_GRID_SPACE + meta->col_width);
+                     }
+                     else
+                     {
+                        result = false;
+                        break;
+                     }
+                  }
+                  else
+                  {
+                     cell_defense = defense[i];
+                     if (Ship_Type_To_Str(cell_defense.ship_type, ship_str, SIZE_STATE_STR + 1) &&
+                         Hit_State_To_Str(cell_defense.hit_state, state_str, SIZE_STATE_STR + 1) &&
+                         (snprintf(
+                              line + line_pos, line_size - line_pos,
+                              "%*s%*s",
+                              SIZE_GRID_SPACE, "",
+                              (int)meta->col_width,
+                              (cell_defense.hit_state == HIT_STATE_HIT) ? state_str : ship_str) > 0))
+                     {
+                        line_pos += (SIZE_GRID_SPACE + meta->col_width);
+                     }
+                     else
+                     {
+                        result = false;
+                        break;
+                     }
+                  }
+               }
+            }
+            if (result)
+            {
+               // column filler
+               if (snprintf(
+                       line + line_pos, line_size - line_pos,
+                       "%*s%s", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V) > 0)
+               {
+                  line_pos += (SIZE_GRID_SPACE + 1);
+               }
+               else
+               {
+                  result = false;
+               }
             }
          }
       }
