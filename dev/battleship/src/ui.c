@@ -17,6 +17,32 @@
 #define NUM_PLACE_MENU_HEADERS 1
 #define NUM_SHIP_MENU_HEADERS 2
 
+// ASCII font 'cybermedium' http://www.topster.de/text-to-ascii/cybermedium.html
+char const *LOGO[NUM_LOGO_ROWS] =
+{
+    "                       |                           ",
+    "                       |                           ",
+    "                 .  -  +  -  .                     ",
+    "              +'       |       '+                  ",
+    "            +          |          +                ",
+    " ___  ____+___ ___ _   |____ ____ _ +_ _ ___  ____ ",
+    " |__] |__|  |   |  |   ||___ [__  |__| | |__] [__  ",
+    " |__] | /|  |   |  |___||___ ___] |  |\\| |    ___] ",
+    "       '               |               '           ",
+    "       |             _ |_  _           |           ",
+    "   ----+-------------|-+|\\ |-----------+----       ",
+    "       |             | || \\|           |           ",
+    "       .            _______            .           ",
+    "       \\            |  |               /           ",
+    "        \\           |  |              /            ",
+    "          +         |__|___         +              ",
+    "            +          |          +                ",
+    "              +.       |       .+                  ",
+    "                 '  -  +  -  '                     ",
+    "                       |                           ",
+    "                       |                           "
+};
+
 static String_t main_menu_headers[NUM_MAIN_MENU_HEADERS] =
 {
    "Option"
@@ -156,6 +182,16 @@ bool BattleShip_UI_Init(void)
             result = Menu_Meta_Init(&ship_menu);
          }
       }
+   }
+   return result;
+}
+
+char const * BattleShip_UI_Get_Logo(int row)
+{
+   char const * result = NULL;
+   if (row >= 0 && row < NUM_LOGO_ROWS)
+   {
+      result = LOGO[row];
    }
    return result;
 }

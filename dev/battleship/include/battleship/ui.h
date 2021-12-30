@@ -12,6 +12,8 @@
 #include "battleship/menu.h"
 #include "battleship/player.h"
 
+#define NUM_LOGO_ROWS 21
+
 #define NUM_MAIN_MENU_OPTIONS 5 // must match enum below
 #define NUM_PLACE_MENU_OPTIONS 4 // must match enum below
 #define NUM_SHIP_MENU_OPTIONS 2 // must match enum below
@@ -59,7 +61,8 @@ typedef struct
    Ship_Type_e          type;
 } Ship_Menu_Choice_t;
 
-Grid_Meta_t* BattleShip_UI_Get_Grid_Meta(void);
+char const * BattleShip_UI_Get_Logo(int row);
+Grid_Meta_t * BattleShip_UI_Get_Grid_Meta(void);
 
 bool BattleShip_UI_Init();
 

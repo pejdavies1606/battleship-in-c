@@ -39,31 +39,21 @@ void BattleShip_UI_Clear_Screen(void)
 
 void BattleShip_UI_Print_Logo(void)
 {
+   char const *line = NULL;
+   int row = 0;
 #ifdef DEBUG
+   UNUSED(line);
+   UNUSED(row);
    puts("logo");
 #else
-   // ASCII font 'cybermedium' http://www.topster.de/text-to-ascii/cybermedium.html
-   puts("                       |                           ");
-   puts("                       |                           ");
-   puts("                 .  -  +  -  .                     ");
-   puts("              +'       |       '+                  ");
-   puts("            +          |          +                ");
-   puts(" ___  ____+___ ___ _   |____ ____ _ +_ _ ___  ____ ");
-   puts(" |__] |__|  |   |  |   ||___ [__  |__| | |__] [__  ");
-   puts(" |__] | /|  |   |  |___||___ ___] |  |\\| |    ___] ");
-   puts("       '               |               '           ");
-   puts("       |             _ |_  _           |           ");
-   puts("   ----+-------------|-+|\\ |-----------+----       ");
-   puts("       |             | || \\|           |           ");
-   puts("       .            _______            .           ");
-   puts("       \\            |  |               /           ");
-   puts("        \\           |  |              /            ");
-   puts("          +         |__|___         +              ");
-   puts("            +          |          +                ");
-   puts("              +.       |       .+                  ");
-   puts("                 '  -  +  -  '                     ");
-   puts("                       |                           ");
-   puts("                       |                           ");
+   for (row = 0; row < NUM_LOGO_ROWS; row++)
+   {
+      line = BattleShip_UI_Get_Logo(row);
+      if (line)
+      {
+         puts(line);
+      }
+   }
 #endif
 }
 
