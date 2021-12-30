@@ -70,13 +70,11 @@ bool BattleShip_UI_Print_Message(String_t message)
 
 bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
 {
-   Grid_Meta_t const * meta = NULL;
    char * line = NULL;
    size_t line_size = MAX_BUFFER_SIZE * sizeof(char);
    bool result = false;
    if (grid)
    {
-      meta = &grid->meta;
       line = malloc(line_size);
       if (line)
       {

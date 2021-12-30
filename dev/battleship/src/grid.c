@@ -40,6 +40,14 @@ static Grid_Status_e Grid_Check_Ship(
    const Grid_t *grid,
    const Ship_t *ship);
 
+static bool AppendLine(
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos,
+    size_t const space_len,
+    char *const str,
+    size_t const str_size);
+
 bool Grid_Init(Grid_t *grid, uint rows, uint cols)
 {
    bool result = false;
@@ -114,9 +122,9 @@ bool Grid_Get_Row(
    Grid_State_t * defense = NULL;
    Hit_State_e * offense = NULL;
    Grid_Meta_t const * meta = NULL;
-   char ship_str[SIZE_STATE_STR + 1] = { 0 };
-   char state_str[SIZE_STATE_STR + 1] = { 0 };
-   char col_char = '\0';
+   char ship_str[SIZE_STATE_STR + 1] = {0};
+   char state_str[SIZE_STATE_STR + 1] = {0};
+   char col_str[2] = {0};
    Grid_State_t cell_defense = { 0 };
    Hit_State_e cell_offense = HIT_STATE_BLANK;
    size_t line_pos = 0;
@@ -144,52 +152,43 @@ bool Grid_Get_Row(
          if (row == GRID_ROW_TITLE)
          {
             // title row
-            result = true;
-            if (snprintf(
-                    line + line_pos, line_size - line_pos,
-                    "%*s%s", (int)(meta->row_width - 1), "",
-                    (showOffense) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE) > 0)
-            {
-               line_pos += (meta->row_width - 1 + SIZE_TITLE_STR);
-            }
-            else
-            {
-               result = false;
-            }
+            result = AppendLine(
+                line,
+                line_size,
+                &line_pos,
+                meta->row_width - 1,
+                (showOffense) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
+                SIZE_TITLE_STR);
          }
          else if (row == GRID_ROW_HEADER)
          {
             // header row
-            result = true;
             // grid corner
-            if (snprintf(
-                    line + line_pos, line_size - line_pos,
-                    "%*s%.*s", (int)(meta->row_width - 1), "",
-                    SIZE_GRID_SPACE, meta->corner_str) > 0)
-            {
-               line_pos += (meta->row_width - 1 + SIZE_GRID_SPACE);
-            }
-            else
-            {
-               result = false;
-            }
+            result = AppendLine(
+                line,
+                line_size,
+                &line_pos,
+                meta->row_width - 1,
+                meta->corner_str,
+                SIZE_GRID_SPACE);
             if (result)
             {
                // column labels
                for (uint col = 0; col < grid->cols; col++)
                {
-                  col_char = '\0';
-                  if (Coord_ColToChar((int)col, &col_char) &&
-                      (snprintf(
-                           line + line_pos, line_size - line_pos,
-                           "%*s%-*c", SIZE_GRID_SPACE, "",
-                           (int)meta->col_width, col_char) > 0))
+                  col_str[0] = '\0';
+                  result = (Coord_ColToChar(
+                                (int)col,
+                                &col_str[0]) &&
+                            AppendLine(
+                                line,
+                                line_size,
+                                &line_pos,
+                                SIZE_GRID_SPACE,
+                                col_str,
+                                meta->col_width));
+                  if (!result)
                   {
-                     line_pos += (SIZE_GRID_SPACE + meta->col_width);
-                  }
-                  else
-                  {
-                     result = false;
                      break;
                   }
                }
@@ -197,65 +196,42 @@ bool Grid_Get_Row(
             if (result)
             {
                // grid corner
-               if (snprintf(
-                       line + line_pos, line_size - line_pos,
-                       "%*s%s", SIZE_GRID_SPACE, "",
-                       STR_GRID_CORNER) > 0)
-               {
-                  line_pos += (SIZE_GRID_SPACE + 1);
-               }
-               else
-               {
-                  result = false;
-               }
+               result = AppendLine(
+                                line,
+                                line_size,
+                                &line_pos,
+                                SIZE_GRID_SPACE,
+                                STR_GRID_CORNER,
+                                SIZE_GRID_SPACE);
             }
          }
          else if (row == (int)grid->rows)
          {
             // footer row
-            result = true;
             // grid corner
-            if (snprintf(
-                    line + line_pos, line_size - line_pos,
-                    "%*s%.*s", (int)(meta->row_width - 1), "",
-                    SIZE_GRID_SPACE, meta->corner_str) > 0)
-            {
-               line_pos += (meta->row_width - 1 + SIZE_GRID_SPACE);
-            }
-            else
-            {
-               result = false;
-            }
-            if (result)
-            {
-               // row filler
-               if (snprintf(
-                       line + line_pos, line_size - line_pos,
-                       "%*s%.*s", SIZE_GRID_SPACE, "",
-                       (int)meta->side_len, meta->side_str) > 0)
-               {
-                  line_pos += (SIZE_GRID_SPACE + meta->side_len - 1);
-               }
-               else
-               {
-                  result = false;
-               }
-            }
-            if (result)
-            {
-               // grid corner
-               if (snprintf(
-                       line + line_pos, line_size - line_pos,
-                       "%*s%s", SIZE_GRID_SPACE, "",
-                       STR_GRID_CORNER) > 0)
-               {
-                  line_pos += (SIZE_GRID_SPACE + 1);
-               }
-               else
-               {
-                  result = false;
-               }
-            }
+            // row filler
+            // grid corner
+            result = AppendLine(
+                         line,
+                         line_size,
+                         &line_pos,
+                         meta->row_width - 1,
+                         meta->corner_str,
+                         SIZE_GRID_SPACE) &&
+                     AppendLine(
+                         line,
+                         line_size,
+                         &line_pos,
+                         SIZE_GRID_SPACE,
+                         meta->side_str,
+                         meta->side_len - 1) &&
+                     AppendLine(
+                         line,
+                         line_size,
+                         &line_pos,
+                         SIZE_GRID_SPACE,
+                         STR_GRID_CORNER,
+                         SIZE_GRID_SPACE);
          }
          else
          {
@@ -281,39 +257,44 @@ bool Grid_Get_Row(
                   if (showOffense)
                   {
                      cell_offense = offense[i];
-                     if (Hit_State_To_Str(cell_offense, state_str, SIZE_STATE_STR + 1) &&
-                         (snprintf(
-                              line + line_pos, line_size - line_pos,
-                              "%*s%*s",
-                              SIZE_GRID_SPACE, "",
-                              (int)meta->col_width,
-                              state_str) > 0))
+                     result =
+                         Hit_State_To_Str(
+                            cell_offense,
+                            state_str,
+                            SIZE_STATE_STR + 1) &&
+                         AppendLine(
+                             line,
+                             line_size,
+                             &line_pos,
+                             SIZE_GRID_SPACE,
+                             state_str,
+                             meta->col_width);
+                     if (!result)
                      {
-                        line_pos += (SIZE_GRID_SPACE + meta->col_width);
-                     }
-                     else
-                     {
-                        result = false;
                         break;
                      }
                   }
                   else
                   {
                      cell_defense = defense[i];
-                     if (Ship_Type_To_Str(cell_defense.ship_type, ship_str, SIZE_STATE_STR + 1) &&
-                         Hit_State_To_Str(cell_defense.hit_state, state_str, SIZE_STATE_STR + 1) &&
-                         (snprintf(
-                              line + line_pos, line_size - line_pos,
-                              "%*s%*s",
-                              SIZE_GRID_SPACE, "",
-                              (int)meta->col_width,
-                              (cell_defense.hit_state == HIT_STATE_HIT) ? state_str : ship_str) > 0))
+                     result =
+                         Ship_Type_To_Str(
+                             cell_defense.ship_type,
+                             ship_str,
+                             SIZE_STATE_STR + 1) &&
+                         Hit_State_To_Str(
+                             cell_defense.hit_state,
+                             state_str,
+                             SIZE_STATE_STR + 1) &&
+                         AppendLine(
+                             line,
+                             line_size,
+                             &line_pos,
+                             SIZE_GRID_SPACE,
+                             (cell_defense.hit_state == HIT_STATE_HIT) ? state_str : ship_str,
+                             meta->col_width);
+                     if (!result)
                      {
-                        line_pos += (SIZE_GRID_SPACE + meta->col_width);
-                     }
-                     else
-                     {
-                        result = false;
                         break;
                      }
                   }
@@ -322,16 +303,13 @@ bool Grid_Get_Row(
             if (result)
             {
                // column filler
-               if (snprintf(
-                       line + line_pos, line_size - line_pos,
-                       "%*s%s", SIZE_GRID_SPACE, "", STR_GRID_SIDE_V) > 0)
-               {
-                  line_pos += (SIZE_GRID_SPACE + 1);
-               }
-               else
-               {
-                  result = false;
-               }
+               result = AppendLine(
+                   line,
+                   line_size,
+                   &line_pos,
+                   SIZE_GRID_SPACE,
+                   STR_GRID_SIDE_V,
+                   SIZE_GRID_SPACE);
             }
          }
       }
@@ -500,6 +478,36 @@ bool Hit_State_To_Str(
       state_str = Grid_Get_State_Str(state);
       result = (state_str &&
                 (snprintf(str, str_len, "%s", state_str) > 0));
+   }
+   return result;
+}
+
+bool AppendLine(
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos,
+    size_t const space_len,
+    char *const str,
+    size_t const str_size)
+{
+   bool result = false;
+   if (line &&
+      line_size > 0 &&
+      line_pos &&
+      *line_pos < line_size)
+   {
+      if (snprintf(
+              line + *line_pos,
+              line_size - *line_pos,
+              "%*s%*s",
+              (int)space_len,
+              "",
+              (int)str_size,
+              str) > 0)
+      {
+         *line_pos += (space_len + str_size);
+         result = true;
+      }
    }
    return result;
 }
