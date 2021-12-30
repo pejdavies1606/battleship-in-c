@@ -69,11 +69,12 @@ bool Grid_Clear_Defense(const Grid_t *grid);
 bool Grid_Clear_Offense(const Grid_t *grid);
 
 bool Grid_Get_Row(
-   Grid_t const * const grid,
-   bool showOffense,
-   int row,
-   char * const line,
-   size_t line_size);
+    Grid_t const *const grid,
+    bool showOffense,
+    int row,
+    char *const line,
+    size_t line_size,
+    size_t *line_pos);
 
 Grid_Status_e Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship);
 

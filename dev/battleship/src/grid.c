@@ -113,11 +113,12 @@ bool Grid_Clear_Offense(const Grid_t *grid)
 }
 
 bool Grid_Get_Row(
-   Grid_t const * const grid,
-   bool showOffense,
-   int row,
-   char * const line,
-   size_t line_size)
+    Grid_t const *const grid,
+    bool showOffense,
+    int row,
+    char *const line,
+    size_t line_size,
+    size_t *line_pos)
 {
    Grid_State_t * defense = NULL;
    Hit_State_e * offense = NULL;
@@ -127,14 +128,16 @@ bool Grid_Get_Row(
    char col_str[2] = {0};
    Grid_State_t cell_defense = { 0 };
    Hit_State_e cell_offense = HIT_STATE_BLANK;
-   size_t line_pos = 0;
    int i = 0;
+   size_t len = 0;
    bool result = false;
 
    if (NULL != grid &&
        Grid_Meta_Is_Valid(&grid->meta) &&
        NULL != line &&
-       line_size > 0)
+       line_size > 0 &&
+       line_pos &&
+       *line_pos < line_size)
    {
       if (showOffense)
       {
@@ -155,10 +158,17 @@ bool Grid_Get_Row(
             result = AppendLine(
                 line,
                 line_size,
-                &line_pos,
+                line_pos,
                 meta->row_width - 1,
                 (showOffense) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
                 SIZE_TITLE_STR);
+            // row filler
+            len = meta->side_len + 6 * SIZE_GRID_SPACE - meta->row_width - SIZE_TITLE_STR;
+            RepeatChar(
+                line + *line_pos,
+                len,
+                ' ');
+            *line_pos += len - 1;
          }
          else if (row == GRID_ROW_HEADER)
          {
@@ -167,7 +177,7 @@ bool Grid_Get_Row(
             result = AppendLine(
                 line,
                 line_size,
-                &line_pos,
+                line_pos,
                 meta->row_width - 1,
                 meta->corner_str,
                 SIZE_GRID_SPACE);
@@ -183,7 +193,7 @@ bool Grid_Get_Row(
                             AppendLine(
                                 line,
                                 line_size,
-                                &line_pos,
+                                line_pos,
                                 SIZE_GRID_SPACE,
                                 col_str,
                                 meta->col_width));
@@ -199,7 +209,7 @@ bool Grid_Get_Row(
                result = AppendLine(
                                 line,
                                 line_size,
-                                &line_pos,
+                                line_pos,
                                 SIZE_GRID_SPACE,
                                 STR_GRID_CORNER,
                                 SIZE_GRID_SPACE);
@@ -214,21 +224,21 @@ bool Grid_Get_Row(
             result = AppendLine(
                          line,
                          line_size,
-                         &line_pos,
+                         line_pos,
                          meta->row_width - 1,
                          meta->corner_str,
                          SIZE_GRID_SPACE) &&
                      AppendLine(
                          line,
                          line_size,
-                         &line_pos,
+                         line_pos,
                          SIZE_GRID_SPACE,
                          meta->side_str,
                          meta->side_len - 1) &&
                      AppendLine(
                          line,
                          line_size,
-                         &line_pos,
+                         line_pos,
                          SIZE_GRID_SPACE,
                          STR_GRID_CORNER,
                          SIZE_GRID_SPACE);
@@ -239,10 +249,10 @@ bool Grid_Get_Row(
             result = true;
             // row label
             if (snprintf(
-                    line + line_pos, line_size - line_pos,
+                    line + *line_pos, line_size - *line_pos,
                     "%*u", (int)meta->row_width, row + 1) > 0)
             {
-               line_pos += (meta->row_width);
+               *line_pos += (meta->row_width);
             }
             else
             {
@@ -265,7 +275,7 @@ bool Grid_Get_Row(
                          AppendLine(
                              line,
                              line_size,
-                             &line_pos,
+                             line_pos,
                              SIZE_GRID_SPACE,
                              state_str,
                              meta->col_width);
@@ -289,7 +299,7 @@ bool Grid_Get_Row(
                          AppendLine(
                              line,
                              line_size,
-                             &line_pos,
+                             line_pos,
                              SIZE_GRID_SPACE,
                              (cell_defense.hit_state == HIT_STATE_HIT) ? state_str : ship_str,
                              meta->col_width);
@@ -306,7 +316,7 @@ bool Grid_Get_Row(
                result = AppendLine(
                    line,
                    line_size,
-                   &line_pos,
+                   line_pos,
                    SIZE_GRID_SPACE,
                    STR_GRID_SIDE_V,
                    SIZE_GRID_SPACE);

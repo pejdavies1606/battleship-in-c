@@ -72,6 +72,7 @@ bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
 {
    char * line = NULL;
    size_t line_size = MAX_BUFFER_SIZE * sizeof(char);
+   size_t line_pos = 0;
    bool result = false;
    if (grid)
    {
@@ -83,9 +84,26 @@ bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
          for (int row = GRID_ROW_TITLE; row < (int)(grid->rows + 1); row++)
          {
             memset(line, 0, line_size);
-            if (Grid_Get_Row(grid, showOffense, row, line, line_size))
+            line_pos = 0;
+            if (Grid_Get_Row(grid, false, row, line, line_size, &line_pos))
             {
-               printf("%s\n", line);
+               if (showOffense)
+               {
+                  line[line_pos++] = ' ';
+                  if (Grid_Get_Row(grid, true, row, line, line_size, &line_pos))
+                  {
+                     printf("%s\n", line);
+                  }
+                  else
+                  {
+                     result = false;
+                     break;
+                  }
+               }
+               else
+               {
+                  printf("%s\n", line);
+               }
             }
             else
             {
