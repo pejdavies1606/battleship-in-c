@@ -11,7 +11,7 @@
 
 typedef struct HitStateInfo
 {
-   Hit_State_e state;
+   GridHit_e state;
    char const * str;
 } HitStateInfo_t;
 
@@ -23,7 +23,7 @@ static HitStateInfo_t const HIT_STATE_TABLE[HIT_STATE_COUNT] =
    { HIT_STATE_MISS,  "o" },
 };
 
-const char * Grid_GetHitStateStr(Hit_State_e const state)
+const char * Grid_GetHitStateStr(GridHit_e const state)
 {
    char const * str = NULL;
    for (uint i = 0; i < HIT_STATE_COUNT; i++)
@@ -48,283 +48,243 @@ static bool Grid_AppendLine(
     char *const str,
     size_t const str_size);
 
-bool Grid_Init(Grid_t *grid, uint rows, uint cols)
+bool Grid_Init(
+   Grid_t * const grid,
+   uint const rows,
+   uint const cols)
 {
    bool result = false;
    if (grid)
    {
       grid->rows = rows;
       grid->cols = cols;
-      result = ((Grid_InitShips(grid)) &&
-                (Grid_InitHits(grid)) &&
-                (Grid_InitMeta(&grid->meta, rows, cols, 0, 1)));
-   }
-   return result;
-}
+      grid->ships = Grid_InitShips(rows, cols);
+      grid->hits = Grid_InitHits(rows, cols);
 
-bool Grid_InitShips(Grid_t *grid)
-{
-   bool result = false;
-   if (grid && grid->rows > 0 && grid->cols > 0)
-   {
-      grid->ships = malloc(grid->rows * grid->cols * sizeof(Ship_Type_e));
-      if (grid->ships)
+      if (grid->ships && grid->hits)
       {
-         result = Grid_ClearShips(grid);
+         result = (Grid_ClearShips(grid->ships, rows, cols) &&
+                   Grid_ClearHits(grid->hits, rows, cols) &&
+                   Grid_InitMeta(&grid->meta, rows, cols, 0, 1));
       }
    }
    return result;
 }
 
-bool Grid_InitHits(Grid_t *grid)
+ShipType_e * Grid_InitShips(uint rows, uint cols)
 {
-   bool result = false;
-   if (grid && grid->rows > 0 && grid->cols > 0)
+   ShipType_e * ships = NULL;
+   if (rows > 0 && cols > 0)
    {
-      grid->hits = malloc(grid->rows * grid->cols * sizeof(Hit_State_e));
-      if (grid->hits)
-      {
-         result = Grid_ClearHits(grid);
-      }
+      ships = malloc(rows * cols * sizeof(ShipType_e));
    }
-   return result;
+   return ships;
 }
 
-bool Grid_ClearShips(const Grid_t *grid)
+GridHit_e * Grid_InitHits(uint rows, uint cols)
+{
+   GridHit_e * hits = NULL;
+   if (rows > 0 && cols > 0)
+   {
+      hits = malloc(rows * cols * sizeof(GridHit_e));
+   }
+   return hits;
+}
+
+bool Grid_ClearShips(
+   ShipType_e * const ships,
+   uint const rows,
+   uint const cols)
 {
    bool result = false;
-   if (grid && grid->ships)
+   if (ships && rows > 0 && cols > 0)
    {
-      memset(grid->ships, 0, grid->rows * grid->cols * sizeof(Ship_Type_e));
+      memset(ships, 0, rows * cols * sizeof(ShipType_e));
       result = true;
    }
    return result;
 }
 
-bool Grid_ClearHits(const Grid_t *grid)
+bool Grid_ClearHits(
+   GridHit_e * const hits,
+   uint const rows,
+   uint const cols)
 {
    bool result = false;
-   if (grid && grid->hits)
+   if (hits && rows > 0 && cols > 0)
    {
-      memset(grid->hits, 0, grid->rows * grid->cols * sizeof(Hit_State_e));
+      memset(hits, 0, rows * cols * sizeof(GridHit_e));
       result = true;
    }
    return result;
 }
 
 bool Grid_GetRowStr(
-    Grid_t const *const grid,
-    bool showOffense,
-    int row,
+    Grid_t *const grid,
+    GridHit_e *const hits,
+    int const row,
     char *const line,
-    size_t line_size,
-    size_t *line_pos)
+    size_t const line_size,
+    size_t *const line_pos)
 {
-   Ship_Type_e * ships = NULL;
-   Hit_State_e * hits = NULL;
    Grid_Meta_t const * meta = NULL;
-   char ship_str[SIZE_STATE_STR + 1] = {0};
-   char state_str[SIZE_STATE_STR + 1] = {0};
-   char col_str[2] = {0};
-   Ship_Type_e ship = SHIP_NONE;
-   Hit_State_e hit = HIT_STATE_BLANK;
+   char cell_str[SIZE_CELL_STR + 1] = {0};
+   ShipType_e ship = SHIP_NONE;
+   GridHit_e hit = HIT_STATE_BLANK;
    int i = 0;
    size_t len = 0;
    bool result = false;
 
-   if (NULL != grid &&
+   if (grid &&
        Grid_IsValidMeta(&grid->meta) &&
-       NULL != line &&
+       line &&
        line_size > 0 &&
        line_pos &&
        *line_pos < line_size)
    {
-      if (showOffense)
+      meta = &grid->meta;
+      if (row == GRID_ROW_TITLE)
       {
-         // TODO get hits array of other player
-         hits = grid->hits; // show own hits for now
+         // title row
+         result = Grid_AppendLine(
+             line,
+             line_size,
+             line_pos,
+             meta->row_width - 1,
+             (hits) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
+             SIZE_TITLE_STR);
+         // row filler
+         len = meta->side_len + 6 * SIZE_GRID_SPACE - meta->row_width - SIZE_TITLE_STR;
+         RepeatChar(
+             line + *line_pos,
+             len,
+             ' ');
+         *line_pos += len - 1;
+      }
+      else if (row == GRID_ROW_HEADER)
+      {
+         // header row
+         // grid corner
+         result = Grid_AppendLine(
+             line,
+             line_size,
+             line_pos,
+             meta->row_width - 1,
+             meta->corner_str,
+             SIZE_GRID_SPACE);
+         if (result)
+         {
+            // column labels
+            for (uint col = 0; col < grid->cols; col++)
+            {
+               cell_str[0] = '\0';
+               result = (Coord_ColToChar(
+                             (int)col,
+                             &cell_str[0]) &&
+                         Grid_AppendLine(
+                             line,
+                             line_size,
+                             line_pos,
+                             SIZE_GRID_SPACE,
+                             cell_str,
+                             meta->col_width));
+               if (!result)
+               {
+                  break;
+               }
+            }
+         }
+         if (result)
+         {
+            // grid corner
+            result = Grid_AppendLine(
+                line,
+                line_size,
+                line_pos,
+                SIZE_GRID_SPACE,
+                STR_GRID_CORNER,
+                SIZE_GRID_SPACE);
+         }
+      }
+      else if (row == (int)grid->rows)
+      {
+         // footer row
+         // grid corner
+         // row filler
+         // grid corner
+         result = Grid_AppendLine(
+                      line,
+                      line_size,
+                      line_pos,
+                      meta->row_width - 1,
+                      meta->corner_str,
+                      SIZE_GRID_SPACE) &&
+                  Grid_AppendLine(
+                      line,
+                      line_size,
+                      line_pos,
+                      SIZE_GRID_SPACE,
+                      meta->side_str,
+                      meta->side_len - 1) &&
+                  Grid_AppendLine(
+                      line,
+                      line_size,
+                      line_pos,
+                      SIZE_GRID_SPACE,
+                      STR_GRID_CORNER,
+                      SIZE_GRID_SPACE);
       }
       else
       {
-         hits = grid->hits;
-         ships = grid->ships;
-      }
-
-      if (ships || hits)
-      {
-         meta = &grid->meta;
-
-         if (row == GRID_ROW_TITLE)
+         // numbered rows
+         result = true;
+         // row label
+         if (snprintf(
+                 line + *line_pos, line_size - *line_pos,
+                 "%*u", (int)meta->row_width, row + 1) > 0)
          {
-            // title row
-            result = Grid_AppendLine(
-                line,
-                line_size,
-                line_pos,
-                meta->row_width - 1,
-                (showOffense) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
-                SIZE_TITLE_STR);
-            // row filler
-            len = meta->side_len + 6 * SIZE_GRID_SPACE - meta->row_width - SIZE_TITLE_STR;
-            RepeatChar(
-                line + *line_pos,
-                len,
-                ' ');
-            *line_pos += len - 1;
-         }
-         else if (row == GRID_ROW_HEADER)
-         {
-            // header row
-            // grid corner
-            result = Grid_AppendLine(
-                line,
-                line_size,
-                line_pos,
-                meta->row_width - 1,
-                meta->corner_str,
-                SIZE_GRID_SPACE);
-            if (result)
-            {
-               // column labels
-               for (uint col = 0; col < grid->cols; col++)
-               {
-                  col_str[0] = '\0';
-                  result = (Coord_ColToChar(
-                                (int)col,
-                                &col_str[0]) &&
-                            Grid_AppendLine(
-                                line,
-                                line_size,
-                                line_pos,
-                                SIZE_GRID_SPACE,
-                                col_str,
-                                meta->col_width));
-                  if (!result)
-                  {
-                     break;
-                  }
-               }
-            }
-            if (result)
-            {
-               // grid corner
-               result = Grid_AppendLine(
-                                line,
-                                line_size,
-                                line_pos,
-                                SIZE_GRID_SPACE,
-                                STR_GRID_CORNER,
-                                SIZE_GRID_SPACE);
-            }
-         }
-         else if (row == (int)grid->rows)
-         {
-            // footer row
-            // grid corner
-            // row filler
-            // grid corner
-            result = Grid_AppendLine(
-                         line,
-                         line_size,
-                         line_pos,
-                         meta->row_width - 1,
-                         meta->corner_str,
-                         SIZE_GRID_SPACE) &&
-                     Grid_AppendLine(
-                         line,
-                         line_size,
-                         line_pos,
-                         SIZE_GRID_SPACE,
-                         meta->side_str,
-                         meta->side_len - 1) &&
-                     Grid_AppendLine(
-                         line,
-                         line_size,
-                         line_pos,
-                         SIZE_GRID_SPACE,
-                         STR_GRID_CORNER,
-                         SIZE_GRID_SPACE);
+            *line_pos += (meta->row_width);
          }
          else
          {
-            // numbered rows
-            result = true;
-            // row label
-            if (snprintf(
-                    line + *line_pos, line_size - *line_pos,
-                    "%*u", (int)meta->row_width, row + 1) > 0)
+            result = false;
+         }
+         if (result)
+         {
+            // cell states
+            for (int col = 0; col < (int)grid->cols; col++)
             {
-               *line_pos += (meta->row_width);
-            }
-            else
-            {
-               result = false;
-            }
-            if (result)
-            {
-               // cell states
-               for (int col = 0; col < (int)grid->cols; col++)
+               i = row * (int)(grid->cols) + col;
+               hit = (hits) ? hits[i] : grid->hits[i];
+               Grid_HitStateToStr(hit, cell_str, SIZE_CELL_STR + 1);
+               if (!hits && hit == HIT_STATE_BLANK)
                {
-                  i = row * (int)(grid->cols) + col;
-                  hits[i] = (i % 2) ? HIT_STATE_HIT : HIT_STATE_MISS;
-                  if (showOffense)
-                  {
-                     hit = hits[i];
-                     result =
-                         Grid_HitStateToStr(
-                            hit,
-                            state_str,
-                            SIZE_STATE_STR + 1) &&
-                         Grid_AppendLine(
-                             line,
-                             line_size,
-                             line_pos,
-                             SIZE_GRID_SPACE,
-                             state_str,
-                             meta->col_width);
-                     if (!result)
-                     {
-                        break;
-                     }
-                  }
-                  else
-                  {
-                     hit = hits[i];
-                     ship = ships[i];
-                     result =
-                         Grid_HitStateToStr(
-                             hit,
-                             state_str,
-                             SIZE_STATE_STR + 1) &&
-                         Ship_TypeToStr(
-                             ship,
-                             ship_str,
-                             SIZE_STATE_STR + 1) &&
-                         Grid_AppendLine(
-                             line,
-                             line_size,
-                             line_pos,
-                             SIZE_GRID_SPACE,
-                             (hit == HIT_STATE_BLANK) ? ship_str : state_str ,
-                             meta->col_width);
-                     if (!result)
-                     {
-                        break;
-                     }
-                  }
+                  ship = grid->ships[i];
+                  Ship_TypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
                }
-            }
-            if (result)
-            {
-               // column filler
                result = Grid_AppendLine(
                    line,
                    line_size,
                    line_pos,
                    SIZE_GRID_SPACE,
-                   STR_GRID_SIDE_V,
-                   SIZE_GRID_SPACE);
+                   cell_str,
+                   meta->col_width);
+               if (!result)
+               {
+                  break;
+               }
             }
+         }
+         if (result)
+         {
+            // column filler
+            result = Grid_AppendLine(
+                line,
+                line_size,
+                line_pos,
+                SIZE_GRID_SPACE,
+                STR_GRID_SIDE_V,
+                SIZE_GRID_SPACE);
          }
       }
    }
@@ -425,7 +385,7 @@ Grid_Status_e Grid_CheckShip(const Grid_t *grid, const Ship_t *ship)
             }
             else
             {
-               Ship_Type_e ship_type =
+               ShipType_e ship_type =
                    grid->ships[point.row * (int)grid->cols +
                                  point.col];
                if (ship_type != SHIP_NONE)
@@ -447,7 +407,7 @@ Grid_Status_e Grid_CheckShip(const Grid_t *grid, const Ship_t *ship)
 }
 
 bool Ship_TypeToStr(
-   Ship_Type_e const type,
+   ShipType_e const type,
    char * const str,
    size_t const str_len)
 {
@@ -479,7 +439,7 @@ bool Ship_TypeToStr(
 }
 
 bool Grid_HitStateToStr(
-   Hit_State_e const state,
+   GridHit_e const state,
    char * const str,
    size_t const str_len)
 {

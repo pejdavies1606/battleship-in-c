@@ -18,13 +18,7 @@ typedef enum
    HIT_STATE_BLANK,
    HIT_STATE_HIT,
    HIT_STATE_MISS
-} Hit_State_e;
-
-typedef struct
-{
-   Ship_Type_e ship_type;
-   Hit_State_e hit_state;
-} Grid_State_t;
+} GridHit_e;
 
 typedef enum
 {
@@ -47,38 +41,38 @@ typedef struct
 
 typedef struct
 {
-   Ship_Type_e *ships;
-   Hit_State_e *hits;
+   ShipType_e *ships;
+   GridHit_e *hits;
    uint rows;
    uint cols;
    Grid_Meta_t meta;
 } Grid_t;
 
-const char * Grid_GetHitStateStr(Hit_State_e const state);
+const char * Grid_GetHitStateStr(GridHit_e const state);
 
 bool Grid_InitMeta(Grid_Meta_t* meta,
 		size_t row_size, size_t col_size,
 		size_t row_width, size_t col_width);
 bool Grid_IsValidMeta(Grid_Meta_t const * const meta);
 
-bool Grid_Init(Grid_t *grid, uint rows, uint cols);
-bool Grid_InitShips(Grid_t *grid);
-bool Grid_InitHits(Grid_t *grid);
+bool Grid_Init(Grid_t * const grid, uint const rows, uint const cols);
+ShipType_e * Grid_InitShips(uint rows, uint cols);
+GridHit_e * Grid_InitHits(uint rows, uint cols);
 
-bool Grid_ClearShips(const Grid_t *grid);
-bool Grid_ClearHits(const Grid_t *grid);
+bool Grid_ClearShips(ShipType_e * const ships, uint const rows, uint const cols);
+bool Grid_ClearHits(GridHit_e * const hits, uint const rows, uint const cols);
 
 bool Grid_GetRowStr(
-    Grid_t const *const grid,
-    bool showOffense,
-    int row,
-    char *const line,
-    size_t line_size,
-    size_t *line_pos);
+    Grid_t *const grid,
+    GridHit_e * const hits,
+    int const row,
+    char * const line,
+    size_t const line_size,
+    size_t * const line_pos);
 
 Grid_Status_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship);
 
-bool Ship_TypeToStr(const Ship_Type_e type, char *str, const size_t str_len);
-bool Grid_HitStateToStr(const Hit_State_e state, char *str, size_t str_len);
+bool Ship_TypeToStr(const ShipType_e type, char *str, const size_t str_len);
+bool Grid_HitStateToStr(const GridHit_e state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_GRID_H_ */

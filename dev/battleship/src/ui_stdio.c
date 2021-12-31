@@ -68,7 +68,9 @@ bool BattleShip_UI_Print_Message(String_t message)
    return result;
 }
 
-bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
+bool BattleShip_UI_Print_Grid(
+   Grid_t * const grid,
+   GridHit_e * const hits)
 {
    char * line = NULL;
    size_t line_size = MAX_BUFFER_SIZE * sizeof(char);
@@ -85,12 +87,24 @@ bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
          {
             memset(line, 0, line_size);
             line_pos = 0;
-            if (Grid_GetRowStr(grid, false, row, line, line_size, &line_pos))
+            if (Grid_GetRowStr(
+               grid,
+               NULL,
+               row,
+               line,
+               line_size,
+               &line_pos))
             {
-               if (showOffense)
+               if (hits)
                {
                   line[line_pos++] = ' ';
-                  if (Grid_GetRowStr(grid, true, row, line, line_size, &line_pos))
+                  if (Grid_GetRowStr(
+                          grid,
+                          hits,
+                          row,
+                          line,
+                          line_size,
+                          &line_pos))
                   {
                      printf("%s\n", line);
                   }
@@ -117,14 +131,6 @@ bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
    }
    return result;
 }
-
-/*void BattleShip_UI_Print_Grid(const Hit_State_t *offense)
-{
-}*/
-
-/*void BattleShip_UI_Print_Grid(const Grid_State_t *defense, const Hit_State_t *offense)
-{
-}*/
 
 bool BattleShip_UI_Print_Menu(Menu_t *menu)
 {

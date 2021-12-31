@@ -18,7 +18,7 @@
 #define NUM_PLACE_MENU_OPTIONS 4 // must match enum below
 #define NUM_SHIP_MENU_OPTIONS 2 // must match enum below
 
-#define SIZE_STATE_STR 1 // not including null terminator
+#define SIZE_CELL_STR 1 // not including null terminator
 
 #define STR_GRID_SIDE_V "|"
 #define STR_GRID_SIDE_H "="
@@ -59,7 +59,7 @@ typedef enum
 typedef struct
 {
    Ship_Menu_Option_e   option;
-   Ship_Type_e          type;
+   ShipType_e          type;
 } Ship_Menu_Choice_t;
 
 char const * BattleShip_UI_Get_Logo(int row);
@@ -70,17 +70,17 @@ bool BattleShip_UI_Init();
 void BattleShip_UI_Clear_Screen(void);
 bool BattleShip_UI_Print_Message(String_t message);
 void BattleShip_UI_Print_Logo();
-bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense);
+bool BattleShip_UI_Print_Grid(Grid_t * const grid, GridHit_e * const hits);
 
 Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message);
-Place_Menu_Option_e BattleShip_UI_Place_Menu(const Grid_t *grid);
-Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid);
+Place_Menu_Option_e BattleShip_UI_Place_Menu(Grid_t * const grid);
+Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(Grid_t * const grid);
 
 bool BattleShip_UI_Print_Menu(Menu_t *menu);
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice);
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading);
 
-void BattleShip_UI_Game_Screen(const Grid_t *grid);
+void BattleShip_UI_Game_Screen(Grid_t * const grid, GridHit_e * const hits);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 

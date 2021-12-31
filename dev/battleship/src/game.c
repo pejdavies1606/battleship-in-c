@@ -32,7 +32,7 @@
 
 static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice);
 static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice);
-static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice);
+static bool Process_Main_Menu(Game_t * const game, Main_Menu_Option_e const choice);
 
 Game_t * BattleShip_Game_Init(void)
 {
@@ -86,7 +86,8 @@ bool BattleShip_Game_Start(Game_t *game)
    if (game)
    {
       // TODO while loop
-      result = Process_Main_Menu(&game->players[0], BattleShip_UI_Main_Menu(""));
+      result = Player_Place_Ships_Auto(&game->players[1]) &&
+               Process_Main_Menu(game, BattleShip_UI_Main_Menu(""));
    }
    return result;
 }
@@ -152,21 +153,21 @@ static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
    return result;
 }
 
-static bool Process_Begin_Game(Player_t *player)
+static bool Process_Begin_Game(Game_t * const game)
 {
    bool doLoop = false;
    bool result = false;
-   if (player)
+   if (game)
    {
       doLoop = true;
       while (doLoop)
       {
-         // TODO redesign grids
-         // remove offense grid
-         // remove Grid_State_t
-         // split defense grid into hit state and ship state arrays instead of struct
-         // player 1 offense grid = player 2 defense grid and vice versa
-         BattleShip_UI_Game_Screen(&player->grid);
+         BattleShip_UI_Game_Screen(
+            &game->players[0].grid,
+            game->players[1].grid.hits);
+         BattleShip_UI_Game_Screen(
+            &game->players[1].grid,
+            game->players[0].grid.hits);
          // TODO check all ships sunk
          doLoop = false;
       }
@@ -185,11 +186,13 @@ static bool Process_Begin_Game(Player_t *player)
    return result;
 }
 
-static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
+static bool Process_Main_Menu(Game_t * const game, Main_Menu_Option_e const choice)
 {
+   Player_t * player = NULL;
    bool result = false;
-   if (player)
+   if (game)
    {
+      player = &game->players[0];
       switch (choice)
       {
       case MENU_OPTION_MAIN_RETURN:
@@ -201,7 +204,7 @@ static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)
              BattleShip_UI_Place_Menu(&player->grid));
          break;
       case MENU_OPTION_MAIN_BEGIN:
-         result = Process_Begin_Game(player);
+         result = Process_Begin_Game(game);
          break;
       case MENU_OPTION_MAIN_WATCH:
          break;

@@ -211,42 +211,44 @@ Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message)
    return choice;
 }
 
-Place_Menu_Option_e BattleShip_UI_Place_Menu(const Grid_t *grid)
+Place_Menu_Option_e BattleShip_UI_Place_Menu(Grid_t * const grid)
 {
    Place_Menu_Option_e choice = MENU_OPTION_PLACE_RETURN;
    bool read_success = false;
    while(!read_success)
    {
       BattleShip_UI_Clear_Screen();
-      BattleShip_UI_Print_Grid(grid, false);
+      BattleShip_UI_Print_Grid(grid, NULL);
       BattleShip_UI_Print_Menu(&place_menu);
       read_success = BattleShip_UI_Read_Menu(&place_menu, (uint*) &choice);
    }
    return choice;
 }
 
-Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
+Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(Grid_t * const grid)
 {
    Ship_Menu_Option_e option = MENU_OPTION_SHIP_RETURN;
    bool read_success = false;
    while(!read_success)
    {
       BattleShip_UI_Clear_Screen();
-      BattleShip_UI_Print_Grid(grid, false);
+      BattleShip_UI_Print_Grid(grid, NULL);
       BattleShip_UI_Print_Menu(&ship_menu);
       read_success = BattleShip_UI_Read_Menu(&ship_menu, (uint*) &option);
    }
    return (Ship_Menu_Choice_t)
    {
       (option == MENU_OPTION_SHIP_RETURN) ? option : MENU_OPTION_SHIP_PLACE,
-      (Ship_Type_e) (option - 1)
+      (ShipType_e) (option - 1)
    };
 }
 
-void BattleShip_UI_Game_Screen(const Grid_t *grid)
+void BattleShip_UI_Game_Screen(
+   Grid_t * const grid,
+   GridHit_e * const hits)
 {
    BattleShip_UI_Clear_Screen();
-   BattleShip_UI_Print_Grid(grid, true);
+   BattleShip_UI_Print_Grid(grid, hits);
    /* screen
     *    defense + offense grids
     *    scoreboards

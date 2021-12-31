@@ -7,7 +7,7 @@
 
 #include "battleship/player.h"
 
-static Ship_t* Player_GetShip(Player_t *player, Ship_Type_e type);
+static Ship_t* Player_GetShip(Player_t *player, ShipType_e type);
 
 Player_t * Player_Init(uint num_players)
 {
@@ -66,33 +66,41 @@ bool Player_Place_Ships_Auto(Player_t *player)
    bool result = false;
    if (player)
    {
-      Grid_ClearShips(&player->grid);
-      Grid_ClearHits(&player->grid);
-      for (uint i = NUM_SHIPS; i > 0; i--)
+      if (Grid_ClearShips(
+              player->grid.ships,
+              player->grid.rows,
+              player->grid.cols) &&
+          Grid_ClearHits(
+              player->grid.hits,
+              player->grid.rows,
+              player->grid.cols))
       {
-         status = GRID_STATUS_UNKNOWN;
-         do
+         for (uint i = NUM_SHIPS; i > 0; i--)
          {
-            ship.type = shipTable[i - 1].type;
-            ship.location = Coord_InitRandom(
-                0, (int)player->grid.rows,
-                0, (int)player->grid.cols);
-            ship.heading = Heading_InitRandom();
-            status = Player_PlaceShip(player, &ship);
-         } while (
-             GRID_STATUS_BORDER & status ||
-             GRID_STATUS_COLLISION & status);
-         if (GRID_STATUS_NULL == status)
-         {
-            break;
+            status = GRID_STATUS_UNKNOWN;
+            do
+            {
+               ship.type = shipTable[i - 1].type;
+               ship.location = Coord_InitRandom(
+                   0, (int)player->grid.rows,
+                   0, (int)player->grid.cols);
+               ship.heading = Heading_InitRandom();
+               status = Player_PlaceShip(player, &ship);
+            } while (
+                GRID_STATUS_BORDER & status ||
+                GRID_STATUS_COLLISION & status);
+            if (GRID_STATUS_NULL == status)
+            {
+               break;
+            }
          }
+         result = true;
       }
-      result = true;
    }
    return result;
 }
 
-static Ship_t * Player_GetShip(Player_t *player, Ship_Type_e type)
+static Ship_t * Player_GetShip(Player_t *player, ShipType_e type)
 {
    if (player)
    {
