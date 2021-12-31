@@ -47,28 +47,28 @@ typedef struct
 
 typedef struct
 {
-   Grid_State_t *defense;
-   Hit_State_e *offense;
+   Ship_Type_e *ships;
+   Hit_State_e *hits;
    uint rows;
    uint cols;
    Grid_Meta_t meta;
 } Grid_t;
 
-const char * Grid_Get_State_Str(Hit_State_e const state);
+const char * Grid_GetHitStateStr(Hit_State_e const state);
 
-bool Grid_Meta_Init(Grid_Meta_t* meta,
+bool Grid_InitMeta(Grid_Meta_t* meta,
 		size_t row_size, size_t col_size,
 		size_t row_width, size_t col_width);
-bool Grid_Meta_Is_Valid(Grid_Meta_t const * const meta);
+bool Grid_IsValidMeta(Grid_Meta_t const * const meta);
 
 bool Grid_Init(Grid_t *grid, uint rows, uint cols);
-bool Grid_Init_Defense(Grid_t *grid);
-bool Grid_Init_Offense(Grid_t *grid);
+bool Grid_InitShips(Grid_t *grid);
+bool Grid_InitHits(Grid_t *grid);
 
-bool Grid_Clear_Defense(const Grid_t *grid);
-bool Grid_Clear_Offense(const Grid_t *grid);
+bool Grid_ClearShips(const Grid_t *grid);
+bool Grid_ClearHits(const Grid_t *grid);
 
-bool Grid_Get_Row(
+bool Grid_GetRowStr(
     Grid_t const *const grid,
     bool showOffense,
     int row,
@@ -76,9 +76,9 @@ bool Grid_Get_Row(
     size_t line_size,
     size_t *line_pos);
 
-Grid_Status_e Grid_Place_Ship(const Grid_t *grid, const Ship_t *ship);
+Grid_Status_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship);
 
-bool Ship_Type_To_Str(const Ship_Type_e type, char *str, const size_t str_len);
-bool Hit_State_To_Str(const Hit_State_e state, char *str, size_t str_len);
+bool Ship_TypeToStr(const Ship_Type_e type, char *str, const size_t str_len);
+bool Grid_HitStateToStr(const Hit_State_e state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_GRID_H_ */

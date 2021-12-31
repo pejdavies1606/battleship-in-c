@@ -10,7 +10,7 @@
 
 #include <ctype.h>
 
-Coord_t Coord_Init_Random(
+Coord_t Coord_InitRandom(
    int row_min, int row_max,
    int col_min, int col_max)
 {
@@ -29,7 +29,7 @@ Coord_t Coord_Init_Random(
    return c;
 }
 
-Heading_e Heading_Init_Random()
+Heading_e Heading_InitRandom()
 {
    Heading_e h = HEADING_UNKNOWN;
    int i = rand() % (NUM_HEADINGS - 1);

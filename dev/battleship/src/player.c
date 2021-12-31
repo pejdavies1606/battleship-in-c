@@ -7,7 +7,7 @@
 
 #include "battleship/player.h"
 
-static Ship_t* Player_Get_Ship(Player_t *player, Ship_Type_e type);
+static Ship_t* Player_GetShip(Player_t *player, Ship_Type_e type);
 
 Player_t * Player_Init(uint num_players)
 {
@@ -44,16 +44,16 @@ Player_t * Player_Init(uint num_players)
    return players;
 }
 
-Grid_Status_e Player_Place_Ship(Player_t *player, Ship_t *ship)
+Grid_Status_e Player_PlaceShip(Player_t *player, Ship_t *ship)
 {
   Grid_Status_e status = GRID_STATUS_NULL;
    if (player && ship)
    {
-      Ship_t *player_ship = Player_Get_Ship(player, ship->type);
+      Ship_t *player_ship = Player_GetShip(player, ship->type);
       if (player_ship)
       {
          *player_ship = *ship;
-         status = Grid_Place_Ship(&player->grid, ship);
+         status = Grid_PlaceShip(&player->grid, ship);
       }
    }
    return status;
@@ -66,18 +66,19 @@ bool Player_Place_Ships_Auto(Player_t *player)
    bool result = false;
    if (player)
    {
-      Grid_Clear_Defense(&player->grid);
+      Grid_ClearShips(&player->grid);
+      Grid_ClearHits(&player->grid);
       for (uint i = NUM_SHIPS; i > 0; i--)
       {
          status = GRID_STATUS_UNKNOWN;
          do
          {
             ship.type = shipTable[i - 1].type;
-            ship.location = Coord_Init_Random(
+            ship.location = Coord_InitRandom(
                 0, (int)player->grid.rows,
                 0, (int)player->grid.cols);
-            ship.heading = Heading_Init_Random();
-            status = Player_Place_Ship(player, &ship);
+            ship.heading = Heading_InitRandom();
+            status = Player_PlaceShip(player, &ship);
          } while (
              GRID_STATUS_BORDER & status ||
              GRID_STATUS_COLLISION & status);
@@ -91,7 +92,7 @@ bool Player_Place_Ships_Auto(Player_t *player)
    return result;
 }
 
-static Ship_t * Player_Get_Ship(Player_t *player, Ship_Type_e type)
+static Ship_t * Player_GetShip(Player_t *player, Ship_Type_e type)
 {
    if (player)
    {

@@ -44,10 +44,10 @@ static const HeadingInfo_t headingTable[NUM_HEADINGS] =
    { HEADING_EAST,    'E' },
    { HEADING_SOUTH,   'S' },
    { HEADING_WEST,    'W' },
-   { HEADING_UNKNOWN, '0'}
+   { HEADING_UNKNOWN, '0' }
 };
 
-static inline char Heading_Get_Char(Heading_e h)
+static inline char Heading_GetChar(Heading_e h)
 {
    char c = headingTable[HEADING_UNKNOWN_INDEX].c;
    for (uint i = 0; i < NUM_HEADINGS; i++)
@@ -60,7 +60,7 @@ static inline char Heading_Get_Char(Heading_e h)
    return c;
 }
 
-static inline Heading_e Heading_Get_Hdg(char c)
+static inline Heading_e Heading_GetHdg(char c)
 {
    Heading_e h = headingTable[HEADING_UNKNOWN_INDEX].h;
    for (uint i = 0; i < NUM_HEADINGS; i++)
@@ -83,11 +83,11 @@ static inline Coord_t Coord_Init(int row, int col)
    return coord;
 }
 
-Coord_t Coord_Init_Random(
+Coord_t Coord_InitRandom(
    int row_min, int row_max,
    int col_min, int col_max);
 
-Heading_e Heading_Init_Random();
+Heading_e Heading_InitRandom();
 
 bool Coord_ColToChar(int col, char *c);
 bool Coord_ColFromChar(char c, int *col);

@@ -243,8 +243,17 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(const Grid_t *grid)
    };
 }
 
-void BattleShip_UI_Game_Menu(const Grid_t *grid)
+void BattleShip_UI_Game_Screen(const Grid_t *grid)
 {
    BattleShip_UI_Clear_Screen();
    BattleShip_UI_Print_Grid(grid, true);
+   /* screen
+    *    defense + offense grids
+    *    scoreboards
+    *    round counter
+    *    player turns
+    *       hit/miss
+    *       ship sunk
+    *       all ships sunk
+    */
 }

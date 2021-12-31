@@ -113,7 +113,7 @@ static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
                 .type = choice.type,
                 .location = location,
                 .heading = heading};
-            result = (GRID_STATUS_OK == Player_Place_Ship(player, &ship));
+            result = (GRID_STATUS_OK == Player_PlaceShip(player, &ship));
          }
       }
       break;
@@ -154,18 +154,26 @@ static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
 
 static bool Process_Begin_Game(Player_t *player)
 {
-   BattleShip_UI_Game_Menu(&player->grid);
-   /* screen
-    *    defense + offense grids
-    *    scoreboards
-    *    round counter
-    *    player turns
-    *       hit/miss
-    *       ship sunk
-    *       all ships sunk
-    */
+   bool doLoop = false;
+   bool result = false;
+   if (player)
+   {
+      doLoop = true;
+      while (doLoop)
+      {
+         // TODO redesign grids
+         // remove offense grid
+         // remove Grid_State_t
+         // split defense grid into hit state and ship state arrays instead of struct
+         // player 1 offense grid = player 2 defense grid and vice versa
+         BattleShip_UI_Game_Screen(&player->grid);
+         // TODO check all ships sunk
+         doLoop = false;
+      }
+   }
    /* loop
-    *    round counter
+    *    increment round counter
+    *    update screen
     *    player turns
     *       manual
     *          read location
@@ -174,7 +182,7 @@ static bool Process_Begin_Game(Player_t *player)
     *          circle stage
     *            line stage
     */
-   return false;
+   return result;
 }
 
 static bool Process_Main_Menu(Player_t *player, Main_Menu_Option_e choice)

@@ -80,7 +80,7 @@ bool BattleShip_UI_Print_Menu(Menu_t *menu);
 bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice);
 bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading);
 
-void BattleShip_UI_Game_Menu(const Grid_t *grid);
+void BattleShip_UI_Game_Screen(const Grid_t *grid);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 

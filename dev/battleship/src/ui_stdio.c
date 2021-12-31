@@ -85,12 +85,12 @@ bool BattleShip_UI_Print_Grid(const Grid_t *grid, bool showOffense)
          {
             memset(line, 0, line_size);
             line_pos = 0;
-            if (Grid_Get_Row(grid, false, row, line, line_size, &line_pos))
+            if (Grid_GetRowStr(grid, false, row, line, line_size, &line_pos))
             {
                if (showOffense)
                {
                   line[line_pos++] = ' ';
-                  if (Grid_Get_Row(grid, true, row, line, line_size, &line_pos))
+                  if (Grid_GetRowStr(grid, true, row, line, line_size, &line_pos))
                   {
                      printf("%s\n", line);
                   }

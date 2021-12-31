@@ -47,7 +47,7 @@ static const Ship_Info_t shipTable[] =
 
 #define NUM_SHIPS ARRAY_LEN(shipTable)
 
-static inline const Ship_Info_t * Ship_Get_Info(const Ship_Type_e type)
+static inline const Ship_Info_t * Ship_GetInfo(const Ship_Type_e type)
 {
    for (uint i = 0; i < NUM_SHIPS; i++)
    {
@@ -72,7 +72,7 @@ static inline uint * Ship_Get_Length_Array(void)
    return ship_length;
 }
 
-static inline Coord_t Ship_Get_Point(const Ship_t *ship, const uint i)
+static inline Coord_t Ship_GetPoint(const Ship_t *ship, const uint i)
 {
    Coord_t point = { 0 };
    if (ship)
