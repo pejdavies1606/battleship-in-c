@@ -86,8 +86,11 @@ bool BattleShip_Game_Start(Game_t *game)
    if (game)
    {
       // TODO while loop
-      result = Player_Place_Ships_Auto(&game->players[1]) &&
-               Process_Main_Menu(game, BattleShip_UI_Main_Menu(""));
+      result = Player_Place_Ships_Auto(&game->players[1]);
+      while (result)
+      {
+         result = Process_Main_Menu(game, BattleShip_UI_Main_Menu(""));
+      }
    }
    return result;
 }
@@ -196,7 +199,6 @@ static bool Process_Main_Menu(Game_t * const game, Main_Menu_Option_e const choi
       switch (choice)
       {
       case MENU_OPTION_MAIN_RETURN:
-         result = true;
          break;
       case MENU_OPTION_MAIN_PLACE:
          result = Process_Place_Menu(
