@@ -17,12 +17,12 @@
 #include "conio21/conio2.h"
 #endif
 
-static bool BattleShip_UI_Read(
+static bool _ReadInput(
    char * prompt,
    size_t option_len,
    InputData_t *data);
 
-static bool ReadString(char * str, size_t str_size, FILE *stream);
+static bool _ReadString(char * str, size_t str_size, FILE *stream);
 
 void BattleShipUI_ClearScreen(void)
 {
@@ -57,7 +57,7 @@ void BattleShipUI_PrintLogo(void)
 #endif
 }
 
-bool BattleShipUI_PrintMessage(char * message)
+bool BattleShipUI_PrintMessage(char const * const message)
 {
    bool result = false;
    if (message)
@@ -179,7 +179,7 @@ bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice)
    {
       option.type = INPUT_INT;
       option.max.ival = (int) menu->num_options;
-      result = BattleShip_UI_Read(
+      result = _ReadInput(
           "option",
           menu->meta.column_width_index,
           &option);
@@ -203,11 +203,11 @@ bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading)
       loc.max.loc.col = GRID_SIZE;
       loc.max.loc.row = GRID_SIZE;
       hdg.type = INPUT_HEADING;
-      result = (BattleShip_UI_Read(
+      result = (_ReadInput(
                     "loc <A1-J10>",
                     (size_t)len,
                     &loc) &&
-                BattleShip_UI_Read(
+                _ReadInput(
                     "hdg <N|E|S|W>",
                     LEN_HEADING,
                     &hdg));
@@ -222,7 +222,7 @@ bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading)
    return result;
 }
 
-bool BattleShip_UI_Read(
+bool _ReadInput(
    char * prompt,
    size_t option_len,
    InputData_t *data)
@@ -240,7 +240,7 @@ bool BattleShip_UI_Read(
 #else
          printf("Enter %s: ", prompt);
 #endif
-         result = ReadString(
+         result = _ReadString(
             chosen_option_str,
             chosen_option_len,
             stdin) &&
@@ -257,7 +257,7 @@ bool BattleShip_UI_Read(
    return result;
 }
 
-bool ReadString(char * str, size_t str_size, FILE *stream)
+bool _ReadString(char * str, size_t str_size, FILE *stream)
 {
    bool result = false;
    // Type-ahead cannot be avoided by attempting to 'flush' stdin.

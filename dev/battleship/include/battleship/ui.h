@@ -58,23 +58,22 @@ typedef enum
 
 typedef struct
 {
-   Ship_Menu_Option_e   option;
-   ShipType_e          type;
-} Ship_Menu_Choice_t;
+   Ship_Menu_Option_e option;
+   ShipType_e type;
+} ShipMenuChoice_t;
 
 char const * BattleShipUI_GetLogo(int row);
-Grid_Meta_t * BattleShip_UI_Get_Grid_Meta(void);
 
 bool BattleShipUI_Init();
 
-void BattleShipUI_ClearScreen(void);
-bool BattleShipUI_PrintMessage(char * message);
+void BattleShipUI_ClearScreen();
+bool BattleShipUI_PrintMessage(char const * const message);
 void BattleShipUI_PrintLogo();
 bool BattleShipUI_PrintGrid(Grid_t * const grid, GridHit_e * const hits);
 
 MainMenuOption_e BattleShipUI_MainMenu(char * message);
 PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid);
-Ship_Menu_Choice_t BattleShipUI_ShipMenuManual(Grid_t * const grid);
+ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid);
 
 bool BattleShipUI_PrintMenu(Menu_t *menu);
 bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice);

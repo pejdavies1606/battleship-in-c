@@ -30,8 +30,8 @@
 //static _Bool sunk, two_ai = false, configExist;
 //static _Bool p1sunk[NUM_SHIPS], p2sunk[NUM_SHIPS];
 
-static bool _ProcShipMenu(Player_t *player, Ship_Menu_Choice_t choice);
-static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e choice);
+static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const choice);
+static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const choice);
 static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice);
 
 Game_t * BattleShip_Game_Init(void)
@@ -94,12 +94,13 @@ bool BattleShip_Game_Start(Game_t *game)
    return result;
 }
 
-static bool _ProcShipMenu(Player_t *player, Ship_Menu_Choice_t choice)
+static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const choice)
 {
+   Ship_t ship = {0};
    bool result = false;
-   if (player)
+   if (player && choice)
    {
-      switch (choice.option)
+      switch (choice->option)
       {
       case MENU_OPTION_SHIP_RETURN:
          result = _ProcPlaceMenu(
@@ -108,14 +109,9 @@ static bool _ProcShipMenu(Player_t *player, Ship_Menu_Choice_t choice)
          break;
       case MENU_OPTION_SHIP_PLACE:
       {
-         Coord_t location;
-         Heading_e heading;
-         if (BattleShipUI_ReadShipCoord(&location, &heading))
+         ship.type = choice->type;
+         if (BattleShipUI_ReadShipCoord(&ship.location, &ship.heading))
          {
-            Ship_t ship = (Ship_t){
-                .type = choice.type,
-                .location = location,
-                .heading = heading};
             result = (GRID_STATUS_OK == Player_PlaceShip(player, &ship));
          }
       }
@@ -127,6 +123,8 @@ static bool _ProcShipMenu(Player_t *player, Ship_Menu_Choice_t choice)
 
 static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e choice)
 {
+   PlaceMenuOption_e placeChoice = MENU_OPTION_PLACE_RETURN;
+   ShipMenuChoice_t shipChoice = {0};
    bool result = false;
    if (player)
    {
@@ -140,15 +138,16 @@ static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e choice)
          break;
       case MENU_OPTION_PLACE_AUTO:
          // TODO confirm yes/no
-         result = Player_PlaceShipsAuto(player) &&
-                  _ProcPlaceMenu(
-                      player,
-                      BattleShipUI_PlaceMenu(&player->grid));
+         if (Player_PlaceShipsAuto(player))
+         {
+            // repeat same menu
+            placeChoice = BattleShipUI_PlaceMenu(&player->grid);
+            result = _ProcPlaceMenu(player, placeChoice);
+         }
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         result = _ProcShipMenu(
-            player,
-            BattleShipUI_ShipMenuManual(&player->grid));
+         shipChoice = BattleShipUI_ShipMenuManual(&player->grid);
+         result = _ProcShipMenu(player, &shipChoice);
          break;
       }
    }
@@ -190,6 +189,7 @@ static bool _ProcBeginGame(Game_t * const game)
 
 static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice)
 {
+   PlaceMenuOption_e placeChoice = MENU_OPTION_PLACE_RETURN;
    Player_t * player = NULL;
    bool result = false;
    if (game)
@@ -200,9 +200,8 @@ static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice)
       case MENU_OPTION_MAIN_RETURN:
          break;
       case MENU_OPTION_MAIN_PLACE:
-         result = _ProcPlaceMenu(
-             player,
-             BattleShipUI_PlaceMenu(&player->grid));
+      placeChoice = BattleShipUI_PlaceMenu(&player->grid);
+         result = _ProcPlaceMenu(player, placeChoice);
          break;
       case MENU_OPTION_MAIN_BEGIN:
          result = _ProcBeginGame(game);
@@ -225,16 +224,3 @@ static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice)
 /*void BattleShip_Ai() // TODO
 {
 }*/
-
-// TODO define these
-/*static void BattleShip_Logo_Print();
-static void BattleShip_Grid_Print_2();
-static void BattleShip_Grid_Print_1();
-static void BattleShip_Set_Ship();
-static void BattleShip_Clear_Ship();
-static void BattleShip_Enter_Ship_Data();
-static void BattleShip_Check_Ship_Grid();
-static void BattleShip_Check_Ship_Collision();
-static void BattleShip_Target_Print();
-static void Strip_Spaces(); // for config read
- */

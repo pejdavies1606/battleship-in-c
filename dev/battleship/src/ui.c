@@ -225,22 +225,30 @@ PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid)
    return choice;
 }
 
-Ship_Menu_Choice_t BattleShipUI_ShipMenuManual(Grid_t * const grid)
+ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid)
 {
-   Ship_Menu_Option_e option = MENU_OPTION_SHIP_RETURN;
+   ShipMenuChoice_t result = {0};
+   uint choice = 0;
    bool read_success = false;
    while(!read_success)
    {
       BattleShipUI_ClearScreen();
-      BattleShipUI_PrintGrid(grid, NULL);
-      BattleShipUI_PrintMenu(&SHIP_MENU);
-      read_success = BattleShipUI_ReadMenu(&SHIP_MENU, (uint*) &option);
+      if (BattleShipUI_PrintGrid(grid, NULL) &&
+          BattleShipUI_PrintMenu(&SHIP_MENU))
+      {
+         read_success = BattleShipUI_ReadMenu(&SHIP_MENU, &choice);
+      }
+      else
+      {
+         break;
+      }
    }
-   return (Ship_Menu_Choice_t)
+   if (choice > 0)
    {
-      (option == MENU_OPTION_SHIP_RETURN) ? option : MENU_OPTION_SHIP_PLACE,
-      (ShipType_e) (option - 1)
-   };
+      result.option = MENU_OPTION_SHIP_PLACE;
+      result.type = (ShipType_e)(choice - 1);
+   }
+   return result;
 }
 
 void BattleShipUI_GameScreen(
