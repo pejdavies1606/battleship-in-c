@@ -70,7 +70,7 @@ bool Player_PlaceShipsAuto(Player_t * const player)
               player->grid.ships,
               player->grid.rows,
               player->grid.cols) &&
-          Grid_ClearHits(
+          Grid_ClearStates(
               player->grid.states,
               player->grid.rows,
               player->grid.cols))

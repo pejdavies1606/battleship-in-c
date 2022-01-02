@@ -9,28 +9,28 @@
 #include "battleship/util.h"
 #include "battleship/grid.h"
 
-typedef struct HitStateInfo
+typedef struct GridStateInfo
 {
    GridState_e state;
    char const * str;
-} HitStateInfo_t;
+} GridStateInfo_t;
 
-#define HIT_STATE_COUNT 3
-static HitStateInfo_t const HIT_STATE_TABLE[HIT_STATE_COUNT] =
+#define GRID_STATE_COUNT 3
+static GridStateInfo_t const GRID_STATE_TABLE[GRID_STATE_COUNT] =
 {
    { GRID_STATE_BLANK, " " },
    { GRID_STATE_HIT,   "x" },
    { GRID_STATE_MISS,  "o" },
 };
 
-const char * Grid_GetHitStateStr(GridState_e const state)
+const char * Grid_GetStateStr(GridState_e const state)
 {
    char const * str = NULL;
-   for (uint i = 0; i < HIT_STATE_COUNT; i++)
+   for (uint i = 0; i < GRID_STATE_COUNT; i++)
    {
-      if (state == HIT_STATE_TABLE[i].state)
+      if (state == GRID_STATE_TABLE[i].state)
       {
-         str = HIT_STATE_TABLE[i].str;
+         str = GRID_STATE_TABLE[i].str;
       }
    }
    return str;
@@ -59,12 +59,12 @@ bool Grid_Init(
       grid->rows = rows;
       grid->cols = cols;
       grid->ships = Grid_InitShips(rows, cols);
-      grid->states = Grid_InitHits(rows, cols);
+      grid->states = Grid_InitStates(rows, cols);
 
       if (grid->ships && grid->states)
       {
          result = (Grid_ClearShips(grid->ships, rows, cols) &&
-                   Grid_ClearHits(grid->states, rows, cols) &&
+                   Grid_ClearStates(grid->states, rows, cols) &&
                    Grid_InitMeta(&grid->meta, rows, cols, 0, 1));
       }
    }
@@ -81,7 +81,7 @@ ShipType_e * Grid_InitShips(uint rows, uint cols)
    return ships;
 }
 
-GridState_e * Grid_InitHits(uint rows, uint cols)
+GridState_e * Grid_InitStates(uint rows, uint cols)
 {
    GridState_e * states = NULL;
    if (rows > 0 && cols > 0)
@@ -105,7 +105,7 @@ bool Grid_ClearShips(
    return result;
 }
 
-bool Grid_ClearHits(
+bool Grid_ClearStates(
    GridState_e * const states,
    uint const rows,
    uint const cols)
@@ -130,7 +130,7 @@ bool Grid_GetRowStr(
    GridMeta_t const * meta = NULL;
    char cell_str[SIZE_CELL_STR + 1] = {0};
    ShipType_e ship = SHIP_NONE;
-   GridState_e hit = GRID_STATE_BLANK;
+   GridState_e state = GRID_STATE_BLANK;
    int i = 0;
    size_t len = 0;
    bool result = false;
@@ -255,12 +255,12 @@ bool Grid_GetRowStr(
             for (int col = 0; col < (int)grid->cols; col++)
             {
                i = row * (int)(grid->cols) + col;
-               hit = (states) ? states[i] : grid->states[i];
-               Grid_HitStateToStr(hit, cell_str, SIZE_CELL_STR + 1);
-               if (!states && hit == GRID_STATE_BLANK)
+               state = (states) ? states[i] : grid->states[i];
+               Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
+               if (!states && state == GRID_STATE_BLANK)
                {
                   ship = grid->ships[i];
-                  Ship_TypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
+                  Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
                }
                result = Grid_AppendLine(
                    line,
@@ -406,7 +406,7 @@ GridStatus_e Grid_CheckShip(const Grid_t *grid, const Ship_t *ship)
    return result;
 }
 
-bool Ship_TypeToStr(
+bool Grid_ShipTypeToStr(
    ShipType_e const type,
    char * const str,
    size_t const str_len)
@@ -418,7 +418,7 @@ bool Ship_TypeToStr(
    {
       if (SHIP_NONE == type)
       {
-         state_str = Grid_GetHitStateStr(GRID_STATE_BLANK);
+         state_str = Grid_GetStateStr(GRID_STATE_BLANK);
          if (state_str &&
             (snprintf(str, str_len, "%s", state_str) > 0))
          {
@@ -438,7 +438,7 @@ bool Ship_TypeToStr(
    return result;
 }
 
-bool Grid_HitStateToStr(
+bool Grid_StateToStr(
    GridState_e const state,
    char * const str,
    size_t const str_len)
@@ -447,7 +447,7 @@ bool Grid_HitStateToStr(
    char const * state_str = NULL;
    if (str && str_len > 0)
    {
-      state_str = Grid_GetHitStateStr(state);
+      state_str = Grid_GetStateStr(state);
       if (state_str)
       {
          result = (snprintf(str, str_len, "%s", state_str) > 0);
