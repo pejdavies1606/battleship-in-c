@@ -144,9 +144,9 @@ bool BattleShipUI_PrintMenu(Menu_t *menu)
       {
          uint column_width =
              (col == 0)
-                 ? 1
+                 ? menu->meta.column_width_index
                  : (menu->meta.column_width_data[col - 1] -
-                    menu->meta.header_width_data[(col - 1)] + 1);
+                    menu->meta.header_width_data[col - 1] + 1);
          printf("%*s%s", column_width, "",
                 IF_NULL_VAL(menu->headers[col], ""));
       }
@@ -158,7 +158,7 @@ bool BattleShipUI_PrintMenu(Menu_t *menu)
          {
             uint column_width =
                 (col == 0)
-                    ? 1
+                    ? menu->meta.column_width_index
                     : (menu->meta.column_width_data[col - 1] -
                        menu->meta.option_width_data[row + (col - 1) * menu->num_options] + 1);
             printf("%*s%s", column_width, "",
