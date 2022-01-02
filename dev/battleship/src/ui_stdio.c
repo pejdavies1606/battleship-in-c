@@ -70,7 +70,7 @@ bool BattleShipUI_PrintMessage(char const * const message)
 
 bool BattleShipUI_PrintGrid(
    Grid_t * const grid,
-   GridHit_e * const hits)
+   GridState_e * const states)
 {
    char * line = NULL;
    size_t line_size = MAX_BUFFER_SIZE * sizeof(char);
@@ -95,12 +95,12 @@ bool BattleShipUI_PrintGrid(
                line_size,
                &line_pos))
             {
-               if (hits)
+               if (states)
                {
                   line[line_pos++] = ' ';
                   if (Grid_GetRowStr(
                           grid,
-                          hits,
+                          states,
                           row,
                           line,
                           line_size,

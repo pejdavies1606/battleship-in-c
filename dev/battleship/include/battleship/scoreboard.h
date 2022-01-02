@@ -10,18 +10,18 @@
 
 #include "battleship/commondefs.h"
 
-typedef struct
+typedef struct ScoreboardEntity
 {
    char * name;
    uint score;
    uint total;
-} Scoreboard_Entity_t;
+} ScoreboardEntity_t;
 
-typedef struct
+typedef struct Scoreboard
 {
    char * title;
    uint num_entities;
-   Scoreboard_Entity_t *entities;
+   ScoreboardEntity_t *entities;
    uint width_score;
    uint width_total;
 } Scoreboard_t;

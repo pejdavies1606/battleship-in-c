@@ -15,14 +15,14 @@
 
 #define GRID_SIZE 10
 
-typedef struct
+typedef struct Player
 {
    Grid_t grid;
    Ship_t *ships;
 } Player_t;
 
 Player_t * Player_Init(uint num_players);
-Grid_Status_e Player_PlaceShip(Player_t *player, Ship_t *ship);
+GridStatus_e Player_PlaceShip(Player_t *player, Ship_t *ship);
 bool Player_PlaceShipsAuto(Player_t * const player);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

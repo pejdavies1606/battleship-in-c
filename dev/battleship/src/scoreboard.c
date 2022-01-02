@@ -15,11 +15,11 @@ bool Scoreboard_Init(Scoreboard_t *scoreboard, uint num_entities)
     {
         scoreboard->num_entities = num_entities;
         scoreboard->entities = malloc(
-            num_entities * sizeof(Scoreboard_Entity_t));
+            num_entities * sizeof(ScoreboardEntity_t));
         if (scoreboard->entities)
         {
             memset(scoreboard->entities, 0,
-                   num_entities * sizeof(Scoreboard_Entity_t));
+                   num_entities * sizeof(ScoreboardEntity_t));
             result = true;
         }
     }

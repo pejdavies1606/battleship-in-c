@@ -10,22 +10,22 @@
 
 #include "battleship/commondefs.h"
 
-typedef struct
+typedef struct MenuMeta
 {
    uint column_width_index; // depends on num_options
    uint *column_width_data; // num_headers, max width of header and options for that column
    uint *header_width_data; // num_headers, width of each header
    uint *option_width_data; // 2D array: row+col*num_rows = option+header*num_options
-} Menu_Meta_t;
+} MenuMeta_t;
 
-typedef struct
+typedef struct Menu
 {
    char * title;
    uint num_headers;
    char * *headers;
    uint num_options;
    char * *options; // 2D array: row+col*num_rows = option+header*num_options
-   Menu_Meta_t meta;
+   MenuMeta_t meta;
 } Menu_t;
 
 bool Menu_InitMeta(Menu_t *menu);

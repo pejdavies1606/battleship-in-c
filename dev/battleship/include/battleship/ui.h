@@ -33,7 +33,7 @@
 
 #define MAX_BUFFER_SIZE 80
 
-typedef enum
+typedef enum MainMenuOption
 {
    MENU_OPTION_MAIN_RETURN,
    MENU_OPTION_MAIN_PLACE,
@@ -42,7 +42,7 @@ typedef enum
    MENU_OPTION_MAIN_ABOUT
 } MainMenuOption_e;
 
-typedef enum
+typedef enum PlaceMenuOption
 {
    MENU_OPTION_PLACE_RETURN,
    MENU_OPTION_PLACE_HELP,
@@ -50,15 +50,15 @@ typedef enum
    MENU_OPTION_PLACE_MANUAL
 } PlaceMenuOption_e;
 
-typedef enum
+typedef enum ShipMenuOption
 {
    MENU_OPTION_SHIP_RETURN,
    MENU_OPTION_SHIP_PLACE
-} Ship_Menu_Option_e;
+} ShipMenuOption_e;
 
-typedef struct
+typedef struct ShipMenuChoice
 {
-   Ship_Menu_Option_e option;
+   ShipMenuOption_e option;
    ShipType_e type;
 } ShipMenuChoice_t;
 
@@ -69,7 +69,7 @@ bool BattleShipUI_Init();
 void BattleShipUI_ClearScreen();
 bool BattleShipUI_PrintMessage(char const * const message);
 void BattleShipUI_PrintLogo();
-bool BattleShipUI_PrintGrid(Grid_t * const grid, GridHit_e * const hits);
+bool BattleShipUI_PrintGrid(Grid_t * const grid, GridState_e * const states);
 
 MainMenuOption_e BattleShipUI_MainMenu(char * message);
 PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid);
@@ -79,7 +79,7 @@ bool BattleShipUI_PrintMenu(Menu_t *menu);
 bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice);
 bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading);
 
-void BattleShipUI_GameScreen(Grid_t * const grid, GridHit_e * const hits);
+void BattleShipUI_GameScreen(Grid_t * const grid, GridState_e * const states);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 

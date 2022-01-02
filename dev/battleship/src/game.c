@@ -165,10 +165,10 @@ static bool _ProcBeginGame(Game_t * const game)
       {
          BattleShipUI_GameScreen(
             &game->players[0].grid,
-            game->players[1].grid.hits);
+            game->players[1].grid.states);
          BattleShipUI_GameScreen(
             &game->players[1].grid,
-            game->players[0].grid.hits);
+            game->players[0].grid.states);
          // TODO check all ships sunk
          doLoop = false;
       }

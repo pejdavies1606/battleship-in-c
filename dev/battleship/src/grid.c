@@ -11,19 +11,19 @@
 
 typedef struct HitStateInfo
 {
-   GridHit_e state;
+   GridState_e state;
    char const * str;
 } HitStateInfo_t;
 
 #define HIT_STATE_COUNT 3
 static HitStateInfo_t const HIT_STATE_TABLE[HIT_STATE_COUNT] =
 {
-   { HIT_STATE_BLANK, " " },
-   { HIT_STATE_HIT,   "x" },
-   { HIT_STATE_MISS,  "o" },
+   { GRID_STATE_BLANK, " " },
+   { GRID_STATE_HIT,   "x" },
+   { GRID_STATE_MISS,  "o" },
 };
 
-const char * Grid_GetHitStateStr(GridHit_e const state)
+const char * Grid_GetHitStateStr(GridState_e const state)
 {
    char const * str = NULL;
    for (uint i = 0; i < HIT_STATE_COUNT; i++)
@@ -36,7 +36,7 @@ const char * Grid_GetHitStateStr(GridHit_e const state)
    return str;
 }
 
-static Grid_Status_e Grid_CheckShip(
+static GridStatus_e Grid_CheckShip(
    const Grid_t *grid,
    const Ship_t *ship);
 
@@ -59,12 +59,12 @@ bool Grid_Init(
       grid->rows = rows;
       grid->cols = cols;
       grid->ships = Grid_InitShips(rows, cols);
-      grid->hits = Grid_InitHits(rows, cols);
+      grid->states = Grid_InitHits(rows, cols);
 
-      if (grid->ships && grid->hits)
+      if (grid->ships && grid->states)
       {
          result = (Grid_ClearShips(grid->ships, rows, cols) &&
-                   Grid_ClearHits(grid->hits, rows, cols) &&
+                   Grid_ClearHits(grid->states, rows, cols) &&
                    Grid_InitMeta(&grid->meta, rows, cols, 0, 1));
       }
    }
@@ -81,14 +81,14 @@ ShipType_e * Grid_InitShips(uint rows, uint cols)
    return ships;
 }
 
-GridHit_e * Grid_InitHits(uint rows, uint cols)
+GridState_e * Grid_InitHits(uint rows, uint cols)
 {
-   GridHit_e * hits = NULL;
+   GridState_e * states = NULL;
    if (rows > 0 && cols > 0)
    {
-      hits = malloc(rows * cols * sizeof(GridHit_e));
+      states = malloc(rows * cols * sizeof(GridState_e));
    }
-   return hits;
+   return states;
 }
 
 bool Grid_ClearShips(
@@ -106,14 +106,14 @@ bool Grid_ClearShips(
 }
 
 bool Grid_ClearHits(
-   GridHit_e * const hits,
+   GridState_e * const states,
    uint const rows,
    uint const cols)
 {
    bool result = false;
-   if (hits && rows > 0 && cols > 0)
+   if (states && rows > 0 && cols > 0)
    {
-      memset(hits, 0, rows * cols * sizeof(GridHit_e));
+      memset(states, 0, rows * cols * sizeof(GridState_e));
       result = true;
    }
    return result;
@@ -121,16 +121,16 @@ bool Grid_ClearHits(
 
 bool Grid_GetRowStr(
     Grid_t *const grid,
-    GridHit_e *const hits,
+    GridState_e *const states,
     int const row,
     char *const line,
     size_t const line_size,
     size_t *const line_pos)
 {
-   Grid_Meta_t const * meta = NULL;
+   GridMeta_t const * meta = NULL;
    char cell_str[SIZE_CELL_STR + 1] = {0};
    ShipType_e ship = SHIP_NONE;
-   GridHit_e hit = HIT_STATE_BLANK;
+   GridState_e hit = GRID_STATE_BLANK;
    int i = 0;
    size_t len = 0;
    bool result = false;
@@ -151,7 +151,7 @@ bool Grid_GetRowStr(
              line_size,
              line_pos,
              meta->row_width - 1,
-             (hits) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
+             (states) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
              SIZE_TITLE_STR);
          // row filler
          len = meta->side_len + 6 * SIZE_GRID_SPACE - meta->row_width - SIZE_TITLE_STR;
@@ -255,9 +255,9 @@ bool Grid_GetRowStr(
             for (int col = 0; col < (int)grid->cols; col++)
             {
                i = row * (int)(grid->cols) + col;
-               hit = (hits) ? hits[i] : grid->hits[i];
+               hit = (states) ? states[i] : grid->states[i];
                Grid_HitStateToStr(hit, cell_str, SIZE_CELL_STR + 1);
-               if (!hits && hit == HIT_STATE_BLANK)
+               if (!states && hit == GRID_STATE_BLANK)
                {
                   ship = grid->ships[i];
                   Ship_TypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
@@ -292,7 +292,7 @@ bool Grid_GetRowStr(
    return result;
 }
 
-bool Grid_InitMeta(Grid_Meta_t* meta,
+bool Grid_InitMeta(GridMeta_t* meta,
    size_t row_size, size_t col_size,
    size_t row_width, size_t col_width)
 {
@@ -328,7 +328,7 @@ bool Grid_InitMeta(Grid_Meta_t* meta,
    return result;
 }
 
-bool Grid_IsValidMeta(Grid_Meta_t const * const meta)
+bool Grid_IsValidMeta(GridMeta_t const * const meta)
 {
    bool result = false;
    if (meta)
@@ -344,10 +344,10 @@ bool Grid_IsValidMeta(Grid_Meta_t const * const meta)
    return result;
 }
 
-Grid_Status_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
+GridStatus_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
 {
    Ship_Info_t const * ship_info = NULL;
-   Grid_Status_e result = GRID_STATUS_NULL;
+   GridStatus_e result = GRID_STATUS_NULL;
    Coord_t point = { 0 };
    if (grid && grid->ships && ship)
    {
@@ -366,9 +366,9 @@ Grid_Status_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
    return result;
 }
 
-Grid_Status_e Grid_CheckShip(const Grid_t *grid, const Ship_t *ship)
+GridStatus_e Grid_CheckShip(const Grid_t *grid, const Ship_t *ship)
 {
-   Grid_Status_e result = GRID_STATUS_NULL;
+   GridStatus_e result = GRID_STATUS_NULL;
    if (grid && grid->ships && ship)
    {
       const Ship_Info_t *ship_info = Ship_GetInfo(ship->type);
@@ -418,7 +418,7 @@ bool Ship_TypeToStr(
    {
       if (SHIP_NONE == type)
       {
-         state_str = Grid_GetHitStateStr(HIT_STATE_BLANK);
+         state_str = Grid_GetHitStateStr(GRID_STATE_BLANK);
          if (state_str &&
             (snprintf(str, str_len, "%s", state_str) > 0))
          {
@@ -439,7 +439,7 @@ bool Ship_TypeToStr(
 }
 
 bool Grid_HitStateToStr(
-   GridHit_e const state,
+   GridState_e const state,
    char * const str,
    size_t const str_len)
 {

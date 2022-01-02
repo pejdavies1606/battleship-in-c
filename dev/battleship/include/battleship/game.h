@@ -28,7 +28,7 @@
 #include "battleship/player.h"
 #include "battleship/comp_player.h"
 
-typedef struct
+typedef struct Game
 {
    Player_t *players;
    Comp_Player_t *comps;

@@ -44,9 +44,9 @@ Player_t * Player_Init(uint num_players)
    return players;
 }
 
-Grid_Status_e Player_PlaceShip(Player_t *player, Ship_t *ship)
+GridStatus_e Player_PlaceShip(Player_t *player, Ship_t *ship)
 {
-  Grid_Status_e status = GRID_STATUS_NULL;
+  GridStatus_e status = GRID_STATUS_NULL;
    if (player && ship)
    {
       Ship_t *player_ship = Player_GetShip(player, ship->type);
@@ -62,7 +62,7 @@ Grid_Status_e Player_PlaceShip(Player_t *player, Ship_t *ship)
 bool Player_PlaceShipsAuto(Player_t * const player)
 {
    Ship_t ship = {0};
-   Grid_Status_e status = GRID_STATUS_UNKNOWN;
+   GridStatus_e status = GRID_STATUS_UNKNOWN;
    bool result = false;
    if (player)
    {
@@ -71,7 +71,7 @@ bool Player_PlaceShipsAuto(Player_t * const player)
               player->grid.rows,
               player->grid.cols) &&
           Grid_ClearHits(
-              player->grid.hits,
+              player->grid.states,
               player->grid.rows,
               player->grid.cols))
       {

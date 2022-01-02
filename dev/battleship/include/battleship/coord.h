@@ -14,13 +14,13 @@
 #define COORD_ROW_MAX 10
 #define COORD_COL_MAX 10
 
-typedef struct
+typedef struct Coord
 {
    int row;
    int col;
 } Coord_t;
 
-typedef enum
+typedef enum Heading
 {
    HEADING_UNKNOWN,
    HEADING_NORTH,
@@ -29,7 +29,7 @@ typedef enum
    HEADING_WEST
 } Heading_e;
 
-typedef struct
+typedef struct HeadingInfo
 {
    Heading_e h;
    char c;

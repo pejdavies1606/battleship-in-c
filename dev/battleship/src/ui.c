@@ -253,10 +253,10 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid)
 
 void BattleShipUI_GameScreen(
    Grid_t * const grid,
-   GridHit_e * const hits)
+   GridState_e * const states)
 {
    BattleShipUI_ClearScreen();
-   BattleShipUI_PrintGrid(grid, hits);
+   BattleShipUI_PrintGrid(grid, states);
    /* screen
     *    defense + offense grids
     *    scoreboards
