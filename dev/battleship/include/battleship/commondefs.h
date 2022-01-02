@@ -12,8 +12,6 @@
 #include <stdlib.h> // NULL, size_t
 #include <stdbool.h> // bool
 
-#define ARRAY_LEN(a) (sizeof(a)/sizeof(a[0]))
-
 #define IF_NULL(a,b,c) (( NULL == a ) ? b : c)
 #define IF_NULL_VAL(a,b) (( NULL == a ) ? b : a)
 #define IF_NULL_BLANK(s) ( (NULL == s) ? "" : s)
@@ -36,6 +34,5 @@
       } while (0)
 
 typedef unsigned int uint;
-typedef char *String_t;
 
 #endif /* COMMONDEFS_H_ */

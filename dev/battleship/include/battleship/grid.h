@@ -33,9 +33,9 @@ typedef struct
 {
    size_t row_width;
    size_t col_width;
-   String_t corner_str;
+   char * corner_str;
    size_t corner_len;
-   String_t side_str;
+   char * side_str;
    size_t side_len;
 } Grid_Meta_t;
 

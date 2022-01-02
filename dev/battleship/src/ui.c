@@ -43,12 +43,12 @@ char const *LOGO[NUM_LOGO_ROWS] =
     "                       |                           "
 };
 
-static String_t MAIN_MENU_HEADERS[NUM_MAIN_MENU_HEADERS] =
+static char * MAIN_MENU_HEADERS[NUM_MAIN_MENU_HEADERS] =
 {
    "Option"
 };
 
-static String_t MAIN_MENU_OPTIONS[NUM_MAIN_MENU_OPTIONS] =
+static char * MAIN_MENU_OPTIONS[NUM_MAIN_MENU_OPTIONS] =
 {
    "Quit",
    "Place your ships",
@@ -66,12 +66,12 @@ static Menu_t MAIN_MENU =
    .options = MAIN_MENU_OPTIONS
 };
 
-static String_t PLACE_MENU_HEADERS[NUM_PLACE_MENU_HEADERS] =
+static char * PLACE_MENU_HEADERS[NUM_PLACE_MENU_HEADERS] =
 {
    "Option",
 };
 
-static String_t PLACE_MENU_OPTIONS[NUM_PLACE_MENU_OPTIONS] =
+static char * PLACE_MENU_OPTIONS[NUM_PLACE_MENU_OPTIONS] =
 {
    "Return",
    "Help",
@@ -88,14 +88,14 @@ static Menu_t PLACE_MENU =
    .options = PLACE_MENU_OPTIONS
 };
 
-static String_t SHIP_MENU_HEADERS[NUM_SHIP_MENU_HEADERS] =
+static char * SHIP_MENU_HEADERS[NUM_SHIP_MENU_HEADERS] =
 {
    "Option",
    "Length"
 };
 
 // stored column-wise, printed row-wise
-static String_t SHIP_MENU_OPTIONS[NUM_SHIP_MENU_OPTIONS*NUM_SHIP_MENU_HEADERS] =
+static char * SHIP_MENU_OPTIONS[NUM_SHIP_MENU_OPTIONS*NUM_SHIP_MENU_HEADERS] =
 {
    "Return", "Place",
    "L0", "L1",
@@ -116,13 +116,13 @@ bool BattleShipUI_Init(void)
    {
       // complete ship menu at runtime
       uint num_options = NUM_SHIPS + 1;
-      size_t ship_menu_size = sizeof(String_t) * num_options * NUM_SHIP_MENU_HEADERS;
-      String_t *ship_menu_data = malloc(ship_menu_size);
+      size_t ship_menu_size = sizeof(char *) * num_options * NUM_SHIP_MENU_HEADERS;
+      char * *ship_menu_data = malloc(ship_menu_size);
       if (ship_menu_data)
       {
          memset(ship_menu_data, 0, ship_menu_size);
-         String_t return_str = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_RETURN];
-         String_t place_prefix = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_PLACE];
+         char * return_str = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_RETURN];
+         char * place_prefix = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_PLACE];
          uint length_len = 0;
          uint *ship_length = Ship_GetLengths();
          if (ship_length)
@@ -156,7 +156,7 @@ bool BattleShipUI_Init(void)
                Ship_Info_t const * ship_info = &SHIP_TABLE[i - 1];
                if (ship_info)
                {
-                  String_t ship_name = ship_info->name;
+                  char * ship_name = ship_info->name;
                   uint ship_length = ship_info->length;
                   size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
                   ship_menu_data[name_index] = malloc(name_len);
@@ -196,7 +196,7 @@ char const * BattleShipUI_GetLogo(int row)
    return result;
 }
 
-MainMenuOption_e BattleShipUI_MainMenu(String_t message)
+MainMenuOption_e BattleShipUI_MainMenu(char * message)
 {
    MainMenuOption_e choice = MENU_OPTION_MAIN_RETURN;
    bool read_success = false;

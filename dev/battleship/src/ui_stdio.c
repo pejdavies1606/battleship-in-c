@@ -18,11 +18,11 @@
 #endif
 
 static bool BattleShip_UI_Read(
-   String_t prompt,
+   char * prompt,
    size_t option_len,
    InputData_t *data);
 
-static bool ReadString(String_t str, size_t str_size, FILE *stream);
+static bool ReadString(char * str, size_t str_size, FILE *stream);
 
 void BattleShipUI_ClearScreen(void)
 {
@@ -57,7 +57,7 @@ void BattleShipUI_PrintLogo(void)
 #endif
 }
 
-bool BattleShipUI_PrintMessage(String_t message)
+bool BattleShipUI_PrintMessage(char * message)
 {
    bool result = false;
    if (message)
@@ -231,12 +231,12 @@ bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading)
 }
 
 bool BattleShip_UI_Read(
-   String_t prompt,
+   char * prompt,
    size_t option_len,
    InputData_t *data)
 {
    size_t chosen_option_len = option_len + 1;
-   String_t chosen_option_str = malloc( (chosen_option_len) * sizeof(char) );
+   char * chosen_option_str = malloc( (chosen_option_len) * sizeof(char) );
    uint retries = 0;
    bool result = false;
    if (data)
@@ -265,7 +265,7 @@ bool BattleShip_UI_Read(
    return result;
 }
 
-bool ReadString(String_t str, size_t str_size, FILE *stream)
+bool ReadString(char * str, size_t str_size, FILE *stream)
 {
    bool result = false;
    // Type-ahead cannot be avoided by attempting to 'flush' stdin.
@@ -276,7 +276,7 @@ bool ReadString(String_t str, size_t str_size, FILE *stream)
    {
       memset(str, 0, str_size);
       size_t line_size = str_size + 1; // to account for newline from fgets
-      String_t line = malloc(line_size * sizeof(*line));
+      char * line = malloc(line_size * sizeof(*line));
       if (line)
       {
          if (fgets(line, (int)line_size, stream))

@@ -9,12 +9,12 @@
 
 #include <string.h>
 
-String_t TrimStr(String_t str, size_t str_size)
+char * TrimStr(char * str, size_t str_size)
 {
    size_t str_len = strnlen(str, str_size);
    if (str && str_size > 0 && str_len > 0 && str_len < str_size)
    {
-      String_t c;
+      char * c;
       // truncate on newlines and carriage returns
       // "foo\n" -> "foo\0" -> "foo"
       while ((c = strpbrk(str, "\n\r")))
@@ -63,7 +63,7 @@ int CalcNumWidth(int n)
    return w;
 }
 
-bool RepeatChar(String_t line, size_t size_line, char elem)
+bool RepeatChar(char * line, size_t size_line, char elem)
 {
    bool result = false;
    if (line && size_line > 0)

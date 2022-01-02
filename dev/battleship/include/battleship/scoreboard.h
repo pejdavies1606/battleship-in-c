@@ -12,14 +12,14 @@
 
 typedef struct
 {
-   String_t name;
+   char * name;
    uint score;
    uint total;
 } Scoreboard_Entity_t;
 
 typedef struct
 {
-   String_t title;
+   char * title;
    uint num_entities;
    Scoreboard_Entity_t *entities;
    uint width_score;

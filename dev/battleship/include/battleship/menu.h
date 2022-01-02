@@ -20,11 +20,11 @@ typedef struct
 
 typedef struct
 {
-   String_t title;
+   char * title;
    uint num_headers;
-   String_t *headers;
+   char * *headers;
    uint num_options;
-   String_t *options; // 2D array: row+col*num_rows = option+header*num_options
+   char * *options; // 2D array: row+col*num_rows = option+header*num_options
    Menu_Meta_t meta;
 } Menu_t;
 

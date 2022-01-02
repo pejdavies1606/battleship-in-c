@@ -32,7 +32,7 @@ typedef struct
 typedef struct
 {
    ShipType_e type;
-   String_t name;
+   char * name;
    uint length;
 } Ship_Info_t;
 

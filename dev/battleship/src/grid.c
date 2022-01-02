@@ -306,10 +306,10 @@ bool Grid_InitMeta(Grid_Meta_t* meta,
          ? col_width : (size_t)CalcNumWidth((int)col_size);
 
       meta->corner_len = meta->col_width + SIZE_GRID_SPACE;
-      String_t corner_char = STR_GRID_CORNER;
+      char * corner_char = STR_GRID_CORNER;
 
       meta->side_len = (meta->col_width + SIZE_GRID_SPACE) * col_size;
-      String_t side_char = STR_GRID_SIDE_H;
+      char * side_char = STR_GRID_SIDE_H;
 
       meta->corner_str = malloc(meta->corner_len);
       meta->side_str = malloc(meta->side_len);
