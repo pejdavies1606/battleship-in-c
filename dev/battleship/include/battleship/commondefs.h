@@ -33,6 +33,4 @@
                   __func__, __VA_ARGS__); \
       } while (0)
 
-typedef unsigned int uint;
-
 #endif /* COMMONDEFS_H_ */
