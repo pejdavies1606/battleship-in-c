@@ -37,8 +37,7 @@ typedef struct
 
 #define LEN_HEADING 1
 #define NUM_HEADINGS 5
-#define HEADING_UNKNOWN_INDEX 0
-static const HeadingInfo_t headingTable[NUM_HEADINGS] =
+static const HeadingInfo_t HEADING_TABLE[NUM_HEADINGS] =
 {
    { HEADING_NORTH,   'N' },
    { HEADING_EAST,    'E' },
@@ -49,12 +48,12 @@ static const HeadingInfo_t headingTable[NUM_HEADINGS] =
 
 static inline char Heading_GetChar(Heading_e h)
 {
-   char c = headingTable[HEADING_UNKNOWN_INDEX].c;
+   char c = HEADING_TABLE[NUM_HEADINGS - 1].c;
    for (uint i = 0; i < NUM_HEADINGS; i++)
    {
-      if (h == headingTable[i].h)
+      if (h == HEADING_TABLE[i].h)
       {
-         c = headingTable[i].c;
+         c = HEADING_TABLE[i].c;
       }
    }
    return c;
@@ -62,12 +61,12 @@ static inline char Heading_GetChar(Heading_e h)
 
 static inline Heading_e Heading_GetHdg(char c)
 {
-   Heading_e h = headingTable[HEADING_UNKNOWN_INDEX].h;
+   Heading_e h = HEADING_TABLE[NUM_HEADINGS - 1].h;
    for (uint i = 0; i < NUM_HEADINGS; i++)
    {
-      if (c == headingTable[i].c)
+      if (c == HEADING_TABLE[i].c)
       {
-         h = headingTable[i].h;
+         h = HEADING_TABLE[i].h;
       }
    }
    return h;

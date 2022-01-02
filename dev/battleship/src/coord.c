@@ -35,7 +35,7 @@ Heading_e Heading_InitRandom()
    int i = rand() % (NUM_HEADINGS - 1);
    if (i >= 0 && i < NUM_HEADINGS)
    {
-      h = headingTable[i].h;
+      h = HEADING_TABLE[i].h;
    }
    return h;
 }

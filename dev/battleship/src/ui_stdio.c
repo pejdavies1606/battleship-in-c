@@ -194,7 +194,6 @@ bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice)
 bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading)
 {
    bool result = false;
-   bool parse_success[3] = { false };
    InputData_t loc = { 0 };
    InputData_t hdg = { 0 };
    int len = 1 + CalcNumWidth(GRID_SIZE); // J10
@@ -204,21 +203,14 @@ bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading)
       loc.max.loc.col = GRID_SIZE;
       loc.max.loc.row = GRID_SIZE;
       hdg.type = INPUT_HEADING;
-      //printf("Enter %s: ", "<0+> <0+> <0+>");
-      //parse_success = (3 == sscanf(buf, "%2d %2d %1u", &location->col, &location->row, heading));
-      parse_success[0] = BattleShip_UI_Read(
-         "loc <A1-J10>",
-         (size_t) len,
-         &loc);
-      parse_success[1] = true;
-      parse_success[2] = BattleShip_UI_Read(
-         "hdg <N|E|S|W>",
-         LEN_HEADING,
-         &hdg);
-      result = (
-         parse_success[0] &&
-         parse_success[1] && 
-         parse_success[2]);
+      result = (BattleShip_UI_Read(
+                    "loc <A1-J10>",
+                    (size_t)len,
+                    &loc) &&
+                BattleShip_UI_Read(
+                    "hdg <N|E|S|W>",
+                    LEN_HEADING,
+                    &hdg));
       if (result)
       {
          location->col = (int) loc.val.loc.col;

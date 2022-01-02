@@ -107,9 +107,9 @@ bool ParseHeading(const char *str, Heading_e *hdg)
    {
       for (uint i = 0; i < NUM_HEADINGS; i++)
       {
-         if (toupper(str[0]) == headingTable[i].c)
+         if (toupper(str[0]) == HEADING_TABLE[i].c)
          {
-            *hdg = headingTable[i].h;
+            *hdg = HEADING_TABLE[i].h;
             result = true;
             break;
          }
