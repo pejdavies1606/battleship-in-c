@@ -36,7 +36,9 @@ typedef struct
    uint length;
 } Ship_Info_t;
 
-static const Ship_Info_t shipTable[] =
+#define NUM_SHIPS 5
+
+static Ship_Info_t const SHIP_TABLE[NUM_SHIPS] =
 {
    { SHIP_DESTROYER,          "Destroyer",         2 },
    { SHIP_CRUISER,            "Cruiser",           3 },
@@ -45,60 +47,22 @@ static const Ship_Info_t shipTable[] =
    { SHIP_AIRCRAFT_CARRIER,   "Aircraft Carrier",  5 }
 };
 
-#define NUM_SHIPS ARRAY_LEN(shipTable)
-
-static inline const Ship_Info_t * Ship_GetInfo(const ShipType_e type)
+static inline Ship_Info_t const * Ship_GetInfo(const ShipType_e type)
 {
+   Ship_Info_t const * info = NULL;
    for (uint i = 0; i < NUM_SHIPS; i++)
    {
-      if (type == shipTable[i].type)
+      if (type == SHIP_TABLE[i].type)
       {
-         return &shipTable[i];
+         info = &SHIP_TABLE[i];
       }
    }
-   return NULL;
+   return info;
 }
 
-static inline uint * Ship_Get_Length_Array(void)
-{
-   uint *ship_length = malloc(sizeof(uint) * NUM_SHIPS);
-   if (ship_length)
-   {
-      for (uint i = 0; i < NUM_SHIPS; i++)
-      {
-         ship_length[i] = shipTable[i].length;
-      }
-   }
-   return ship_length;
-}
-
-static inline Coord_t Ship_GetPoint(const Ship_t *ship, const uint i)
-{
-   Coord_t point = { 0 };
-   if (ship)
-   {
-      point = ship->location;
-      switch (ship->heading)
-      {
-      case HEADING_NORTH:
-         point.row -= (int) i;
-         break;
-      case HEADING_EAST:
-         point.col += (int) i;
-         break;
-      case HEADING_SOUTH:
-         point.row += (int) i;
-         break;
-      case HEADING_WEST:
-         point.col -= (int) i;
-         break;
-      case HEADING_UNKNOWN:
-         break;
-      }
-   }
-   return point;
-}
-
+uint * Ship_GetLengths(void);
+Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i);
 Ship_t * Ship_Init(uint num_ships);
+bool Ship_TypeToStr(const ShipType_e type, char *str, const size_t str_len);
 
 #endif /* BATTLESHIP_SHIP_H_ */

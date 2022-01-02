@@ -7,14 +7,52 @@
 
 #include "battleship/ship.h"
 
+uint * Ship_GetLengths(void)
+{
+   uint * ship_length = malloc(sizeof(uint) * NUM_SHIPS);
+   if (ship_length)
+   {
+      for (uint i = 0; i < NUM_SHIPS; i++)
+      {
+         ship_length[i] = SHIP_TABLE[i].length;
+      }
+   }
+   return ship_length;
+}
+
+Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i)
+{
+   Coord_t point = { 0 };
+   if (ship)
+   {
+      point = ship->location;
+      switch (ship->heading)
+      {
+      case HEADING_NORTH:
+         point.row -= (int) i;
+         break;
+      case HEADING_EAST:
+         point.col += (int) i;
+         break;
+      case HEADING_SOUTH:
+         point.row += (int) i;
+         break;
+      case HEADING_WEST:
+         point.col -= (int) i;
+         break;
+      case HEADING_UNKNOWN:
+         break;
+      }
+   }
+   return point;
+}
+
 Ship_t * Ship_Init(uint num_ships)
 {
    Ship_t *ships = malloc(num_ships * sizeof(Ship_t));
-   if (!ships)
+   if (ships)
    {
-      return NULL;
+      memset(ships, 0, num_ships * sizeof(Ship_t));
    }
-   memset(ships, 0, num_ships * sizeof(Ship_t));
    return ships;
 }
-

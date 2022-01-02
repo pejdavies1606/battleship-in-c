@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-bool Menu_Meta_Init(Menu_t *menu)
+bool Menu_InitMeta(Menu_t * const menu)
 {
    bool result = false;
    if (menu)
@@ -53,4 +53,3 @@ bool Menu_Meta_Init(Menu_t *menu)
    }
    return result;
 }
-

@@ -72,7 +72,6 @@ bool Grid_GetRowStr(
 
 Grid_Status_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship);
 
-bool Ship_TypeToStr(const ShipType_e type, char *str, const size_t str_len);
 bool Grid_HitStateToStr(const GridHit_e state, char *str, size_t str_len);
 
 #endif /* BATTLESHIP_GRID_H_ */

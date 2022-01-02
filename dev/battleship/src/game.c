@@ -30,9 +30,9 @@
 //static _Bool sunk, two_ai = false, configExist;
 //static _Bool p1sunk[NUM_SHIPS], p2sunk[NUM_SHIPS];
 
-static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice);
-static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice);
-static bool Process_Main_Menu(Game_t * const game, Main_Menu_Option_e const choice);
+static bool _ProcShipMenu(Player_t *player, Ship_Menu_Choice_t choice);
+static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e choice);
+static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice);
 
 Game_t * BattleShip_Game_Init(void)
 {
@@ -63,7 +63,7 @@ Game_t * BattleShip_Game_Init(void)
          Scoreboard_Init(&game->ship_health, NUM_SHIPS);
          for (uint i = 0; i < NUM_SHIPS; i++)
          {
-            const Ship_Info_t ship_info = shipTable[i];
+            Ship_Info_t const ship_info = SHIP_TABLE[i];
             game->ship_health.entities[i].name = ship_info.name;
             game->ship_health.entities[i].total = ship_info.length;
          }
@@ -73,7 +73,7 @@ Game_t * BattleShip_Game_Init(void)
          game->hit_score.width_score = SCOREBOARD_HITS_SCORE_WIDTH;
          game->hit_score.width_total = SCOREBOARD_HITS_SCORE_WIDTH;
 
-         BattleShip_UI_Init();
+         BattleShipUI_Init();
       }
    }
 
@@ -85,17 +85,16 @@ bool BattleShip_Game_Start(Game_t *game)
    bool result = false;
    if (game)
    {
-      // TODO while loop
-      result = Player_Place_Ships_Auto(&game->players[1]);
+      result = Player_PlaceShipsAuto(&game->players[1]);
       while (result)
       {
-         result = Process_Main_Menu(game, BattleShip_UI_Main_Menu(""));
+         result = _ProcMainMenu(game, BattleShipUI_MainMenu(""));
       }
    }
    return result;
 }
 
-static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
+static bool _ProcShipMenu(Player_t *player, Ship_Menu_Choice_t choice)
 {
    bool result = false;
    if (player)
@@ -103,15 +102,15 @@ static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
       switch (choice.option)
       {
       case MENU_OPTION_SHIP_RETURN:
-         result = Process_Place_Menu(
+         result = _ProcPlaceMenu(
              player,
-             BattleShip_UI_Place_Menu(&player->grid));
+             BattleShipUI_PlaceMenu(&player->grid));
          break;
       case MENU_OPTION_SHIP_PLACE:
       {
          Coord_t location;
          Heading_e heading;
-         if (BattleShip_UI_Read_Ship_Location_Heading(&location, &heading))
+         if (BattleShipUI_ReadShipCoord(&location, &heading))
          {
             Ship_t ship = (Ship_t){
                 .type = choice.type,
@@ -126,7 +125,7 @@ static bool Process_Ship_Menu(Player_t *player, Ship_Menu_Choice_t choice)
    return result;
 }
 
-static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
+static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e choice)
 {
    bool result = false;
    if (player)
@@ -141,22 +140,22 @@ static bool Process_Place_Menu(Player_t *player, Place_Menu_Option_e choice)
          break;
       case MENU_OPTION_PLACE_AUTO:
          // TODO confirm yes/no
-         result = Player_Place_Ships_Auto(player) &&
-                  Process_Place_Menu(
+         result = Player_PlaceShipsAuto(player) &&
+                  _ProcPlaceMenu(
                       player,
-                      BattleShip_UI_Place_Menu(&player->grid));
+                      BattleShipUI_PlaceMenu(&player->grid));
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         result = Process_Ship_Menu(
+         result = _ProcShipMenu(
             player,
-            BattleShip_UI_Ship_Menu_Manual(&player->grid));
+            BattleShipUI_ShipMenuManual(&player->grid));
          break;
       }
    }
    return result;
 }
 
-static bool Process_Begin_Game(Game_t * const game)
+static bool _ProcBeginGame(Game_t * const game)
 {
    bool doLoop = false;
    bool result = false;
@@ -165,10 +164,10 @@ static bool Process_Begin_Game(Game_t * const game)
       doLoop = true;
       while (doLoop)
       {
-         BattleShip_UI_Game_Screen(
+         BattleShipUI_GameScreen(
             &game->players[0].grid,
             game->players[1].grid.hits);
-         BattleShip_UI_Game_Screen(
+         BattleShipUI_GameScreen(
             &game->players[1].grid,
             game->players[0].grid.hits);
          // TODO check all ships sunk
@@ -189,7 +188,7 @@ static bool Process_Begin_Game(Game_t * const game)
    return result;
 }
 
-static bool Process_Main_Menu(Game_t * const game, Main_Menu_Option_e const choice)
+static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice)
 {
    Player_t * player = NULL;
    bool result = false;
@@ -201,12 +200,12 @@ static bool Process_Main_Menu(Game_t * const game, Main_Menu_Option_e const choi
       case MENU_OPTION_MAIN_RETURN:
          break;
       case MENU_OPTION_MAIN_PLACE:
-         result = Process_Place_Menu(
+         result = _ProcPlaceMenu(
              player,
-             BattleShip_UI_Place_Menu(&player->grid));
+             BattleShipUI_PlaceMenu(&player->grid));
          break;
       case MENU_OPTION_MAIN_BEGIN:
-         result = Process_Begin_Game(game);
+         result = _ProcBeginGame(game);
          break;
       case MENU_OPTION_MAIN_WATCH:
          break;

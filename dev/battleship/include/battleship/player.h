@@ -23,6 +23,6 @@ typedef struct
 
 Player_t * Player_Init(uint num_players);
 Grid_Status_e Player_PlaceShip(Player_t *player, Ship_t *ship);
-bool Player_Place_Ships_Auto(Player_t *player);
+bool Player_PlaceShipsAuto(Player_t * const player);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

@@ -43,12 +43,12 @@ char const *LOGO[NUM_LOGO_ROWS] =
     "                       |                           "
 };
 
-static String_t main_menu_headers[NUM_MAIN_MENU_HEADERS] =
+static String_t MAIN_MENU_HEADERS[NUM_MAIN_MENU_HEADERS] =
 {
    "Option"
 };
 
-static String_t main_menu_options[NUM_MAIN_MENU_OPTIONS] =
+static String_t MAIN_MENU_OPTIONS[NUM_MAIN_MENU_OPTIONS] =
 {
    "Quit",
    "Place your ships",
@@ -57,21 +57,21 @@ static String_t main_menu_options[NUM_MAIN_MENU_OPTIONS] =
    "About"
 };
 
-static Menu_t main_menu =
+static Menu_t MAIN_MENU =
 {
    .title = "Main Menu",
    .num_headers = NUM_MAIN_MENU_HEADERS,
-   .headers = main_menu_headers,
+   .headers = MAIN_MENU_HEADERS,
    .num_options = NUM_MAIN_MENU_OPTIONS,
-   .options = main_menu_options
+   .options = MAIN_MENU_OPTIONS
 };
 
-static String_t place_menu_headers[NUM_PLACE_MENU_HEADERS] =
+static String_t PLACE_MENU_HEADERS[NUM_PLACE_MENU_HEADERS] =
 {
    "Option",
 };
 
-static String_t place_menu_options[NUM_PLACE_MENU_OPTIONS] =
+static String_t PLACE_MENU_OPTIONS[NUM_PLACE_MENU_OPTIONS] =
 {
    "Return",
    "Help",
@@ -79,40 +79,40 @@ static String_t place_menu_options[NUM_PLACE_MENU_OPTIONS] =
    "Manual"
 };
 
-static Menu_t place_menu =
+static Menu_t PLACE_MENU =
 {
    .title = "Ship Placement Menu",
    .num_headers = NUM_PLACE_MENU_HEADERS,
-   .headers = place_menu_headers,
+   .headers = PLACE_MENU_HEADERS,
    .num_options = NUM_PLACE_MENU_OPTIONS,
-   .options = place_menu_options
+   .options = PLACE_MENU_OPTIONS
 };
 
-static String_t ship_menu_headers[NUM_SHIP_MENU_HEADERS] =
+static String_t SHIP_MENU_HEADERS[NUM_SHIP_MENU_HEADERS] =
 {
    "Option",
    "Length"
 };
 
 // stored column-wise, printed row-wise
-static String_t ship_menu_options[NUM_SHIP_MENU_OPTIONS*NUM_SHIP_MENU_HEADERS] =
+static String_t SHIP_MENU_OPTIONS[NUM_SHIP_MENU_OPTIONS*NUM_SHIP_MENU_HEADERS] =
 {
    "Return", "Place",
    "L0", "L1",
 };
 
-static Menu_t ship_menu =
+static Menu_t SHIP_MENU =
 {
    .title = "Ships",
    .num_headers = NUM_SHIP_MENU_HEADERS,
-   .headers = ship_menu_headers,
+   .headers = SHIP_MENU_HEADERS,
 };
 
-bool BattleShip_UI_Init(void)
+bool BattleShipUI_Init(void)
 {
    bool result = false;
-   if (Menu_Meta_Init(&main_menu) &&
-       Menu_Meta_Init(&place_menu))
+   if (Menu_InitMeta(&MAIN_MENU) &&
+       Menu_InitMeta(&PLACE_MENU))
    {
       // complete ship menu at runtime
       uint num_options = NUM_SHIPS + 1;
@@ -121,10 +121,10 @@ bool BattleShip_UI_Init(void)
       if (ship_menu_data)
       {
          memset(ship_menu_data, 0, ship_menu_size);
-         String_t return_str = ship_menu_options[MENU_OPTION_SHIP_RETURN];
-         String_t place_prefix = ship_menu_options[MENU_OPTION_SHIP_PLACE];
+         String_t return_str = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_RETURN];
+         String_t place_prefix = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_PLACE];
          uint length_len = 0;
-         uint *ship_length = Ship_Get_Length_Array();
+         uint *ship_length = Ship_GetLengths();
          if (ship_length)
          {
             length_len = (uint)CalcNumWidth(CalcMax((int *)ship_length, NUM_SHIPS)) + 1;
@@ -153,7 +153,7 @@ bool BattleShip_UI_Init(void)
             }
             else
             {
-               const Ship_Info_t *ship_info = &shipTable[i - 1];
+               Ship_Info_t const * ship_info = &SHIP_TABLE[i - 1];
                if (ship_info)
                {
                   String_t ship_name = ship_info->name;
@@ -177,16 +177,16 @@ bool BattleShip_UI_Init(void)
          if (result)
          {
             // redefine template options table in menu with new, completed options table
-            ship_menu.num_options = num_options;
-            ship_menu.options = ship_menu_data;
-            result = Menu_Meta_Init(&ship_menu);
+            SHIP_MENU.num_options = num_options;
+            SHIP_MENU.options = ship_menu_data;
+            result = Menu_InitMeta(&SHIP_MENU);
          }
       }
    }
    return result;
 }
 
-char const * BattleShip_UI_Get_Logo(int row)
+char const * BattleShipUI_GetLogo(int row)
 {
    char const * result = NULL;
    if (row >= 0 && row < NUM_LOGO_ROWS)
@@ -196,45 +196,45 @@ char const * BattleShip_UI_Get_Logo(int row)
    return result;
 }
 
-Main_Menu_Option_e BattleShip_UI_Main_Menu(String_t message)
+MainMenuOption_e BattleShipUI_MainMenu(String_t message)
 {
-   Main_Menu_Option_e choice = MENU_OPTION_MAIN_RETURN;
+   MainMenuOption_e choice = MENU_OPTION_MAIN_RETURN;
    bool read_success = false;
    while(!read_success)
    {
-      BattleShip_UI_Clear_Screen();
-      BattleShip_UI_Print_Logo();
-      BattleShip_UI_Print_Message(message);
-      BattleShip_UI_Print_Menu(&main_menu);
-      read_success = BattleShip_UI_Read_Menu(&main_menu, (uint*) &choice);
+      BattleShipUI_ClearScreen();
+      BattleShipUI_PrintLogo();
+      BattleShipUI_PrintMessage(message);
+      BattleShipUI_PrintMenu(&MAIN_MENU);
+      read_success = BattleShipUI_ReadMenu(&MAIN_MENU, (uint*) &choice);
    }
    return choice;
 }
 
-Place_Menu_Option_e BattleShip_UI_Place_Menu(Grid_t * const grid)
+PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid)
 {
-   Place_Menu_Option_e choice = MENU_OPTION_PLACE_RETURN;
+   PlaceMenuOption_e choice = MENU_OPTION_PLACE_RETURN;
    bool read_success = false;
    while(!read_success)
    {
-      BattleShip_UI_Clear_Screen();
-      BattleShip_UI_Print_Grid(grid, NULL);
-      BattleShip_UI_Print_Menu(&place_menu);
-      read_success = BattleShip_UI_Read_Menu(&place_menu, (uint*) &choice);
+      BattleShipUI_ClearScreen();
+      BattleShipUI_PrintGrid(grid, NULL);
+      BattleShipUI_PrintMenu(&PLACE_MENU);
+      read_success = BattleShipUI_ReadMenu(&PLACE_MENU, (uint*) &choice);
    }
    return choice;
 }
 
-Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(Grid_t * const grid)
+Ship_Menu_Choice_t BattleShipUI_ShipMenuManual(Grid_t * const grid)
 {
    Ship_Menu_Option_e option = MENU_OPTION_SHIP_RETURN;
    bool read_success = false;
    while(!read_success)
    {
-      BattleShip_UI_Clear_Screen();
-      BattleShip_UI_Print_Grid(grid, NULL);
-      BattleShip_UI_Print_Menu(&ship_menu);
-      read_success = BattleShip_UI_Read_Menu(&ship_menu, (uint*) &option);
+      BattleShipUI_ClearScreen();
+      BattleShipUI_PrintGrid(grid, NULL);
+      BattleShipUI_PrintMenu(&SHIP_MENU);
+      read_success = BattleShipUI_ReadMenu(&SHIP_MENU, (uint*) &option);
    }
    return (Ship_Menu_Choice_t)
    {
@@ -243,12 +243,12 @@ Ship_Menu_Choice_t BattleShip_UI_Ship_Menu_Manual(Grid_t * const grid)
    };
 }
 
-void BattleShip_UI_Game_Screen(
+void BattleShipUI_GameScreen(
    Grid_t * const grid,
    GridHit_e * const hits)
 {
-   BattleShip_UI_Clear_Screen();
-   BattleShip_UI_Print_Grid(grid, hits);
+   BattleShipUI_ClearScreen();
+   BattleShipUI_PrintGrid(grid, hits);
    /* screen
     *    defense + offense grids
     *    scoreboards

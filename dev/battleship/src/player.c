@@ -25,7 +25,7 @@ Player_t * Player_Init(uint num_players)
             {
                for (uint i = 0; i < NUM_SHIPS; i++)
                {
-                  player->ships[i].type = shipTable[i].type;
+                  player->ships[i].type = SHIP_TABLE[i].type;
                }
             }
             else
@@ -59,7 +59,7 @@ Grid_Status_e Player_PlaceShip(Player_t *player, Ship_t *ship)
    return status;
 }
 
-bool Player_Place_Ships_Auto(Player_t *player)
+bool Player_PlaceShipsAuto(Player_t * const player)
 {
    Ship_t ship = {0};
    Grid_Status_e status = GRID_STATUS_UNKNOWN;
@@ -80,7 +80,7 @@ bool Player_Place_Ships_Auto(Player_t *player)
             status = GRID_STATUS_UNKNOWN;
             do
             {
-               ship.type = shipTable[i - 1].type;
+               ship.type = SHIP_TABLE[i - 1].type;
                ship.location = Coord_InitRandom(
                    0, (int)player->grid.rows,
                    0, (int)player->grid.cols);

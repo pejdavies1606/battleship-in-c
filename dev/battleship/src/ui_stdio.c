@@ -24,7 +24,7 @@ static bool BattleShip_UI_Read(
 
 static bool ReadString(String_t str, size_t str_size, FILE *stream);
 
-void BattleShip_UI_Clear_Screen(void)
+void BattleShipUI_ClearScreen(void)
 {
 #ifdef DEBUG
    puts("clrscr");
@@ -37,7 +37,7 @@ void BattleShip_UI_Clear_Screen(void)
 #endif
 }
 
-void BattleShip_UI_Print_Logo(void)
+void BattleShipUI_PrintLogo(void)
 {
    char const *line = NULL;
    int row = 0;
@@ -48,7 +48,7 @@ void BattleShip_UI_Print_Logo(void)
 #else
    for (row = 0; row < NUM_LOGO_ROWS; row++)
    {
-      line = BattleShip_UI_Get_Logo(row);
+      line = BattleShipUI_GetLogo(row);
       if (line)
       {
          puts(line);
@@ -57,7 +57,7 @@ void BattleShip_UI_Print_Logo(void)
 #endif
 }
 
-bool BattleShip_UI_Print_Message(String_t message)
+bool BattleShipUI_PrintMessage(String_t message)
 {
    bool result = false;
    if (message)
@@ -68,7 +68,7 @@ bool BattleShip_UI_Print_Message(String_t message)
    return result;
 }
 
-bool BattleShip_UI_Print_Grid(
+bool BattleShipUI_PrintGrid(
    Grid_t * const grid,
    GridHit_e * const hits)
 {
@@ -132,7 +132,7 @@ bool BattleShip_UI_Print_Grid(
    return result;
 }
 
-bool BattleShip_UI_Print_Menu(Menu_t *menu)
+bool BattleShipUI_PrintMenu(Menu_t *menu)
 {
    bool result = false;
    if (menu)
@@ -171,7 +171,7 @@ bool BattleShip_UI_Print_Menu(Menu_t *menu)
    return result;
 }
 
-bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
+bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice)
 {
    bool result = false;
    InputData_t option = { 0 };
@@ -191,7 +191,7 @@ bool BattleShip_UI_Read_Menu(Menu_t *menu, uint *choice)
    return result;
 }
 
-bool BattleShip_UI_Read_Ship_Location_Heading(Coord_t *location, Heading_e *heading)
+bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading)
 {
    bool result = false;
    bool parse_success[3] = { false };
