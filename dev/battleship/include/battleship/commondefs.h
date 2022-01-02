@@ -8,14 +8,12 @@
 #ifndef COMMONDEFS_H_
 #define COMMONDEFS_H_
 
-#include <stdint.h>
-#include <stdlib.h> // NULL, size_t
+#include <stdlib.h> // NULL, size_t, uint
 #include <stdbool.h> // bool
 
 #define IF_NULL(a,b,c) (( NULL == a ) ? b : c)
 #define IF_NULL_VAL(a,b) (( NULL == a ) ? b : a)
 #define IF_NULL_BLANK(s) ( (NULL == s) ? "" : s)
-#define strlens(s) IF_NULL(s,0,strlen(s))
 
 #define UNUSED(x) (void)(x)
 

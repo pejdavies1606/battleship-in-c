@@ -9,40 +9,62 @@
 #include "battleship/util.h"
 
 #include <string.h>
-#include <stdarg.h>
 
 bool Menu_InitMeta(Menu_t * const menu)
 {
    bool result = false;
-   if (menu)
+   if (menu &&
+       menu->num_headers > 0 &&
+       menu->num_options > 0)
    {
       menu->meta.column_width_index = (uint)CalcNumWidth((int)menu->num_options);
-      uint *column_widths = malloc(
-          menu->num_headers * sizeof(uint));
-      uint *header_widths = malloc(
-          menu->num_headers * sizeof(uint));
-      uint *option_widths = malloc(
-          menu->num_options * menu->num_headers * sizeof(uint));
+      uint *column_widths = malloc(menu->num_headers * sizeof(uint));
+      uint *header_widths = malloc(menu->num_headers * sizeof(uint));
+      uint *option_widths = malloc(menu->num_options * menu->num_headers * sizeof(uint));
       if (column_widths && header_widths && option_widths)
       {
+         result = true;
+         // loop headers
          for (uint header_index = 0; header_index < menu->num_headers; header_index++)
          {
-            header_widths[header_index] = (uint)strlens(menu->headers[header_index]);
-            for (uint option_index = 0; option_index < menu->num_options; option_index++)
+            // get size of header string
+            size_t header_len = strnlen(menu->headers[header_index], SIZE_MENU_COL_MAX);
+            if (header_len > 0 && header_len < SIZE_MENU_COL_MAX)
             {
-               uint i = header_index * menu->num_options + option_index;
-               option_widths[i] = (uint)strlens(menu->options[i]);
-            }
-            uint option_width_max = (uint)CalcMax(
-                (int *)&option_widths[header_index * menu->num_options],
-                menu->num_options);
-            if (option_width_max > header_widths[header_index])
-            {
-               column_widths[header_index] = option_width_max;
+               header_widths[header_index] = (uint)header_len;
+               // loop options
+               for (uint option_index = 0; option_index < menu->num_options; option_index++)
+               {
+                  uint i = header_index * menu->num_options + option_index;
+                  // get size of option string
+                  size_t option_len = strnlen(menu->options[i], SIZE_MENU_COL_MAX);
+                  if (option_len > 0 && option_len < SIZE_MENU_COL_MAX)
+                  {
+                     option_widths[i] = (uint)option_len;
+                  }
+                  else
+                  {
+                     result = false;
+                     break;
+                  }
+               }
+               // get maximum size of option strings
+               uint option_width_max = (uint)CalcMax(
+                   (int *)&option_widths[header_index * menu->num_options],
+                   menu->num_options);
+               if (option_width_max > header_widths[header_index])
+               {
+                  column_widths[header_index] = option_width_max;
+               }
+               else
+               {
+                  column_widths[header_index] = header_widths[header_index];
+               }
             }
             else
             {
-               column_widths[header_index] = header_widths[header_index];
+               result= false;
+               break;
             }
          }
          menu->meta.column_width_data = column_widths;

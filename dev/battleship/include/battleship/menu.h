@@ -10,6 +10,8 @@
 
 #include "battleship/commondefs.h"
 
+#define SIZE_MENU_COL_MAX 32
+
 typedef struct MenuMeta
 {
    uint column_width_index; // depends on num_options
