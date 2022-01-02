@@ -25,7 +25,6 @@
 #define SCOREBOARD_HITS_SCORE_WIDTH 1
 #define SCOREBOARD_HITS_TOTAL_WIDTH 1
 
-#include "battleship/convert.h"
 #include "battleship/player.h"
 #include "battleship/comp_player.h"
 
