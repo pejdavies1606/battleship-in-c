@@ -27,5 +27,6 @@ typedef struct Scoreboard
 } Scoreboard_t;
 
 bool Scoreboard_Init(Scoreboard_t *scoreboard, uint num_entities);
+void Scoreboard_Destroy(Scoreboard_t * const scoreboard);
 
 #endif /* SCOREBOARD_H_ */

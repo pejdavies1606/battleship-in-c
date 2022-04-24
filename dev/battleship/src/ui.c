@@ -108,6 +108,16 @@ static Menu_t SHIP_MENU =
    .headers = SHIP_MENU_HEADERS,
 };
 
+char const * BattleShipUI_GetLogo(int row)
+{
+   char const * result = NULL;
+   if (row >= 0 && row < NUM_LOGO_ROWS)
+   {
+      result = LOGO[row];
+   }
+   return result;
+}
+
 bool BattleShipUI_Init(void)
 {
    bool result = false;
@@ -143,7 +153,7 @@ bool BattleShipUI_Init(void)
                if (ship_menu_data[name_index])
                {
                   snprintf(ship_menu_data[name_index], return_len, "%s", return_str);
-                  ship_menu_data[length_index] = ""; // blank entry
+                  // ship_menu_data[length_index] initialised to NULL with memset above
                }
                else
                {
@@ -186,14 +196,30 @@ bool BattleShipUI_Init(void)
    return result;
 }
 
-char const * BattleShipUI_GetLogo(int row)
+void BattleShipUI_Destroy(void)
 {
-   char const * result = NULL;
-   if (row >= 0 && row < NUM_LOGO_ROWS)
+   Menu_DestroyMeta(&MAIN_MENU);
+   Menu_DestroyMeta(&PLACE_MENU);
+   Menu_DestroyMeta(&SHIP_MENU);
+   if (SHIP_MENU.options)
    {
-      result = LOGO[row];
+      for (uint i = 0; i < SHIP_MENU.num_options; i++)
+      {
+         uint name_index = i;
+         uint length_index = i + SHIP_MENU.num_options;
+         if (SHIP_MENU.options[name_index])
+         {
+            free(SHIP_MENU.options[name_index]);
+         }
+         if (SHIP_MENU.options[length_index])
+         {
+            free(SHIP_MENU.options[length_index]);
+         }
+      }
+      free(SHIP_MENU.options);
+      SHIP_MENU.options = NULL;
+      SHIP_MENU.num_options = 0;
    }
-   return result;
 }
 
 MainMenuOption_e BattleShipUI_MainMenu(char * message)

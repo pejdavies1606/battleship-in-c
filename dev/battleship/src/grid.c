@@ -23,7 +23,7 @@ static GridStateInfo_t const GRID_STATE_TABLE[GRID_STATE_COUNT] =
    { GRID_STATE_MISS,  "o" },
 };
 
-const char * Grid_GetStateStr(GridState_e const state)
+char const * Grid_GetStateStr(GridState_e const state)
 {
    char const * str = NULL;
    for (uint i = 0; i < GRID_STATE_COUNT; i++)
@@ -36,17 +36,30 @@ const char * Grid_GetStateStr(GridState_e const state)
    return str;
 }
 
-static GridStatus_e Grid_CheckShip(
+static bool _InitMeta(
+   GridMeta_t * const meta,
+   size_t const row_size,
+   size_t const col_size,
+   size_t const row_width,
+   size_t const col_width);
+
+static void _DestroyMeta(
+   GridMeta_t * const meta);
+
+static bool _IsValidMeta(
+   GridMeta_t const * const meta);
+
+static GridStatus_e _CheckShip(
    const Grid_t *grid,
    const Ship_t *ship);
 
-static bool Grid_AppendLine(
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos,
-    size_t const space_len,
-    char *const str,
-    size_t const str_size);
+static bool _AppendLine(
+   char * const line,
+   size_t const line_size,
+   size_t * const line_pos,
+   size_t const space_len,
+   char * const str,
+   size_t const str_size);
 
 bool Grid_Init(
    Grid_t * const grid,
@@ -54,41 +67,39 @@ bool Grid_Init(
    uint const cols)
 {
    bool result = false;
-   if (grid)
+   if (grid && rows > 0 && cols > 0)
    {
       grid->rows = rows;
       grid->cols = cols;
-      grid->ships = Grid_InitShips(rows, cols);
-      grid->states = Grid_InitStates(rows, cols);
+      grid->ships = malloc(rows * cols * sizeof(ShipType_e));
+      grid->states = malloc(rows * cols * sizeof(GridState_e));
 
       if (grid->ships && grid->states)
       {
          result = (Grid_ClearShips(grid->ships, rows, cols) &&
                    Grid_ClearStates(grid->states, rows, cols) &&
-                   Grid_InitMeta(&grid->meta, rows, cols, 0, 1));
+                   _InitMeta(&grid->meta, rows, cols, 0, 1));
       }
    }
    return result;
 }
 
-ShipType_e * Grid_InitShips(uint rows, uint cols)
+void Grid_Destroy(Grid_t * const grid)
 {
-   ShipType_e * ships = NULL;
-   if (rows > 0 && cols > 0)
+   if (grid)
    {
-      ships = malloc(rows * cols * sizeof(ShipType_e));
+      if (grid->ships)
+      {
+         free(grid->ships);
+         grid->ships = NULL;
+      }
+      if (grid->states)
+      {
+         free(grid->states);
+         grid->states = NULL;
+      }
+      _DestroyMeta(&grid->meta);
    }
-   return ships;
-}
-
-GridState_e * Grid_InitStates(uint rows, uint cols)
-{
-   GridState_e * states = NULL;
-   if (rows > 0 && cols > 0)
-   {
-      states = malloc(rows * cols * sizeof(GridState_e));
-   }
-   return states;
 }
 
 bool Grid_ClearShips(
@@ -120,8 +131,8 @@ bool Grid_ClearStates(
 }
 
 bool Grid_GetRowStr(
-    Grid_t *const grid,
-    GridState_e *const states,
+    Grid_t const *const grid,
+    GridState_e const *const states,
     int const row,
     char *const line,
     size_t const line_size,
@@ -136,7 +147,7 @@ bool Grid_GetRowStr(
    bool result = false;
 
    if (grid &&
-       Grid_IsValidMeta(&grid->meta) &&
+       _IsValidMeta(&grid->meta) &&
        line &&
        line_size > 0 &&
        line_pos &&
@@ -146,7 +157,7 @@ bool Grid_GetRowStr(
       if (row == GRID_ROW_TITLE)
       {
          // title row
-         result = Grid_AppendLine(
+         result = _AppendLine(
              line,
              line_size,
              line_pos,
@@ -165,7 +176,7 @@ bool Grid_GetRowStr(
       {
          // header row
          // grid corner
-         result = Grid_AppendLine(
+         result = _AppendLine(
              line,
              line_size,
              line_pos,
@@ -181,7 +192,7 @@ bool Grid_GetRowStr(
                result = (Coord_ColToChar(
                              (int)col,
                              &cell_str[0]) &&
-                         Grid_AppendLine(
+                         _AppendLine(
                              line,
                              line_size,
                              line_pos,
@@ -197,7 +208,7 @@ bool Grid_GetRowStr(
          if (result)
          {
             // grid corner
-            result = Grid_AppendLine(
+            result = _AppendLine(
                 line,
                 line_size,
                 line_pos,
@@ -212,21 +223,21 @@ bool Grid_GetRowStr(
          // grid corner
          // row filler
          // grid corner
-         result = Grid_AppendLine(
+         result = _AppendLine(
                       line,
                       line_size,
                       line_pos,
                       meta->row_width - 1,
                       meta->corner_str,
                       SIZE_GRID_SPACE) &&
-                  Grid_AppendLine(
+                  _AppendLine(
                       line,
                       line_size,
                       line_pos,
                       SIZE_GRID_SPACE,
                       meta->side_str,
                       meta->side_len - 1) &&
-                  Grid_AppendLine(
+                  _AppendLine(
                       line,
                       line_size,
                       line_pos,
@@ -262,7 +273,7 @@ bool Grid_GetRowStr(
                   ship = grid->ships[i];
                   Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
                }
-               result = Grid_AppendLine(
+               result = _AppendLine(
                    line,
                    line_size,
                    line_pos,
@@ -278,7 +289,7 @@ bool Grid_GetRowStr(
          if (result)
          {
             // column filler
-            result = Grid_AppendLine(
+            result = _AppendLine(
                 line,
                 line_size,
                 line_pos,
@@ -292,18 +303,21 @@ bool Grid_GetRowStr(
    return result;
 }
 
-bool Grid_InitMeta(GridMeta_t* meta,
-   size_t row_size, size_t col_size,
-   size_t row_width, size_t col_width)
+bool _InitMeta(
+   GridMeta_t * const meta,
+   size_t const row_size,
+   size_t const col_size,
+   size_t const row_width,
+   size_t const col_width)
 {
    bool result = false;
    if (meta)
    {
       meta->row_width = (row_width)
-         ? row_width : (size_t)CalcNumWidth((int)row_size);
+         ? row_width : (uint)CalcNumWidth((int)row_size);
 
       meta->col_width = (col_width)
-         ? col_width : (size_t)CalcNumWidth((int)col_size);
+         ? col_width : (uint)CalcNumWidth((int)col_size);
 
       meta->corner_len = meta->col_width + SIZE_GRID_SPACE;
       char * corner_char = STR_GRID_CORNER;
@@ -328,7 +342,24 @@ bool Grid_InitMeta(GridMeta_t* meta,
    return result;
 }
 
-bool Grid_IsValidMeta(GridMeta_t const * const meta)
+void _DestroyMeta(GridMeta_t * const meta)
+{
+   if (meta)
+   {
+      if (meta->corner_str)
+      {
+         free(meta->corner_str);
+         meta->corner_str = NULL;
+      }
+      if (meta->side_str)
+      {
+         free(meta->side_str);
+         meta->side_str = NULL;
+      }
+   }
+}
+
+bool _IsValidMeta(GridMeta_t const * const meta)
 {
    bool result = false;
    if (meta)
@@ -352,7 +383,7 @@ GridStatus_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
    if (grid && grid->ships && ship)
    {
       ship_info = Ship_GetInfo(ship->type);
-      result = Grid_CheckShip(grid, ship);
+      result = _CheckShip(grid, ship);
       if (ship_info && (GRID_STATUS_OK == result))
       {
          for (uint i = 0; i < ship_info->length; i++)
@@ -366,7 +397,7 @@ GridStatus_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
    return result;
 }
 
-GridStatus_e Grid_CheckShip(const Grid_t *grid, const Ship_t *ship)
+GridStatus_e _CheckShip(const Grid_t *grid, const Ship_t *ship)
 {
    GridStatus_e result = GRID_STATUS_NULL;
    if (grid && grid->ships && ship)
@@ -408,7 +439,7 @@ GridStatus_e Grid_CheckShip(const Grid_t *grid, const Ship_t *ship)
 
 bool Grid_ShipTypeToStr(
    ShipType_e const type,
-   char * const str,
+   char const * const str,
    size_t const str_len)
 {
    Ship_Info_t const * ship_info = NULL;
@@ -420,7 +451,7 @@ bool Grid_ShipTypeToStr(
       {
          state_str = Grid_GetStateStr(GRID_STATE_BLANK);
          if (state_str &&
-            (snprintf(str, str_len, "%s", state_str) > 0))
+            (snprintf((char *)str, str_len, "%s", state_str) > 0))
          {
             result = true;
          }
@@ -429,7 +460,7 @@ bool Grid_ShipTypeToStr(
       {
          ship_info = Ship_GetInfo(type);
          if (ship_info &&
-             (snprintf(str, str_len, "%c", ship_info->name[0]) > 0))
+             (snprintf((char *)str, str_len, "%c", ship_info->name[0]) > 0))
          {
             result = true;
          }
@@ -440,7 +471,7 @@ bool Grid_ShipTypeToStr(
 
 bool Grid_StateToStr(
    GridState_e const state,
-   char * const str,
+   char const * const str,
    size_t const str_len)
 {
    bool result = false;
@@ -450,18 +481,18 @@ bool Grid_StateToStr(
       state_str = Grid_GetStateStr(state);
       if (state_str)
       {
-         result = (snprintf(str, str_len, "%s", state_str) > 0);
+         result = (snprintf((char *)str, str_len, "%s", state_str) > 0);
       }
    }
    return result;
 }
 
-bool Grid_AppendLine(
-    char *const line,
+bool _AppendLine(
+    char * const line,
     size_t const line_size,
-    size_t *const line_pos,
+    size_t * const line_pos,
     size_t const space_len,
-    char *const str,
+    char * const str,
     size_t const str_size)
 {
    bool result = false;

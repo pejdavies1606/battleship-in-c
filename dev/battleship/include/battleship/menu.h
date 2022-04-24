@@ -15,9 +15,9 @@
 typedef struct MenuMeta
 {
    uint column_width_index; // depends on num_options
-   uint *column_width_data; // num_headers, max width of header and options for that column
-   uint *header_width_data; // num_headers, width of each header
-   uint *option_width_data; // 2D array: row+col*num_rows = option+header*num_options
+   uint * column_width_data; // num_headers, max width of header and options for that column
+   uint * header_width_data; // num_headers, width of each header
+   uint * option_width_data; // 2D array: row+col*num_rows = option+header*num_options
 } MenuMeta_t;
 
 typedef struct Menu
@@ -30,6 +30,7 @@ typedef struct Menu
    MenuMeta_t meta;
 } Menu_t;
 
-bool Menu_InitMeta(Menu_t *menu);
+bool Menu_InitMeta(Menu_t * menu);
+void Menu_DestroyMeta(Menu_t * const menu);
 
 #endif /* MENU_H_ */

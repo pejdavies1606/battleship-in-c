@@ -25,3 +25,16 @@ bool Scoreboard_Init(Scoreboard_t *scoreboard, uint num_entities)
     }
     return result;
 }
+
+void Scoreboard_Destroy(Scoreboard_t * const scoreboard)
+{
+    if (scoreboard)
+    {
+        scoreboard->num_entities = 0u;
+        if (scoreboard->entities)
+        {
+            free(scoreboard->entities);
+            scoreboard->entities = NULL;
+        }
+    }
+}

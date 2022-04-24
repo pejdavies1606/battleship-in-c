@@ -65,6 +65,7 @@ typedef struct ShipMenuChoice
 char const * BattleShipUI_GetLogo(int row);
 
 bool BattleShipUI_Init();
+void BattleShipUI_Destroy();
 
 void BattleShipUI_ClearScreen();
 bool BattleShipUI_PrintMessage(char const * const message);

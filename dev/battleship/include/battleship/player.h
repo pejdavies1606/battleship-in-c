@@ -24,5 +24,6 @@ typedef struct Player
 Player_t * Player_Init(uint num_players);
 GridStatus_e Player_PlaceShip(Player_t *player, Ship_t *ship);
 bool Player_PlaceShipsAuto(Player_t * const player);
+void Player_Destroy(Player_t ** const players, uint num_players);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

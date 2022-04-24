@@ -26,9 +26,11 @@ int main(int argc, char *argv[])
    if (game)
    {
       result = BattleShip_Game_Start(game);
+      BattleShip_Game_Destroy(&game);
    }
 
    puts("done");
    getchar();
-   return 0;
+
+   return (result) ? 0 : 1;
 }

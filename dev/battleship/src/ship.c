@@ -56,3 +56,12 @@ Ship_t * Ship_Init(uint num_ships)
    }
    return ships;
 }
+
+void Ship_Destroy(Ship_t ** const ships)
+{
+   if (ships && *ships)
+   {
+      free(*ships);
+      *ships = NULL;
+   }
+}

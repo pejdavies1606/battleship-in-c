@@ -46,18 +46,14 @@ Game_t * BattleShip_Game_Init(void)
    Rng_Init(0);
 #endif
 
+   bool result = false;
    Game_t *game = malloc(sizeof(Game_t));
    if (game)
    {
       memset(game, 0, sizeof(Game_t));
 
       game->players = Player_Init(NUM_PLAYERS);
-      if (!game->players)
-      {
-         free(game);
-         game = NULL;
-      }
-      else
+      if (game->players)
       {
          game->ship_health.title = "Ship Health";
          Scoreboard_Init(&game->ship_health, NUM_SHIPS);
@@ -73,11 +69,31 @@ Game_t * BattleShip_Game_Init(void)
          game->hit_score.width_score = SCOREBOARD_HITS_SCORE_WIDTH;
          game->hit_score.width_total = SCOREBOARD_HITS_SCORE_WIDTH;
 
-         BattleShipUI_Init();
+         result = BattleShipUI_Init();
       }
    }
 
+   if (!result)
+   {
+      free(game);
+      game = NULL;
+   }
+
    return game;
+}
+
+void BattleShip_Game_Destroy(Game_t ** const game)
+{
+   if (game && *game)
+   {
+      Game_t * pGame = *game;
+      Scoreboard_Destroy(&pGame->hit_score);
+      Scoreboard_Destroy(&pGame->ship_health);
+      Player_Destroy(&pGame->players, NUM_PLAYERS);
+      BattleShipUI_Destroy();
+      free(*game);
+      *game = NULL;
+   }
 }
 
 bool BattleShip_Game_Start(Game_t *game)

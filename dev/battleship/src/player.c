@@ -7,7 +7,7 @@
 
 #include "battleship/player.h"
 
-static Ship_t* Player_GetShip(Player_t *player, ShipType_e type);
+static Ship_t* _GetShip(Player_t *player, ShipType_e type);
 
 Player_t * Player_Init(uint num_players)
 {
@@ -44,12 +44,28 @@ Player_t * Player_Init(uint num_players)
    return players;
 }
 
+void Player_Destroy(Player_t ** const players, uint num_players)
+{
+   if (players && *players && num_players > 0)
+   {
+      Player_t * pPlayers = *players;
+      for (uint p = 0; p < num_players; p++)
+      {
+         Player_t * player = &pPlayers[p];
+         Ship_Destroy(&player->ships);
+         Grid_Destroy(&player->grid);
+      }
+      free(*players);
+      *players = NULL;
+   }
+}
+
 GridStatus_e Player_PlaceShip(Player_t *player, Ship_t *ship)
 {
   GridStatus_e status = GRID_STATUS_NULL;
    if (player && ship)
    {
-      Ship_t *player_ship = Player_GetShip(player, ship->type);
+      Ship_t *player_ship = _GetShip(player, ship->type);
       if (player_ship)
       {
          *player_ship = *ship;
@@ -100,7 +116,7 @@ bool Player_PlaceShipsAuto(Player_t * const player)
    return result;
 }
 
-static Ship_t * Player_GetShip(Player_t *player, ShipType_e type)
+Ship_t * _GetShip(Player_t *player, ShipType_e type)
 {
    if (player)
    {

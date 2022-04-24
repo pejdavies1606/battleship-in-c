@@ -63,5 +63,6 @@ static inline Ship_Info_t const * Ship_GetInfo(const ShipType_e type)
 uint * Ship_GetLengths(void);
 Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i);
 Ship_t * Ship_Init(uint num_ships);
+void Ship_Destroy(Ship_t ** const ships);
 
 #endif /* BATTLESHIP_SHIP_H_ */
