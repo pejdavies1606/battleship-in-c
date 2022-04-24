@@ -29,16 +29,16 @@ Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i)
       switch (ship->heading)
       {
       case HEADING_NORTH:
-         point.row -= (int) i;
-         break;
-      case HEADING_EAST:
-         point.col += (int) i;
-         break;
-      case HEADING_SOUTH:
          point.row += (int) i;
          break;
-      case HEADING_WEST:
+      case HEADING_EAST:
          point.col -= (int) i;
+         break;
+      case HEADING_SOUTH:
+         point.row -= (int) i;
+         break;
+      case HEADING_WEST:
+         point.col += (int) i;
          break;
       case HEADING_UNKNOWN:
          break;

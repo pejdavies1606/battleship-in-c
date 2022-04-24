@@ -272,7 +272,7 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid)
    if (choice > 0)
    {
       result.option = MENU_OPTION_SHIP_PLACE;
-      result.type = (ShipType_e)(choice - 1);
+      result.type = (ShipType_e)(choice);
    }
    return result;
 }

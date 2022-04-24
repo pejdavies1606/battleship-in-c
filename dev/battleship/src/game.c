@@ -30,9 +30,9 @@
 //static _Bool sunk, two_ai = false, configExist;
 //static _Bool p1sunk[NUM_SHIPS], p2sunk[NUM_SHIPS];
 
-static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const choice);
-static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const choice);
-static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice);
+static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const shipChoice);
+static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const placeChoice);
+static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice);
 
 Game_t * BattleShip_Game_Init(void)
 {
@@ -99,33 +99,36 @@ void BattleShip_Game_Destroy(Game_t ** const game)
 bool BattleShip_Game_Start(Game_t *game)
 {
    bool result = false;
+   MainMenuOption_e mainChoice = MENU_OPTION_MAIN_RETURN;
    if (game)
    {
+      // initialise computer player
       result = Player_PlaceShipsAuto(&game->players[1]);
-      while (result)
+      // enter UI for user player
+      do
       {
-         result = _ProcMainMenu(game, BattleShipUI_MainMenu(""));
+         mainChoice = BattleShipUI_MainMenu("");
+         result = _ProcMainMenu(game, mainChoice);
       }
+      while (result && mainChoice != MENU_OPTION_MAIN_RETURN);
    }
    return result;
 }
 
-static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const choice)
+static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const shipChoice)
 {
    Ship_t ship = {0};
    bool result = false;
-   if (player && choice)
+   if (player && shipChoice)
    {
-      switch (choice->option)
+      switch (shipChoice->option)
       {
       case MENU_OPTION_SHIP_RETURN:
-         result = _ProcPlaceMenu(
-             player,
-             BattleShipUI_PlaceMenu(&player->grid));
+         result = true;
          break;
       case MENU_OPTION_SHIP_PLACE:
       {
-         ship.type = choice->type;
+         ship.type = shipChoice->type;
          if (BattleShipUI_ReadShipCoord(&ship.location, &ship.heading))
          {
             result = (GRID_STATUS_OK == Player_PlaceShip(player, &ship));
@@ -137,14 +140,13 @@ static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * cons
    return result;
 }
 
-static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e choice)
+static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e placeChoice)
 {
-   PlaceMenuOption_e placeChoice = MENU_OPTION_PLACE_RETURN;
    ShipMenuChoice_t shipChoice = {0};
    bool result = false;
    if (player)
    {
-      switch (choice)
+      switch (placeChoice)
       {
       case MENU_OPTION_PLACE_RETURN:
          result = true;
@@ -154,16 +156,15 @@ static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e choice)
          break;
       case MENU_OPTION_PLACE_AUTO:
          // TODO confirm yes/no
-         if (Player_PlaceShipsAuto(player))
-         {
-            // repeat same menu
-            placeChoice = BattleShipUI_PlaceMenu(&player->grid);
-            result = _ProcPlaceMenu(player, placeChoice);
-         }
+         result = Player_PlaceShipsAuto(player);
          break;
       case MENU_OPTION_PLACE_MANUAL:
-         shipChoice = BattleShipUI_ShipMenuManual(&player->grid);
-         result = _ProcShipMenu(player, &shipChoice);
+         do
+         {
+            shipChoice = BattleShipUI_ShipMenuManual(&player->grid);
+            result = _ProcShipMenu(player, &shipChoice);
+         }
+         while (shipChoice.option != MENU_OPTION_SHIP_RETURN);
          break;
       }
    }
@@ -203,21 +204,26 @@ static bool _ProcBeginGame(Game_t * const game)
    return result;
 }
 
-static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const choice)
+static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice)
 {
    PlaceMenuOption_e placeChoice = MENU_OPTION_PLACE_RETURN;
    Player_t * player = NULL;
    bool result = false;
-   if (game)
+   if (game && game->players)
    {
       player = &game->players[0];
-      switch (choice)
+      switch (mainChoice)
       {
       case MENU_OPTION_MAIN_RETURN:
+         result = true;
          break;
       case MENU_OPTION_MAIN_PLACE:
-      placeChoice = BattleShipUI_PlaceMenu(&player->grid);
-         result = _ProcPlaceMenu(player, placeChoice);
+         do
+         {
+            placeChoice = BattleShipUI_PlaceMenu(&player->grid);
+            result = _ProcPlaceMenu(player, placeChoice);
+         }
+         while (result && placeChoice != MENU_OPTION_PLACE_RETURN);
          break;
       case MENU_OPTION_MAIN_BEGIN:
          result = _ProcBeginGame(game);
