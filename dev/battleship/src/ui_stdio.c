@@ -98,7 +98,7 @@ bool BattleShipUI_PrintGrid(
                if (states)
                {
                   line[line_pos++] = ' ';
-                  if (Grid_GetRowStr(
+                  if (!Grid_GetRowStr(
                           grid,
                           states,
                           row,
@@ -106,18 +106,11 @@ bool BattleShipUI_PrintGrid(
                           line_size,
                           &line_pos))
                   {
-                     printf("%s\n", line);
-                  }
-                  else
-                  {
                      result = false;
                      break;
                   }
                }
-               else
-               {
-                  printf("%s\n", line);
-               }
+               printf("%s\n", line);
             }
             else
             {
