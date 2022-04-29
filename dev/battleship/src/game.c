@@ -117,7 +117,6 @@ bool BattleShip_Game_Start(Game_t *game)
 
 static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const shipChoice)
 {
-   Ship_t ship = {0};
    bool result = false;
    if (player && shipChoice)
    {
@@ -128,8 +127,11 @@ static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * cons
          break;
       case MENU_OPTION_SHIP_PLACE:
       {
+         Ship_t ship = {0};
          ship.type = shipChoice->type;
-         if (BattleShipUI_ReadShipCoord(&ship.location, &ship.heading))
+         bool loc = BattleShipUI_ReadCoord(&ship.location);
+         bool hdg = BattleShipUI_ReadHeading(&ship.heading);
+         if (loc && hdg)
          {
             result = (GRID_STATUS_OK == Player_PlaceShip(player, &ship));
          }
@@ -173,22 +175,36 @@ static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e placeChoice)
 
 static bool _ProcBeginGame(Game_t * const game)
 {
-   bool doLoop = false;
    bool result = false;
    if (game)
    {
-      doLoop = true;
-      while (doLoop)
+      bool stop = false;
+      do
       {
+         result = true;
+         int round = 0;
          BattleShipUI_GameScreen(
             &game->players[0].grid,
             game->players[1].grid.states);
          BattleShipUI_GameScreen(
             &game->players[1].grid,
             game->players[0].grid.states);
+         // TODO player turn
+         Coord_t location;
+         bool target = BattleShipUI_ReadCoord(&location);
+         if (target)
+         {
+            bool hit = false;
+            result = Grid_PlaceHit(
+              &game->players[1].grid,
+               game->players[0].grid.states,
+              &location, &hit);
+            if (!result) break;
+         }
+         round++;
          // TODO check all ships sunk
-         doLoop = false;
       }
+      while (result && !stop);
    }
    /* loop
     *    increment round counter

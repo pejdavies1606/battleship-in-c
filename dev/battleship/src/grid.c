@@ -303,6 +303,96 @@ bool Grid_GetRowStr(
    return result;
 }
 
+GridStatus_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
+{
+   Ship_Info_t const * ship_info = NULL;
+   GridStatus_e result = GRID_STATUS_NULL;
+   Coord_t point = { 0 };
+   if (grid && grid->ships && ship)
+   {
+      ship_info = Ship_GetInfo(ship->type);
+      result = _CheckShip(grid, ship);
+      if (ship_info && (GRID_STATUS_OK == result))
+      {
+         for (uint i = 0; i < ship_info->length; i++)
+         {
+            point = Ship_GetPoint(ship, i);
+            grid->ships[point.row * (int)grid->cols +
+                          point.col] = ship->type;
+         }
+      }
+   }
+   return result;
+}
+
+bool Grid_PlaceHit(
+   const Grid_t * const grid,
+   GridState_e * const states,
+   const Coord_t * const location,
+   bool * const hit)
+{
+   bool result = false;
+   if (grid && states && location && hit)
+   {
+      int i = location->row * (int)grid->cols + location->col;
+      ShipType_e ship_type = grid->ships[i];
+      *hit = (ship_type != SHIP_NONE);
+      states[i] = (*hit) ? GRID_STATE_HIT : GRID_STATE_MISS;
+      result = true;
+   }
+   return result;
+}
+
+bool Grid_ShipTypeToStr(
+   ShipType_e const type,
+   char const * const str,
+   size_t const str_len)
+{
+   Ship_Info_t const * ship_info = NULL;
+   char const * state_str = NULL;
+   bool result = false;
+   if (str && str_len > 0)
+   {
+      if (SHIP_NONE == type)
+      {
+         state_str = Grid_GetStateStr(GRID_STATE_BLANK);
+         if (state_str &&
+            (snprintf((char *)str, str_len, "%s", state_str) > 0))
+         {
+            result = true;
+         }
+      }
+      else
+      {
+         ship_info = Ship_GetInfo(type);
+         if (ship_info &&
+             (snprintf((char *)str, str_len, "%c", ship_info->name[0]) > 0))
+         {
+            result = true;
+         }
+      }
+   }
+   return result;
+}
+
+bool Grid_StateToStr(
+   GridState_e const state,
+   char const * const str,
+   size_t const str_len)
+{
+   bool result = false;
+   char const * state_str = NULL;
+   if (str && str_len > 0)
+   {
+      state_str = Grid_GetStateStr(state);
+      if (state_str)
+      {
+         result = (snprintf((char *)str, str_len, "%s", state_str) > 0);
+      }
+   }
+   return result;
+}
+
 bool _InitMeta(
    GridMeta_t * const meta,
    size_t const row_size,
@@ -375,28 +465,6 @@ bool _IsValidMeta(GridMeta_t const * const meta)
    return result;
 }
 
-GridStatus_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
-{
-   Ship_Info_t const * ship_info = NULL;
-   GridStatus_e result = GRID_STATUS_NULL;
-   Coord_t point = { 0 };
-   if (grid && grid->ships && ship)
-   {
-      ship_info = Ship_GetInfo(ship->type);
-      result = _CheckShip(grid, ship);
-      if (ship_info && (GRID_STATUS_OK == result))
-      {
-         for (uint i = 0; i < ship_info->length; i++)
-         {
-            point = Ship_GetPoint(ship, i);
-            grid->ships[point.row * (int)grid->cols +
-                          point.col] = ship->type;
-         }
-      }
-   }
-   return result;
-}
-
 GridStatus_e _CheckShip(const Grid_t *grid, const Ship_t *ship)
 {
    GridStatus_e result = GRID_STATUS_NULL;
@@ -432,56 +500,6 @@ GridStatus_e _CheckShip(const Grid_t *grid, const Ship_t *ship)
                      Heading_GetChar(ship->heading),
                      (result & GRID_STATUS_COLLISION ? '1' : '0'),
                      (result & GRID_STATUS_BORDER) ? '1' : '0');
-      }
-   }
-   return result;
-}
-
-bool Grid_ShipTypeToStr(
-   ShipType_e const type,
-   char const * const str,
-   size_t const str_len)
-{
-   Ship_Info_t const * ship_info = NULL;
-   char const * state_str = NULL;
-   bool result = false;
-   if (str && str_len > 0)
-   {
-      if (SHIP_NONE == type)
-      {
-         state_str = Grid_GetStateStr(GRID_STATE_BLANK);
-         if (state_str &&
-            (snprintf((char *)str, str_len, "%s", state_str) > 0))
-         {
-            result = true;
-         }
-      }
-      else
-      {
-         ship_info = Ship_GetInfo(type);
-         if (ship_info &&
-             (snprintf((char *)str, str_len, "%c", ship_info->name[0]) > 0))
-         {
-            result = true;
-         }
-      }
-   }
-   return result;
-}
-
-bool Grid_StateToStr(
-   GridState_e const state,
-   char const * const str,
-   size_t const str_len)
-{
-   bool result = false;
-   char const * state_str = NULL;
-   if (str && str_len > 0)
-   {
-      state_str = Grid_GetStateStr(state);
-      if (state_str)
-      {
-         result = (snprintf((char *)str, str_len, "%s", state_str) > 0);
       }
    }
    return result;

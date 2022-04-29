@@ -78,7 +78,8 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid);
 
 bool BattleShipUI_PrintMenu(Menu_t *menu);
 bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice);
-bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading);
+bool BattleShipUI_ReadCoord(Coord_t *location);
+bool BattleShipUI_ReadHeading(Heading_e *heading);
 
 void BattleShipUI_GameScreen(Grid_t * const grid, GridState_e * const states);
 

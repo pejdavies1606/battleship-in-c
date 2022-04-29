@@ -81,6 +81,12 @@ GridStatus_e Grid_PlaceShip(
    Grid_t const * const grid,
    Ship_t const * const ship);
 
+bool Grid_PlaceHit(
+   Grid_t const * const grid,
+   GridState_e * const states,
+   Coord_t const * const location,
+   bool * const hit);
+
 bool Grid_StateToStr(
    GridState_e const state,
    char const * const str,

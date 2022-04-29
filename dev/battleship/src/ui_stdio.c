@@ -191,32 +191,39 @@ bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice)
    return result;
 }
 
-bool BattleShipUI_ReadShipCoord(Coord_t *location, Heading_e *heading)
+bool BattleShipUI_ReadCoord(Coord_t *location)
 {
    bool result = false;
    InputData_t loc = { 0 };
-   InputData_t hdg = { 0 };
    int len = 1 + CalcNumWidth(GRID_SIZE); // J10
-   if (location && heading && len > 0)
+   if (location && len > 1)
    {
       loc.type = INPUT_COORD;
       loc.max.loc.col = GRID_SIZE;
       loc.max.loc.row = GRID_SIZE;
-      hdg.type = INPUT_HEADING;
-      result = (_ReadInput(
-                    "loc <A1-J10>",
-                    (size_t)len,
-                    &loc) &&
-                _ReadInput(
-                    "hdg <N|E|S|W>",
-                    LEN_HEADING,
-                    &hdg));
+      result = _ReadInput("loc <A1-J10>", (size_t)len, &loc);
       if (result)
       {
          location->col = (int) loc.val.loc.col;
          location->row = (int) loc.val.loc.row;
+         printf("%d %d\n", location->col, location->row);
+      }
+   }
+   return result;
+}
+
+bool BattleShipUI_ReadHeading(Heading_e *heading)
+{
+   bool result = false;
+   InputData_t hdg = { 0 };
+   if (heading)
+   {
+      hdg.type = INPUT_HEADING;
+      result = _ReadInput("hdg <N|E|S|W>", LEN_HEADING, &hdg);
+      if (result)
+      {
          *heading = (Heading_e) hdg.val.hdg;
-         printf("%d %d %u\n", location->col, location->row, *heading);
+         printf("%u\n", *heading);
       }
    }
    return result;
