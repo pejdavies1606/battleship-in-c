@@ -197,7 +197,7 @@ static bool _ProcBeginGame(Game_t * const game)
             bool hit = false;
             result = Grid_PlaceHit(
               &game->players[1].grid,
-               game->players[0].grid.states,
+               game->players[1].grid.states,
               &location, &hit);
             if (!result) break;
          }
