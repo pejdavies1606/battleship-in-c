@@ -36,8 +36,8 @@ typedef struct Game
    Scoreboard_t hit_score;
 } Game_t;
 
-Game_t * BattleShip_Game_Init();
-void BattleShip_Game_Destroy(Game_t ** const game);
-bool BattleShip_Game_Start();
+bool BattleShip_Game_Init(Game_t * const game);
+void BattleShip_Game_Destroy(Game_t * const game);
+bool BattleShip_Game_Start(Game_t * const game);
 
 #endif /* BATTLESHIP_GAME_H_ */

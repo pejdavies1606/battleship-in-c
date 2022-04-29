@@ -34,23 +34,20 @@ static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * cons
 static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const placeChoice);
 static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice);
 
-Game_t * BattleShip_Game_Init(void)
+bool BattleShip_Game_Init(Game_t * const game)
 {
-   Window_Init(
-      POS_WINDOW_X, POS_WINDOW_Y,
-      SIZE_WINDOW_W, SIZE_WINDOW_H);
-
-#ifdef DEBUG
-   Rng_Init(1606);
-#else
-   Rng_Init(0);
-#endif
-
    bool result = false;
-   Game_t *game = malloc(sizeof(Game_t));
    if (game)
    {
-      memset(game, 0, sizeof(Game_t));
+      Window_Init(
+          POS_WINDOW_X, POS_WINDOW_Y,
+          SIZE_WINDOW_W, SIZE_WINDOW_H);
+
+#ifdef DEBUG
+      Rng_Init(1606);
+#else
+      Rng_Init(0);
+#endif
 
       game->players = Player_Init(NUM_PLAYERS);
       if (game->players)
@@ -73,30 +70,21 @@ Game_t * BattleShip_Game_Init(void)
       }
    }
 
-   if (!result)
-   {
-      free(game);
-      game = NULL;
-   }
-
-   return game;
+   return result;
 }
 
-void BattleShip_Game_Destroy(Game_t ** const game)
+void BattleShip_Game_Destroy(Game_t * const game)
 {
-   if (game && *game)
+   if (game)
    {
-      Game_t * pGame = *game;
-      Scoreboard_Destroy(&pGame->hit_score);
-      Scoreboard_Destroy(&pGame->ship_health);
-      Player_Destroy(&pGame->players, NUM_PLAYERS);
+      Scoreboard_Destroy(&game->hit_score);
+      Scoreboard_Destroy(&game->ship_health);
+      Player_Destroy(&game->players, NUM_PLAYERS);
       BattleShipUI_Destroy();
-      free(*game);
-      *game = NULL;
    }
 }
 
-bool BattleShip_Game_Start(Game_t *game)
+bool BattleShip_Game_Start(Game_t * const game)
 {
    bool result = false;
    MainMenuOption_e mainChoice = MENU_OPTION_MAIN_RETURN;
