@@ -8,7 +8,7 @@
 #include "battleship/player.h"
 
 static Ship_t* _GetShip(
-   Player_t const * const player,
+   Player_t * const player,
    ShipType_e const type);
 
 bool Player_Init(Player_t * const player)
@@ -18,15 +18,12 @@ bool Player_Init(Player_t * const player)
    {
       if (Grid_Init(&player->grid))
       {
-         player->ships = Ship_Init(NUM_SHIPS);
-         if (player->ships)
+         memset(player->ships, 0, NUM_SHIPS * sizeof(Ship_t));
+         for (uint i = 0; i < NUM_SHIPS; i++)
          {
-            for (uint i = 0; i < NUM_SHIPS; i++)
-            {
-               player->ships[i].type = SHIP_TABLE[i].type;
-            }
-            result = true;
+            player->ships[i].type = SHIP_TABLE[i].type;
          }
+         result = true;
       }
    }
    return result;
@@ -36,7 +33,6 @@ void Player_Destroy(Player_t * const player)
 {
    if (player)
    {
-      Ship_Destroy(&player->ships);
       Grid_Destroy(&player->grid);
    }
 }
@@ -96,7 +92,7 @@ bool Player_PlaceShipsAuto(Player_t * const player)
 }
 
 Ship_t * _GetShip(
-   Player_t const * const player,
+   Player_t * const player,
    ShipType_e const type)
 {
    if (player)

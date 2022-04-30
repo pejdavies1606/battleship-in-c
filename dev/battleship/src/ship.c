@@ -33,22 +33,3 @@ Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i)
    }
    return point;
 }
-
-Ship_t * Ship_Init(uint num_ships)
-{
-   Ship_t *ships = malloc(num_ships * sizeof(Ship_t));
-   if (ships)
-   {
-      memset(ships, 0, num_ships * sizeof(Ship_t));
-   }
-   return ships;
-}
-
-void Ship_Destroy(Ship_t ** const ships)
-{
-   if (ships && *ships)
-   {
-      free(*ships);
-      *ships = NULL;
-   }
-}

@@ -162,8 +162,9 @@ bool BattleShipUI_Init(void)
                   size_t name_len =
                       strlen(place_prefix) + 1 +
                       strlen(ship_info->name) + 1;
+                  size_t length_len = LEN_SHIPS + 1;
                   ship_menu_data[name_index] = malloc(name_len);
-                  ship_menu_data[length_index] = malloc(LEN_SHIPS);
+                  ship_menu_data[length_index] = malloc(length_len);
                   if (
                       ship_menu_data[name_index] &&
                       ship_menu_data[length_index])
@@ -176,7 +177,7 @@ bool BattleShipUI_Init(void)
                          ship_info->name);
                      snprintf(
                          ship_menu_data[length_index],
-                         LEN_SHIPS,
+                         length_len,
                          "%u",
                          ship_info->length);
                   }

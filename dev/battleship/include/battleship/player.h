@@ -16,7 +16,7 @@
 typedef struct Player
 {
    Grid_t grid;
-   Ship_t *ships;
+   Ship_t ships[NUM_SHIPS];
 } Player_t;
 
 bool Player_Init(
