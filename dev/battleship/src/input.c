@@ -6,10 +6,10 @@
 #include <string.h>
 #include <ctype.h>
 
-static bool ParseLocation(const char *input, Coord_t *output);
-static bool ParseHeading(const char *input, Heading_e *output);
+static bool _ParseCoord(const char *input, Coord_t *output);
+static bool _ParseHeading(const char *input, Heading_e *output);
 
-static bool ValidateRange(int val, int min, int max);
+static bool _ValidateRange(int val, int min, int max);
 
 bool ParseInput(const char *str, InputData_t *data)
 {
@@ -20,24 +20,24 @@ bool ParseInput(const char *str, InputData_t *data)
       {
       case INPUT_INT:
          result = ParseInt(str, &data->val.ival) &&
-            ValidateRange(
+            _ValidateRange(
                (int) data->val.ival,
                (int) data->min.ival,
                (int) data->max.ival);
          break;
       case INPUT_COORD:
-         result = ParseLocation(str, &data->val.loc) &&
-            ValidateRange(
+         result = _ParseCoord(str, &data->val.loc) &&
+            _ValidateRange(
                data->val.loc.col,
                0,
                data->max.loc.col) &&
-            ValidateRange(
+            _ValidateRange(
                data->val.loc.row,
                0,
                data->max.loc.row);
          break;
       case INPUT_HEADING:
-         result = ParseHeading(str, &data->val.hdg);
+         result = _ParseHeading(str, &data->val.hdg);
          break;
       default:
          break;
@@ -87,7 +87,7 @@ bool ParseInt(const char *str, int *val)
    return result;
 }
 
-bool ParseLocation(const char *str, Coord_t *loc)
+bool _ParseCoord(const char *str, Coord_t *loc)
 {
    bool result = false;
    if (str && loc)
@@ -100,14 +100,15 @@ bool ParseLocation(const char *str, Coord_t *loc)
    return result;
 }
 
-bool ParseHeading(const char *str, Heading_e *hdg)
+bool _ParseHeading(const char *str, Heading_e *hdg)
 {
    bool result = false;
    if (str && hdg)
    {
+      char c = toupper(str[0]);
       for (uint i = 0; i < NUM_HEADINGS; i++)
       {
-         if (toupper(str[0]) == HEADING_TABLE[i].c)
+         if (c == HEADING_TABLE[i].c)
          {
             *hdg = HEADING_TABLE[i].h;
             result = true;
@@ -118,7 +119,7 @@ bool ParseHeading(const char *str, Heading_e *hdg)
    return result;
 }
 
-bool ValidateRange(int val, int min, int max)
+bool _ValidateRange(int val, int min, int max)
 {
    bool result = false;
    result = (val >= min) && (val < max);
