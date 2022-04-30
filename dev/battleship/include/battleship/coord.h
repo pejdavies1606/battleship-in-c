@@ -11,8 +11,9 @@
 #include <string.h>
 #include "battleship/commondefs.h"
 
-#define COORD_ROW_MAX 10
-#define COORD_COL_MAX 10
+#define MAX_COORD_ROW 10
+#define MAX_COORD_COL 10
+#define LEN_COORD 3 // J10
 
 typedef struct Coord
 {

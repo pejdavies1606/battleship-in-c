@@ -43,7 +43,7 @@ Heading_e Heading_InitRandom()
 bool Coord_ColToChar(int col, char *c)
 {
    bool result = false;
-   if (c && col >= 0 && col < COORD_COL_MAX)
+   if (c && col >= 0 && col < MAX_COORD_COL)
    {
       *c = (char) (col + 'A'); // ASCII
       result = true;
@@ -74,7 +74,7 @@ bool Coord_RowFromStr(const char *str, int *row)
    {
       if (ParseInt(str, &rowval) &&
          rowval > 0 &&
-         rowval <= COORD_ROW_MAX)
+         rowval <= MAX_COORD_ROW)
       {
          *row = rowval - 1;
          result = true;

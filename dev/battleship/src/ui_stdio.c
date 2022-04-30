@@ -185,7 +185,7 @@ bool BattleShipUI_ReadCoord(Coord_t *location)
       loc.type = INPUT_COORD;
       loc.max.loc.col = GRID_SIZE;
       loc.max.loc.row = GRID_SIZE;
-      result = _ReadInput("loc <A1-J10>", COORD_LEN, &loc);
+      result = _ReadInput("loc <A1-J10>", LEN_COORD, &loc);
       if (result)
       {
          *location = loc.val.loc;
