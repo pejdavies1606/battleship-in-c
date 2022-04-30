@@ -62,69 +62,37 @@ static bool _AppendLine(
    size_t const str_size);
 
 bool Grid_Init(
-   Grid_t * const grid,
-   uint const rows,
-   uint const cols)
+   Grid_t * const grid)
 {
    bool result = false;
-   if (grid && rows > 0 && cols > 0)
+   if (grid)
    {
-      grid->rows = rows;
-      grid->cols = cols;
-      grid->ships = malloc(rows * cols * sizeof(ShipType_e));
-      grid->states = malloc(rows * cols * sizeof(GridState_e));
-
-      if (grid->ships && grid->states)
-      {
-         result = (Grid_ClearShips(grid->ships, rows, cols) &&
-                   Grid_ClearStates(grid->states, rows, cols) &&
-                   _InitMeta(&grid->meta, rows, cols, 0, 1));
-      }
+      grid->rows = MAX_COORD_ROW;
+      grid->cols = MAX_COORD_COL;
+      memset(grid->ships, 0, SIZE_GRID * sizeof(ShipType_e));
+      memset(grid->states, 0, SIZE_GRID * sizeof(GridState_e));
+      result = _InitMeta(&grid->meta, grid->rows, grid->cols, 0, 1);
    }
    return result;
 }
 
-void Grid_Destroy(Grid_t * const grid)
+void Grid_Destroy(
+   Grid_t * const grid)
 {
    if (grid)
    {
-      if (grid->ships)
-      {
-         free(grid->ships);
-         grid->ships = NULL;
-      }
-      if (grid->states)
-      {
-         free(grid->states);
-         grid->states = NULL;
-      }
       _DestroyMeta(&grid->meta);
    }
 }
 
-bool Grid_ClearShips(
-   ShipType_e * const ships,
-   uint const rows,
-   uint const cols)
+bool Grid_Clear(
+   Grid_t * const grid)
 {
    bool result = false;
-   if (ships && rows > 0 && cols > 0)
+   if (grid)
    {
-      memset(ships, 0, rows * cols * sizeof(ShipType_e));
-      result = true;
-   }
-   return result;
-}
-
-bool Grid_ClearStates(
-   GridState_e * const states,
-   uint const rows,
-   uint const cols)
-{
-   bool result = false;
-   if (states && rows > 0 && cols > 0)
-   {
-      memset(states, 0, rows * cols * sizeof(GridState_e));
+      memset(grid->ships, 0, SIZE_GRID * sizeof(ShipType_e));
+      memset(grid->states, 0, SIZE_GRID * sizeof(GridState_e));
       result = true;
    }
    return result;
@@ -303,12 +271,14 @@ bool Grid_GetRowStr(
    return result;
 }
 
-GridStatus_e Grid_PlaceShip(const Grid_t *grid, const Ship_t *ship)
+GridStatus_e Grid_PlaceShip(
+   Grid_t * const grid,
+   const Ship_t * const ship)
 {
    Ship_Info_t const * ship_info = NULL;
    GridStatus_e result = GRID_STATUS_NULL;
    Coord_t point = { 0 };
-   if (grid && grid->ships && ship)
+   if (grid && ship)
    {
       ship_info = Ship_GetInfo(ship->type);
       result = _CheckShip(grid, ship);

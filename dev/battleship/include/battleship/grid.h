@@ -10,6 +10,8 @@
 
 #include "battleship/commondefs.h"
 
+#define SIZE_GRID (MAX_COORD_ROW * MAX_COORD_COL)
+
 #define GRID_ROW_TITLE -2
 #define GRID_ROW_HEADER -1
 
@@ -41,8 +43,8 @@ typedef struct GridMeta
 
 typedef struct Grid
 {
-   ShipType_e *ships;
-   GridState_e *states;
+   ShipType_e ships[SIZE_GRID];
+   GridState_e states[SIZE_GRID];
    uint rows;
    uint cols;
    GridMeta_t meta;
@@ -52,22 +54,13 @@ char const * Grid_GetStateStr(
    GridState_e const state);
 
 bool Grid_Init(
-   Grid_t * const grid,
-   uint const rows,
-   uint const cols);
+   Grid_t * const grid);
 
 void Grid_Destroy(
    Grid_t * const grid);
 
-bool Grid_ClearShips(
-   ShipType_e * const ships,
-   uint const rows,
-   uint const cols);
-
-bool Grid_ClearStates(
-   GridState_e * const states,
-   uint const rows,
-   uint const cols);
+bool Grid_Clear(
+   Grid_t * const grid);
 
 bool Grid_GetRowStr(
    Grid_t const * const grid,
@@ -78,8 +71,8 @@ bool Grid_GetRowStr(
    size_t * const line_pos);
 
 GridStatus_e Grid_PlaceShip(
-   Grid_t const * const grid,
-   Ship_t const * const ship);
+   Grid_t * const grid,
+   const Ship_t * const ship);
 
 bool Grid_PlaceHit(
    Grid_t const * const grid,

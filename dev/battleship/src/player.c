@@ -18,7 +18,7 @@ Player_t * Player_Init(uint num_players)
       for (uint p = 0; p < num_players; p++)
       {
          Player_t *player = &players[p];
-         if (Grid_Init(&player->grid, GRID_SIZE, GRID_SIZE))
+         if (Grid_Init(&player->grid))
          {
             player->ships = Ship_Init(NUM_SHIPS);
             if (player->ships)
@@ -77,25 +77,17 @@ GridStatus_e Player_PlaceShip(Player_t *player, Ship_t *ship)
 
 bool Player_PlaceShipsAuto(Player_t * const player)
 {
-   Ship_t ship = {0};
-   GridStatus_e status = GRID_STATUS_UNKNOWN;
    bool result = false;
    if (player)
    {
-      if (Grid_ClearShips(
-              player->grid.ships,
-              player->grid.rows,
-              player->grid.cols) &&
-          Grid_ClearStates(
-              player->grid.states,
-              player->grid.rows,
-              player->grid.cols))
+      if (Grid_Clear(&player->grid))
       {
          for (uint i = NUM_SHIPS; i > 0; i--)
          {
-            status = GRID_STATUS_UNKNOWN;
+            GridStatus_e status = GRID_STATUS_UNKNOWN;
             do
             {
+               Ship_t ship = {0};
                ship.type = SHIP_TABLE[i - 1].type;
                ship.location = Coord_InitRandom(
                    0, (int)player->grid.rows,
@@ -103,10 +95,11 @@ bool Player_PlaceShipsAuto(Player_t * const player)
                ship.heading = Heading_InitRandom();
                status = Player_PlaceShip(player, &ship);
             } while (
-                GRID_STATUS_BORDER & status ||
-                GRID_STATUS_COLLISION & status);
+                GRID_STATUS_OK != status &&
+                GRID_STATUS_NULL != status);
             if (GRID_STATUS_NULL == status)
             {
+               result = false;
                break;
             }
          }

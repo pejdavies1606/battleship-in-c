@@ -13,9 +13,6 @@
 #include "battleship/scoreboard.h"
 #include "battleship/grid.h"
 
-#define GRID_SIZE 10
-#define GRID_SIZE_LEN 2
-
 typedef struct Player
 {
    Grid_t grid;
