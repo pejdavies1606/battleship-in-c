@@ -14,6 +14,8 @@
 #include "battleship/grid.h"
 
 #define GRID_SIZE 10
+#define GRID_SIZE_LEN 2
+#define COORD_LEN (1 + GRID_SIZE_LEN) // J10
 
 typedef struct Player
 {
