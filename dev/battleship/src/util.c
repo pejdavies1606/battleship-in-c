@@ -9,6 +9,15 @@
 
 #include <string.h>
 
+inline void Destroy(void ** const ptr)
+{
+   if (ptr && *ptr)
+   {
+      free(*ptr);
+      *ptr = NULL;
+   }
+}
+
 bool TrimStr(char * str, size_t str_size)
 {
    bool result = false;

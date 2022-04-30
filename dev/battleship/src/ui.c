@@ -184,16 +184,8 @@ bool BattleShipUI_Init(void)
                   else
                   {
                      result = false;
-                     if (ship_menu_data[name_index])
-                     {
-                        free(ship_menu_data[name_index]);
-                        ship_menu_data[name_index] = NULL;
-                     }
-                     if (ship_menu_data[length_index])
-                     {
-                        free(ship_menu_data[length_index]);
-                        ship_menu_data[length_index] = NULL;
-                     }
+                     Destroy((void **)&ship_menu_data[name_index]);
+                     Destroy((void **)&ship_menu_data[length_index]);
                      break;
                   }
                }
@@ -222,19 +214,10 @@ void BattleShipUI_Destroy(void)
       {
          uint name_index = i;
          uint length_index = i + SHIP_MENU.num_options;
-         if (SHIP_MENU.options[name_index])
-         {
-            free(SHIP_MENU.options[name_index]);
-            SHIP_MENU.options[name_index] = NULL;
-         }
-         if (SHIP_MENU.options[length_index])
-         {
-            free(SHIP_MENU.options[length_index]);
-            SHIP_MENU.options[length_index] = NULL;
-         }
+         Destroy((void **)&SHIP_MENU.options[name_index]);
+         Destroy((void **)&SHIP_MENU.options[length_index]);
       }
-      free(SHIP_MENU.options);
-      SHIP_MENU.options = NULL;
+      Destroy((void **)&SHIP_MENU.options);
       SHIP_MENU.num_options = 0;
    }
 }

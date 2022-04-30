@@ -10,6 +10,7 @@
 
 #include "battleship/commondefs.h"
 
+void Destroy(void ** ptr);
 bool TrimStr(char * str, size_t str_size);
 int CalcMax(const int *data, uint n);
 int CalcNumWidth(int n);

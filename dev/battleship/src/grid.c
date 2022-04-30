@@ -432,16 +432,8 @@ void _DestroyMeta(GridMeta_t * const meta)
 {
    if (meta)
    {
-      if (meta->corner_str)
-      {
-         free(meta->corner_str);
-         meta->corner_str = NULL;
-      }
-      if (meta->side_str)
-      {
-         free(meta->side_str);
-         meta->side_str = NULL;
-      }
+      Destroy((void **)&meta->corner_str);
+      Destroy((void **)&meta->side_str);
    }
 }
 

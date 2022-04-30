@@ -91,17 +91,8 @@ void Menu_DestroyMeta(Menu_t * const menu)
 {
    if (menu)
    {
-      if (menu->meta.column_width_data)
-      {
-         free(menu->meta.column_width_data);
-      }
-      if (menu->meta.header_width_data)
-      {
-         free(menu->meta.header_width_data);
-      }
-      if (menu->meta.option_width_data)
-      {
-         free(menu->meta.option_width_data);
-      }
+      Destroy((void **)&menu->meta.column_width_data);
+      Destroy((void **)&menu->meta.header_width_data);
+      Destroy((void **)&menu->meta.option_width_data);
    }
 }
