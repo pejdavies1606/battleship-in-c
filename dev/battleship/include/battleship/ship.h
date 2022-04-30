@@ -37,6 +37,7 @@ typedef struct
 } Ship_Info_t;
 
 #define NUM_SHIPS 5
+#define LEN_SHIPS 1
 
 static Ship_Info_t const SHIP_TABLE[NUM_SHIPS] =
 {
@@ -60,7 +61,6 @@ static inline Ship_Info_t const * Ship_GetInfo(const ShipType_e type)
    return info;
 }
 
-uint * Ship_GetLengths(void);
 Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i);
 Ship_t * Ship_Init(uint num_ships);
 void Ship_Destroy(Ship_t ** const ships);

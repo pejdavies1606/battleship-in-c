@@ -126,21 +126,14 @@ bool BattleShipUI_Init(void)
    {
       // complete ship menu at runtime
       uint num_options = NUM_SHIPS + 1;
-      size_t ship_menu_size = sizeof(char *) * num_options * NUM_SHIP_MENU_HEADERS;
-      char * *ship_menu_data = malloc(ship_menu_size);
+      size_t ship_menu_size =
+          sizeof(char *) * num_options * NUM_SHIP_MENU_HEADERS;
+      char **ship_menu_data = malloc(ship_menu_size);
       if (ship_menu_data)
       {
          memset(ship_menu_data, 0, ship_menu_size);
-         char * return_str = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_RETURN];
-         char * place_prefix = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_PLACE];
-         uint length_len = 0;
-         uint *ship_length = Ship_GetLengths();
-         if (ship_length)
-         {
-            length_len = (uint)CalcNumWidth(CalcMax((int *)ship_length, NUM_SHIPS)) + 1;
-            free(ship_length);
-            ship_length = NULL;
-         }
+         char *return_str = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_RETURN];
+         char *place_prefix = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_PLACE];
          result = true;
          for (uint i = 0; i < num_options; i++)
          {
@@ -163,22 +156,43 @@ bool BattleShipUI_Init(void)
             }
             else
             {
-               Ship_Info_t const * ship_info = &SHIP_TABLE[i - 1];
+               Ship_Info_t const *ship_info = &SHIP_TABLE[i - 1];
                if (ship_info)
                {
-                  char * ship_name = ship_info->name;
-                  uint ship_length = ship_info->length;
-                  size_t name_len = strlen(place_prefix) + 1 + strlen(ship_name) + 1;
+                  size_t name_len =
+                      strlen(place_prefix) + 1 +
+                      strlen(ship_info->name) + 1;
                   ship_menu_data[name_index] = malloc(name_len);
-                  ship_menu_data[length_index] = malloc(length_len);
-                  if (ship_menu_data[name_index] && ship_menu_data[length_index])
+                  ship_menu_data[length_index] = malloc(LEN_SHIPS);
+                  if (
+                      ship_menu_data[name_index] &&
+                      ship_menu_data[length_index])
                   {
-                     snprintf(ship_menu_data[name_index], name_len, "%s %s", place_prefix, ship_name);
-                     snprintf(ship_menu_data[length_index], length_len, "%u", ship_length);
+                     snprintf(
+                         ship_menu_data[name_index],
+                         name_len,
+                         "%s %s",
+                         place_prefix,
+                         ship_info->name);
+                     snprintf(
+                         ship_menu_data[length_index],
+                         LEN_SHIPS,
+                         "%u",
+                         ship_info->length);
                   }
                   else
                   {
                      result = false;
+                     if (ship_menu_data[name_index])
+                     {
+                        free(ship_menu_data[name_index]);
+                        ship_menu_data[name_index] = NULL;
+                     }
+                     if (ship_menu_data[length_index])
+                     {
+                        free(ship_menu_data[length_index]);
+                        ship_menu_data[length_index] = NULL;
+                     }
                      break;
                   }
                }
@@ -210,10 +224,12 @@ void BattleShipUI_Destroy(void)
          if (SHIP_MENU.options[name_index])
          {
             free(SHIP_MENU.options[name_index]);
+            SHIP_MENU.options[name_index] = NULL;
          }
          if (SHIP_MENU.options[length_index])
          {
             free(SHIP_MENU.options[length_index]);
+            SHIP_MENU.options[length_index] = NULL;
          }
       }
       free(SHIP_MENU.options);

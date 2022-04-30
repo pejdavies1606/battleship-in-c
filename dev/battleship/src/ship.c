@@ -7,19 +7,6 @@
 
 #include "battleship/ship.h"
 
-uint * Ship_GetLengths(void)
-{
-   uint * ship_length = malloc(sizeof(uint) * NUM_SHIPS);
-   if (ship_length)
-   {
-      for (uint i = 0; i < NUM_SHIPS; i++)
-      {
-         ship_length[i] = SHIP_TABLE[i].length;
-      }
-   }
-   return ship_length;
-}
-
 Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i)
 {
    Coord_t point = { 0 };
