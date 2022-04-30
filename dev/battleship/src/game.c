@@ -49,14 +49,19 @@ bool BattleShip_Game_Init(Game_t * const game)
       Rng_Init(0);
 #endif
 
-      game->players = Player_Init(NUM_PLAYERS);
-      if (game->players)
+      for (uint p = 0; p < NUM_PLAYERS; p++)
+      {
+         result = Player_Init(&game->players[p]);
+         if (!result) break;
+      }
+
+      if (result)
       {
          game->ship_health.title = "Ship Health";
          Scoreboard_Init(&game->ship_health, NUM_SHIPS);
          for (uint i = 0; i < NUM_SHIPS; i++)
          {
-            Ship_Info_t const ship_info = SHIP_TABLE[i];
+            const Ship_Info_t ship_info = SHIP_TABLE[i];
             game->ship_health.entities[i].name = ship_info.name;
             game->ship_health.entities[i].total = ship_info.length;
          }
@@ -79,7 +84,10 @@ void BattleShip_Game_Destroy(Game_t * const game)
    {
       Scoreboard_Destroy(&game->hit_score);
       Scoreboard_Destroy(&game->ship_health);
-      Player_Destroy(&game->players, NUM_PLAYERS);
+      for (uint p = 0; p < NUM_PLAYERS; p++)
+      {
+         Player_Destroy(&game->players[p]);
+      }
       BattleShipUI_Destroy();
    }
 }

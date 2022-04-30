@@ -30,7 +30,7 @@
 
 typedef struct Game
 {
-   Player_t *players;
+   Player_t players[NUM_PLAYERS];
    Comp_Player_t *comps;
    Scoreboard_t ship_health;
    Scoreboard_t hit_score;

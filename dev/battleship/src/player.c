@@ -9,54 +9,33 @@
 
 static Ship_t* _GetShip(Player_t *player, ShipType_e type);
 
-Player_t * Player_Init(uint num_players)
+bool Player_Init(Player_t * const player)
 {
-   Player_t *players = malloc(num_players * sizeof(Player_t));
-   if (players)
+   bool result = false;
+   if (player)
    {
-      memset(players, 0, num_players * sizeof(Player_t));
-      for (uint p = 0; p < num_players; p++)
+      if (Grid_Init(&player->grid))
       {
-         Player_t *player = &players[p];
-         if (Grid_Init(&player->grid))
+         player->ships = Ship_Init(NUM_SHIPS);
+         if (player->ships)
          {
-            player->ships = Ship_Init(NUM_SHIPS);
-            if (player->ships)
+            for (uint i = 0; i < NUM_SHIPS; i++)
             {
-               for (uint i = 0; i < NUM_SHIPS; i++)
-               {
-                  player->ships[i].type = SHIP_TABLE[i].type;
-               }
+               player->ships[i].type = SHIP_TABLE[i].type;
             }
-            else
-            {
-               free(players);
-               players = NULL;
-            }
-         }
-         else
-         {
-            free(players);
-            players = NULL;
+            result = true;
          }
       }
    }
-   return players;
+   return result;
 }
 
-void Player_Destroy(Player_t ** const players, uint num_players)
+void Player_Destroy(Player_t * const player)
 {
-   if (players && *players && num_players > 0)
+   if (player)
    {
-      Player_t * pPlayers = *players;
-      for (uint p = 0; p < num_players; p++)
-      {
-         Player_t * player = &pPlayers[p];
-         Ship_Destroy(&player->ships);
-         Grid_Destroy(&player->grid);
-      }
-      free(*players);
-      *players = NULL;
+      Ship_Destroy(&player->ships);
+      Grid_Destroy(&player->grid);
    }
 }
 
