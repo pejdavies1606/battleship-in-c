@@ -215,12 +215,10 @@ bool _ReadInput(
    size_t option_len,
    InputData_t *data)
 {
-   size_t chosen_option_len = option_len + 1;
-   char * chosen_option_str = malloc( (chosen_option_len) * sizeof(char) );
-   uint retries = 0;
    bool result = false;
-   if (data)
+   if (prompt && option_len > 0 && data)
    {
+      uint retries = 0;
       while (!result && retries < MAX_READ_RETRIES)
       {
 #ifdef DEBUG
@@ -228,19 +226,19 @@ bool _ReadInput(
 #else
          printf("Enter %s: ", prompt);
 #endif
+         static char line[MAX_BUFFER_SIZE];
          result = _ReadString(
-            chosen_option_str,
-            chosen_option_len,
-            stdin) &&
-            ParseInput(
-               chosen_option_str,
-               data);
+                      line,
+                      MAX_BUFFER_SIZE,
+                      stdin) &&
+                  ParseInput(
+                      line,
+                      data);
          if (!result)
          {
             retries++;
          }
       }
-      free(chosen_option_str);
    }
    return result;
 }
@@ -255,17 +253,9 @@ bool _ReadString(char * str, size_t str_size, FILE *stream)
    if (str && str_size > 0 && stream)
    {
       memset(str, 0, str_size);
-      size_t line_size = str_size + 1; // to account for newline from fgets
-      char * line = malloc(line_size * sizeof(*line));
-      if (line)
+      if (fgets(str, (int)str_size, stream))
       {
-         if (fgets(line, (int)line_size, stream))
-         {
-            line = TrimStr(line, line_size);
-            strncpy(str, line, str_size);
-            free(line);
-            result = true;
-         }
+         result = TrimStr(str, str_size);
       }
    }
    return result;

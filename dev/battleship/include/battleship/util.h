@@ -10,7 +10,7 @@
 
 #include "battleship/commondefs.h"
 
-char * TrimStr(char * str, size_t str_size);
+bool TrimStr(char * str, size_t str_size);
 int CalcMax(const int *data, uint n);
 int CalcNumWidth(int n);
 bool RepeatChar(char * line, size_t size_line, char elem);

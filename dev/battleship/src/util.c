@@ -9,34 +9,39 @@
 
 #include <string.h>
 
-char * TrimStr(char * str, size_t str_size)
+bool TrimStr(char * str, size_t str_size)
 {
-   size_t str_len = strnlen(str, str_size);
-   if (str && str_size > 0 && str_len > 0 && str_len < str_size)
+   bool result = false;
+   if (str && str_size > 0)
    {
-      char * c;
-      // truncate on newlines and carriage returns
-      // "foo\n" -> "foo\0" -> "foo"
-      while ((c = strpbrk(str, "\n\r")))
-      {
-         *c = 0;
-      }
-      // recalculate length
-      // "foo \n " -> "foo \0 " -> "foo "
-      str_len = strnlen(str, str_size);
-      // truncate on trailing spaces and tabs
-      // "foo " -> "foo\0" -> "foo"
+      size_t str_len = strnlen(str, str_size);
       if (str_len > 0 && str_len < str_size)
       {
-         c = &str[str_len - 1];
-         while (*c == ' ' || *c == '\t')
+         char *c;
+         // truncate on newlines and carriage returns
+         // "foo\n" -> "foo\0" -> "foo"
+         while ((c = strpbrk(str, "\n")))
          {
             *c = 0;
-            c--;
          }
+         // recalculate length
+         // "foo \n " -> "foo \0 " -> "foo "
+         str_len = strnlen(str, str_size);
+         // truncate on trailing spaces and tabs
+         // "foo " -> "foo\0" -> "foo"
+         if (str_len > 0 && str_len < str_size)
+         {
+            c = &str[str_len - 1];
+            while (*c == ' ' || *c == '\t')
+            {
+               *c = 0;
+               c--;
+            }
+         }
+         result = true;
       }
    }
-   return str;
+   return result;
 }
 
 int CalcMax(const int *data, uint n)
