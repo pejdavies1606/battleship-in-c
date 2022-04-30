@@ -27,7 +27,6 @@ typedef enum GridStatus
    GRID_STATUS_OK          = 0x0,
    GRID_STATUS_BORDER      = 0x1,
    GRID_STATUS_COLLISION   = 0x2,
-   GRID_STATUS_NULL        = 0xE,
    GRID_STATUS_UNKNOWN     = 0xF
 } GridStatus_e;
 
@@ -70,9 +69,11 @@ bool Grid_GetRowStr(
    size_t const line_size,
    size_t * const line_pos);
 
-GridStatus_e Grid_PlaceShip(
+bool Grid_PlaceShip(
    Grid_t * const grid,
-   const Ship_t * const ship);
+   Ship_t * const player_ship,
+   const Ship_t * const ship,
+   GridStatus_e * const status);
 
 bool Grid_PlaceHit(
    Grid_t const * const grid,

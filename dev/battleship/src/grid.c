@@ -49,9 +49,16 @@ static void _DestroyMeta(
 static bool _IsValidMeta(
    GridMeta_t const * const meta);
 
-static GridStatus_e _CheckShip(
-   const Grid_t *grid,
-   const Ship_t *ship);
+static bool _CheckShip(
+   const Grid_t * const grid,
+   const Ship_t * const ship,
+   GridStatus_e * const status);
+
+static bool _SetShip(
+   ShipType_e * const ships,
+   const Ship_t * const ship,
+   uint len,
+   ShipType_e type);
 
 static bool _AppendLine(
    char * const line,
@@ -271,24 +278,43 @@ bool Grid_GetRowStr(
    return result;
 }
 
-GridStatus_e Grid_PlaceShip(
+bool Grid_PlaceShip(
    Grid_t * const grid,
-   const Ship_t * const ship)
+   Ship_t * const player_ship,
+   const Ship_t * const ship,
+   GridStatus_e * const status)
 {
-   Ship_Info_t const * ship_info = NULL;
-   GridStatus_e result = GRID_STATUS_NULL;
-   Coord_t point = { 0 };
-   if (grid && ship)
+   bool result = false;
+   if (grid && ship && status)
    {
-      ship_info = Ship_GetInfo(ship->type);
-      result = _CheckShip(grid, ship);
-      if (ship_info && (GRID_STATUS_OK == result))
+      result = _CheckShip(grid, ship, status);
+      if (GRID_STATUS_OK == *status)
       {
-         for (uint i = 0; i < ship_info->length; i++)
+         Ship_Info_t const *ship_info = Ship_GetInfo(ship->type);
+         if (ship_info)
          {
-            point = Ship_GetPoint(ship, i);
-            grid->ships[point.row * (int)grid->cols +
-                          point.col] = ship->type;
+            // Check if ship has been placed before,
+            // otherwise location defaults to 0,0 (A1)
+            // and may clear a ship already placed there
+            if (player_ship->heading != HEADING_UNKNOWN)
+            {
+               // Remove previous location of ship on grid
+               result = _SetShip(
+                   grid->ships,
+                   player_ship,
+                   ship_info->length,
+                   SHIP_NONE);
+            }
+            // Place new location of ship on grid
+            result = _SetShip(
+                grid->ships,
+                ship,
+                ship_info->length,
+                ship->type);
+            // Update player ship location and heading
+            player_ship->location = ship->location;
+            player_ship->heading = ship->heading;
+            result = true;
          }
       }
    }
@@ -435,42 +461,68 @@ bool _IsValidMeta(GridMeta_t const * const meta)
    return result;
 }
 
-GridStatus_e _CheckShip(const Grid_t *grid, const Ship_t *ship)
+bool _CheckShip(
+   const Grid_t * const grid,
+   const Ship_t * const ship,
+   GridStatus_e * const status)
 {
-   GridStatus_e result = GRID_STATUS_NULL;
-   if (grid && grid->ships && ship)
+   bool result = false;
+   if (grid && ship && status)
    {
       const Ship_Info_t *ship_info = Ship_GetInfo(ship->type);
       if (ship_info)
       {
-         result = GRID_STATUS_OK;
+         *status = GRID_STATUS_OK;
          for (uint i = 0; i < ship_info->length; i++)
          {
-            Coord_t point = Ship_GetPoint(ship, i);
-            if (!(point.row >= 0 && point.row < (int)grid->rows &&
-                  point.col >= 0 && point.col < (int)grid->cols))
+            Coord_t loc = Ship_GetPoint(ship, i);
+            if (!(loc.row >= 0 && loc.row < (int)grid->rows &&
+                  loc.col >= 0 && loc.col < (int)grid->cols))
             {
-               result |= GRID_STATUS_BORDER;
+               *status |= GRID_STATUS_BORDER;
             }
             else
             {
                ShipType_e ship_type =
-                   grid->ships[point.row * (int)grid->cols +
-                                 point.col];
-               if (ship_type != SHIP_NONE)
+                   grid->ships[loc.row * (int)grid->cols + loc.col];
+               // Allow collision with same type to enable replacing
+               if (ship_type != SHIP_NONE && ship_type != ship->type)
                {
-                  result |= GRID_STATUS_COLLISION;
+                  *status |= GRID_STATUS_COLLISION;
                }
             }
          }
+         result = true;
          debug_print("(n,r,c,h,s)=(%c,%d,%d,%c,%c%c)\n",
                      ship_info->name[0],
                      ship->location.row,
                      ship->location.col,
                      Heading_GetChar(ship->heading),
-                     (result & GRID_STATUS_COLLISION ? '1' : '0'),
-                     (result & GRID_STATUS_BORDER) ? '1' : '0');
+                     (*status & GRID_STATUS_COLLISION ? '1' : '0'),
+                     (*status & GRID_STATUS_BORDER) ? '1' : '0');
       }
+   }
+   return result;
+}
+
+bool _SetShip(
+   ShipType_e * const ships,
+   const Ship_t * const ship,
+   uint len,
+   ShipType_e type)
+{
+   bool result = false;
+   if (ships && ship)
+   {
+      for (uint i = 0; i < len; i++)
+      {
+         Coord_t loc = Ship_GetPoint(ship, i);
+         if (loc.col < MAX_COORD_COL && loc.row < MAX_COORD_ROW)
+         {
+            ships[loc.row * MAX_COORD_COL + loc.col] = type;
+         }
+      }
+      result = true;
    }
    return result;
 }

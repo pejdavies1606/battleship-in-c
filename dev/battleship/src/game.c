@@ -123,13 +123,18 @@ static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * cons
          break;
       case MENU_OPTION_SHIP_PLACE:
       {
+         GridStatus_e status = GRID_STATUS_UNKNOWN;
          Ship_t ship = {0};
          ship.type = shipChoice->type;
          bool loc = BattleShipUI_ReadCoord(&ship.location);
          bool hdg = BattleShipUI_ReadHeading(&ship.heading);
          if (loc && hdg)
          {
-            result = (GRID_STATUS_OK == Player_PlaceShip(player, &ship));
+            result = Player_PlaceShip(player, &ship, &status);
+            if (result)
+            {
+               result = (GRID_STATUS_OK == status);
+            }
          }
       }
       break;

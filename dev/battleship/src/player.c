@@ -7,7 +7,9 @@
 
 #include "battleship/player.h"
 
-static Ship_t* _GetShip(Player_t *player, ShipType_e type);
+static Ship_t* _GetShip(
+   Player_t const * const player,
+   ShipType_e const type);
 
 bool Player_Init(Player_t * const player)
 {
@@ -39,19 +41,21 @@ void Player_Destroy(Player_t * const player)
    }
 }
 
-GridStatus_e Player_PlaceShip(Player_t *player, Ship_t *ship)
+bool Player_PlaceShip(
+   Player_t * const player,
+   Ship_t * const ship,
+   GridStatus_e * const status)
 {
-  GridStatus_e status = GRID_STATUS_NULL;
+   bool result = false;
    if (player && ship)
    {
-      Ship_t *player_ship = _GetShip(player, ship->type);
+      Ship_t * const player_ship = _GetShip(player, ship->type);
       if (player_ship)
       {
-         *player_ship = *ship;
-         status = Grid_PlaceShip(&player->grid, ship);
+         result = Grid_PlaceShip(&player->grid, player_ship, ship, status);
       }
    }
-   return status;
+   return result;
 }
 
 bool Player_PlaceShipsAuto(Player_t * const player)
@@ -63,32 +67,37 @@ bool Player_PlaceShipsAuto(Player_t * const player)
       {
          for (uint i = NUM_SHIPS; i > 0; i--)
          {
-            GridStatus_e status = GRID_STATUS_UNKNOWN;
-            do
+            ShipType_e type = SHIP_TABLE[i - 1].type;
+            Ship_t ship = {0};
+            ship.type = type;
+            Ship_t * player_ship = _GetShip(player, ship.type);
+            if (player_ship)
             {
-               Ship_t ship = {0};
-               ship.type = SHIP_TABLE[i - 1].type;
-               ship.location = Coord_InitRandom(
-                   0, (int)player->grid.rows,
-                   0, (int)player->grid.cols);
-               ship.heading = Heading_InitRandom();
-               status = Player_PlaceShip(player, &ship);
-            } while (
-                GRID_STATUS_OK != status &&
-                GRID_STATUS_NULL != status);
-            if (GRID_STATUS_NULL == status)
-            {
-               result = false;
-               break;
+               GridStatus_e status = GRID_STATUS_UNKNOWN;
+               do
+               {
+                  ship.location = Coord_InitRandom(
+                      0, (int)player->grid.rows,
+                      0, (int)player->grid.cols);
+                  ship.heading = Heading_InitRandom();
+                  result = Grid_PlaceShip(
+                      &player->grid,
+                      player_ship,
+                      &ship,
+                      &status);
+               } while (result && GRID_STATUS_OK != status);
+               if (!result)
+                  break;
             }
          }
-         result = true;
       }
    }
    return result;
 }
 
-Ship_t * _GetShip(Player_t *player, ShipType_e type)
+Ship_t * _GetShip(
+   Player_t const * const player,
+   ShipType_e const type)
 {
    if (player)
    {
