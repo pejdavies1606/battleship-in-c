@@ -72,54 +72,46 @@ bool BattleShipUI_PrintGrid(
    Grid_t * const grid,
    GridState_e * const states)
 {
-   char * line = NULL;
-   size_t line_size = MAX_BUFFER_SIZE * sizeof(char);
-   size_t line_pos = 0;
    bool result = false;
    if (grid)
    {
-      line = malloc(line_size);
-      if (line)
+      result = true;
+      for (int row = GRID_ROW_TITLE; row < (int)(grid->rows + 1); row++)
       {
-         // iterate rows
-         result = true;
-         for (int row = GRID_ROW_TITLE; row < (int)(grid->rows + 1); row++)
+         static char line[MAX_BUFFER_SIZE] = {0};
+         size_t line_pos = 0;
+         if (Grid_GetRowStr(
+                 grid,
+                 NULL,
+                 row,
+                 line,
+                 MAX_BUFFER_SIZE,
+                 &line_pos))
          {
-            memset(line, 0, line_size);
-            line_pos = 0;
-            if (Grid_GetRowStr(
-               grid,
-               NULL,
-               row,
-               line,
-               line_size,
-               &line_pos))
+            if (states)
             {
-               if (states)
+               line[line_pos++] = ' ';
+               if (!Grid_GetRowStr(
+                       grid,
+                       states,
+                       row,
+                       line,
+                       MAX_BUFFER_SIZE,
+                       &line_pos))
                {
-                  line[line_pos++] = ' ';
-                  if (!Grid_GetRowStr(
-                          grid,
-                          states,
-                          row,
-                          line,
-                          line_size,
-                          &line_pos))
-                  {
-                     result = false;
-                     break;
-                  }
+                  result = false;
+                  break;
                }
-               printf("%s\n", line);
             }
-            else
-            {
-               result = false;
-               break;
-            }
+            printf("%s\n", line);
          }
-         free(line);
-         line = NULL;
+         else
+         {
+            result = false;
+            break;
+         }
+         memset(line, 0, MAX_BUFFER_SIZE);
+         line_pos = 0;
       }
    }
    return result;
