@@ -37,13 +37,6 @@ char const * Grid_GetStateStr(GridState_e const state)
 }
 
 static bool _InitMeta(
-   GridMeta_t * const meta,
-   size_t const row_size,
-   size_t const col_size,
-   size_t const row_width,
-   size_t const col_width);
-
-static void _DestroyMeta(
    GridMeta_t * const meta);
 
 static bool _IsValidMeta(
@@ -65,7 +58,7 @@ static bool _AppendLine(
    size_t const line_size,
    size_t * const line_pos,
    size_t const space_len,
-   char * const str,
+   char const * const str,
    size_t const str_size);
 
 bool Grid_Init(
@@ -78,18 +71,9 @@ bool Grid_Init(
       grid->cols = MAX_COORD_COL;
       memset(grid->ships, 0, SIZE_GRID * sizeof(ShipType_e));
       memset(grid->states, 0, SIZE_GRID * sizeof(GridState_e));
-      result = _InitMeta(&grid->meta, grid->rows, grid->cols, 0, 1);
+      result = _InitMeta(&grid->meta);
    }
    return result;
-}
-
-void Grid_Destroy(
-   Grid_t * const grid)
-{
-   if (grid)
-   {
-      _DestroyMeta(&grid->meta);
-   }
 }
 
 bool Grid_Clear(
@@ -140,7 +124,11 @@ bool Grid_GetRowStr(
              (states) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
              SIZE_TITLE_STR);
          // row filler
-         len = meta->side_len + 6 * SIZE_GRID_SPACE - meta->row_width - SIZE_TITLE_STR;
+         len =
+            LEN_GRID_SIDE +
+            6 * LEN_GRID_SPACE -
+            meta->row_width -
+            SIZE_TITLE_STR;
          RepeatChar(
              line + *line_pos,
              len,
@@ -157,7 +145,7 @@ bool Grid_GetRowStr(
              line_pos,
              meta->row_width - 1,
              meta->corner_str,
-             SIZE_GRID_SPACE);
+             LEN_GRID_SPACE);
          if (result)
          {
             // column labels
@@ -171,7 +159,7 @@ bool Grid_GetRowStr(
                              line,
                              line_size,
                              line_pos,
-                             SIZE_GRID_SPACE,
+                             LEN_GRID_SPACE,
                              cell_str,
                              meta->col_width));
                if (!result)
@@ -187,9 +175,9 @@ bool Grid_GetRowStr(
                 line,
                 line_size,
                 line_pos,
-                SIZE_GRID_SPACE,
+                LEN_GRID_SPACE,
                 STR_GRID_CORNER,
-                SIZE_GRID_SPACE);
+                LEN_GRID_SPACE);
          }
       }
       else if (row == (int)grid->rows)
@@ -204,21 +192,21 @@ bool Grid_GetRowStr(
                       line_pos,
                       meta->row_width - 1,
                       meta->corner_str,
-                      SIZE_GRID_SPACE) &&
+                      LEN_GRID_SPACE) &&
                   _AppendLine(
                       line,
                       line_size,
                       line_pos,
-                      SIZE_GRID_SPACE,
+                      LEN_GRID_SPACE,
                       meta->side_str,
-                      meta->side_len - 1) &&
+                      LEN_GRID_SIDE - 1) &&
                   _AppendLine(
                       line,
                       line_size,
                       line_pos,
-                      SIZE_GRID_SPACE,
+                      LEN_GRID_SPACE,
                       STR_GRID_CORNER,
-                      SIZE_GRID_SPACE);
+                      LEN_GRID_SPACE);
       }
       else
       {
@@ -252,7 +240,7 @@ bool Grid_GetRowStr(
                    line,
                    line_size,
                    line_pos,
-                   SIZE_GRID_SPACE,
+                   LEN_GRID_SPACE,
                    cell_str,
                    meta->col_width);
                if (!result)
@@ -268,9 +256,9 @@ bool Grid_GetRowStr(
                 line,
                 line_size,
                 line_pos,
-                SIZE_GRID_SPACE,
+                LEN_GRID_SPACE,
                 STR_GRID_SIDE_V,
-                SIZE_GRID_SPACE);
+                LEN_GRID_SPACE);
          }
       }
    }
@@ -390,65 +378,41 @@ bool Grid_StateToStr(
 }
 
 bool _InitMeta(
-   GridMeta_t * const meta,
-   size_t const row_size,
-   size_t const col_size,
-   size_t const row_width,
-   size_t const col_width)
+   GridMeta_t * const meta)
 {
    bool result = false;
    if (meta)
    {
-      meta->row_width = (row_width)
-         ? row_width : (uint)CalcNumWidth((int)row_size);
+      meta->row_width = LEN_COORD_ROW;
+      meta->col_width = LEN_COORD_COL;
 
-      meta->col_width = (col_width)
-         ? col_width : (uint)CalcNumWidth((int)col_size);
-
-      meta->corner_len = meta->col_width + SIZE_GRID_SPACE;
       char * corner_char = STR_GRID_CORNER;
-
-      meta->side_len = (meta->col_width + SIZE_GRID_SPACE) * col_size;
       char * side_char = STR_GRID_SIDE_H;
 
-      meta->corner_str = malloc(meta->corner_len);
-      meta->side_str = malloc(meta->side_len);
+      bool corner = RepeatChar(
+          meta->corner_str,
+          LEN_GRID_CORNER,
+          corner_char[0]);
 
-      result = (meta->corner_str &&
-                meta->side_str &&
-                RepeatChar(
-                   meta->corner_str,
-                   meta->corner_len,
-                   corner_char[0]) &&
-                RepeatChar(
-                   meta->side_str,
-                   meta->side_len,
-                   side_char[0]));
+      bool side = RepeatChar(
+          meta->side_str,
+          LEN_GRID_SIDE,
+          side_char[0]);
+
+      result = (corner && side);
    }
    return result;
 }
 
-void _DestroyMeta(GridMeta_t * const meta)
-{
-   if (meta)
-   {
-      Destroy((void **)&meta->corner_str);
-      Destroy((void **)&meta->side_str);
-   }
-}
-
-bool _IsValidMeta(GridMeta_t const * const meta)
+bool _IsValidMeta(
+   GridMeta_t const * const meta)
 {
    bool result = false;
    if (meta)
    {
       result = (
          meta->row_width > 0 &&
-         meta->col_width > 0 &&
-         meta->corner_len > 0 &&
-         meta->side_len > 0 &&
-         meta->corner_str &&
-         meta->side_str);
+         meta->col_width > 0);
    }
    return result;
 }
@@ -524,7 +488,7 @@ bool _AppendLine(
     size_t const line_size,
     size_t * const line_pos,
     size_t const space_len,
-    char * const str,
+    char const * const str,
     size_t const str_size)
 {
    bool result = false;

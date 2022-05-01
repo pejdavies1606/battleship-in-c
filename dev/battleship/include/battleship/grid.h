@@ -12,6 +12,14 @@
 
 #define SIZE_GRID (MAX_COORD_ROW * MAX_COORD_COL)
 
+#define STR_GRID_SIDE_V "|"
+#define STR_GRID_SIDE_H "="
+#define STR_GRID_CORNER "+"
+#define LEN_GRID_SPACE 1
+
+#define LEN_GRID_CORNER (LEN_COORD_COL + LEN_GRID_SPACE)
+#define LEN_GRID_SIDE ((LEN_COORD_COL + LEN_GRID_SPACE) * MAX_COORD_COL)
+
 #define GRID_ROW_TITLE -2
 #define GRID_ROW_HEADER -1
 
@@ -34,10 +42,8 @@ typedef struct GridMeta
 {
    size_t row_width;
    size_t col_width;
-   char * corner_str;
-   size_t corner_len;
-   char * side_str;
-   size_t side_len;
+   char corner_str[LEN_GRID_CORNER];
+   char side_str[LEN_GRID_SIDE];
 } GridMeta_t;
 
 typedef struct Grid
@@ -53,9 +59,6 @@ char const * Grid_GetStateStr(
    GridState_e const state);
 
 bool Grid_Init(
-   Grid_t * const grid);
-
-void Grid_Destroy(
    Grid_t * const grid);
 
 bool Grid_Clear(

@@ -13,7 +13,9 @@
 
 #define MAX_COORD_ROW 10
 #define MAX_COORD_COL 10
-#define LEN_COORD 3 // J10
+#define LEN_COORD_ROW 2
+#define LEN_COORD_COL 1
+#define LEN_COORD (LEN_COORD_ROW + LEN_COORD_COL)
 
 typedef struct Coord
 {

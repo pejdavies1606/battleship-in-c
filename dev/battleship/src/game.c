@@ -84,10 +84,6 @@ void BattleShip_Game_Destroy(Game_t * const game)
    {
       Scoreboard_Destroy(&game->hit_score);
       Scoreboard_Destroy(&game->ship_health);
-      for (uint p = 0; p < NUM_PLAYERS; p++)
-      {
-         Player_Destroy(&game->players[p]);
-      }
       BattleShipUI_Destroy();
    }
 }

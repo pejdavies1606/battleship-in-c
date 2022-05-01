@@ -30,7 +30,4 @@ bool Player_PlaceShip(
 bool Player_PlaceShipsAuto(
    Player_t * const player);
 
-void Player_Destroy(
-   Player_t * const player);
-
 #endif /* BATTLESHIP_PLAYER_H_ */

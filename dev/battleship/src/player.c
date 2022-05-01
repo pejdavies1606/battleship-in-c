@@ -29,14 +29,6 @@ bool Player_Init(Player_t * const player)
    return result;
 }
 
-void Player_Destroy(Player_t * const player)
-{
-   if (player)
-   {
-      Grid_Destroy(&player->grid);
-   }
-}
-
 bool Player_PlaceShip(
    Player_t * const player,
    Ship_t * const ship,

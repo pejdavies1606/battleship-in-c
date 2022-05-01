@@ -100,12 +100,12 @@ bool _ParseCoord(const char *str, Coord_t *loc)
    return result;
 }
 
-bool _ParseHeading(const char *str, Heading_e *hdg)
+bool _ParseHeading(const char * const str, Heading_e * const hdg)
 {
    bool result = false;
    if (str && hdg)
    {
-      char c = toupper(str[0]);
+      char c = (char)toupper(str[0]);
       for (uint i = 0; i < NUM_HEADINGS; i++)
       {
          if (c == HEADING_TABLE[i].c)

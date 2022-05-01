@@ -20,11 +20,6 @@
 
 #define SIZE_CELL_STR 1 // not including null terminator
 
-#define STR_GRID_SIDE_V "|"
-#define STR_GRID_SIDE_H "="
-#define STR_GRID_CORNER "+"
-#define SIZE_GRID_SPACE 1
-
 #define STR_TITLE_DEFENSE "DEFENSE"
 #define STR_TITLE_OFFENSE "OFFENSE"
 #define SIZE_TITLE_STR 7
