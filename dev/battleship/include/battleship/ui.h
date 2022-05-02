@@ -16,7 +16,8 @@
 
 #define NUM_MAIN_MENU_OPTIONS 5 // must match enum below
 #define NUM_PLACE_MENU_OPTIONS 4 // must match enum below
-#define NUM_SHIP_MENU_OPTIONS (1 + NUM_SHIPS)
+#define NUM_SHIP_MENU_OPTIONS 2 // must match enum below
+#define NUM_SHIP_MENU_OPTIONS_FULL (1 + NUM_SHIPS)
 
 #define SIZE_CELL_STR 1 // not including null terminator
 
