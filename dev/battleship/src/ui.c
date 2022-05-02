@@ -94,11 +94,10 @@ static char * SHIP_MENU_HEADERS[NUM_SHIP_MENU_HEADERS] =
    "Length"
 };
 
-// stored column-wise, printed row-wise
 static char * SHIP_MENU_OPTIONS[NUM_SHIP_MENU_OPTIONS*NUM_SHIP_MENU_HEADERS] =
 {
-   "Return", "Place",
-   "L0", "L1",
+   "Return",
+   "Place",
 };
 
 static Menu_t SHIP_MENU =
@@ -125,76 +124,57 @@ bool BattleShipUI_Init(void)
        Menu_InitMeta(&PLACE_MENU))
    {
       // complete ship menu at runtime
-      uint num_options = NUM_SHIPS + 1;
       size_t ship_menu_size =
-          sizeof(char *) * num_options * NUM_SHIP_MENU_HEADERS;
+          sizeof(char *) * NUM_SHIP_MENU_OPTIONS * NUM_SHIP_MENU_HEADERS;
       char **ship_menu_data = malloc(ship_menu_size);
       if (ship_menu_data)
       {
          memset(ship_menu_data, 0, ship_menu_size);
-         char *return_str = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_RETURN];
+         ship_menu_data[0] = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_RETURN];
          char *place_prefix = SHIP_MENU_OPTIONS[MENU_OPTION_SHIP_PLACE];
          result = true;
-         for (uint i = 0; i < num_options; i++)
+         for (uint i = 0; i < NUM_SHIPS; i++)
          {
-            uint name_index = i;
-            uint length_index = i + num_options;
-            if (i == 0)
+            uint name_index = i + 1;
+            uint length_index = name_index + NUM_SHIP_MENU_OPTIONS;
+            Ship_Info_t const *ship_info = &SHIP_TABLE[i];
+            if (ship_info)
             {
-               size_t return_len = strlen(return_str) + 1;
-               ship_menu_data[name_index] = malloc(return_len);
-               if (ship_menu_data[name_index])
+               size_t name_len =
+                   strlen(place_prefix) + 1 +
+                   strlen(ship_info->name) + 1;
+               size_t length_len = LEN_SHIPS + 1;
+               ship_menu_data[name_index] = malloc(name_len);
+               ship_menu_data[length_index] = malloc(length_len);
+               if (
+                   ship_menu_data[name_index] &&
+                   ship_menu_data[length_index])
                {
-                  snprintf(ship_menu_data[name_index], return_len, "%s", return_str);
-                  // ship_menu_data[length_index] initialised to NULL with memset above
+                  snprintf(
+                      ship_menu_data[name_index],
+                      name_len,
+                      "%s %s",
+                      place_prefix,
+                      ship_info->name);
+                  snprintf(
+                      ship_menu_data[length_index],
+                      length_len,
+                      "%u",
+                      ship_info->length);
                }
                else
                {
                   result = false;
+                  Destroy((void **)&ship_menu_data[name_index]);
+                  Destroy((void **)&ship_menu_data[length_index]);
                   break;
-               }
-            }
-            else
-            {
-               Ship_Info_t const *ship_info = &SHIP_TABLE[i - 1];
-               if (ship_info)
-               {
-                  size_t name_len =
-                      strlen(place_prefix) + 1 +
-                      strlen(ship_info->name) + 1;
-                  size_t length_len = LEN_SHIPS + 1;
-                  ship_menu_data[name_index] = malloc(name_len);
-                  ship_menu_data[length_index] = malloc(length_len);
-                  if (
-                      ship_menu_data[name_index] &&
-                      ship_menu_data[length_index])
-                  {
-                     snprintf(
-                         ship_menu_data[name_index],
-                         name_len,
-                         "%s %s",
-                         place_prefix,
-                         ship_info->name);
-                     snprintf(
-                         ship_menu_data[length_index],
-                         length_len,
-                         "%u",
-                         ship_info->length);
-                  }
-                  else
-                  {
-                     result = false;
-                     Destroy((void **)&ship_menu_data[name_index]);
-                     Destroy((void **)&ship_menu_data[length_index]);
-                     break;
-                  }
                }
             }
          }
          if (result)
          {
             // redefine template options table in menu with new, completed options table
-            SHIP_MENU.num_options = num_options;
+            SHIP_MENU.num_options = NUM_SHIP_MENU_OPTIONS;
             SHIP_MENU.options = ship_menu_data;
             result = Menu_InitMeta(&SHIP_MENU);
          }
