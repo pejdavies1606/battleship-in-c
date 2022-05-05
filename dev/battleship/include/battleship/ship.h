@@ -26,7 +26,7 @@ typedef struct
    ShipType_e type;
    Coord_t location;
    Heading_e heading;
-   uint states;
+   uint hits;
 } Ship_t;
 
 typedef struct

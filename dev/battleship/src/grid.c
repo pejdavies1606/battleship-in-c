@@ -47,6 +47,11 @@ static bool _CheckShip(
    const Ship_t * const ship,
    GridStatus_e * const status);
 
+static bool _CheckBorder(
+   Grid_t const * const grid,
+   Coord_t const * const loc,
+   bool * const valid);
+
 static bool _SetShip(
    ShipType_e * const ships,
    const Ship_t * const ship,
@@ -312,17 +317,20 @@ bool Grid_PlaceShip(
 bool Grid_PlaceHit(
    const Grid_t * const grid,
    GridState_e * const states,
-   const Coord_t * const location,
-   bool * const hit)
+   const Coord_t * const target,
+   ShipType_e * const hit_ship)
 {
    bool result = false;
-   if (grid && states && location && hit)
+   if (grid && states && target && hit_ship)
    {
-      int i = location->row * (int)grid->cols + location->col;
-      ShipType_e ship_type = grid->ships[i];
-      *hit = (ship_type != SHIP_NONE);
-      states[i] = (*hit) ? GRID_STATE_HIT : GRID_STATE_MISS;
-      result = true;
+      bool border = false;
+      result = _CheckBorder(grid, target, &border);
+      if (result && border)
+      {
+         int i = target->row * (int)grid->cols + target->col;
+         *hit_ship = grid->ships[i];
+         states[i] = (*hit_ship != SHIP_NONE) ? GRID_STATE_HIT : GRID_STATE_MISS;
+      }
    }
    return result;
 }
@@ -432,8 +440,10 @@ bool _CheckShip(
          for (uint i = 0; i < ship_info->length; i++)
          {
             Coord_t loc = Ship_GetPoint(ship, i);
-            if (!(loc.row >= 0 && loc.row < (int)grid->rows &&
-                  loc.col >= 0 && loc.col < (int)grid->cols))
+            bool border = false;
+            result = _CheckBorder(grid, &loc, &border);
+            if (!result) break;
+            if (!border)
             {
                *status |= GRID_STATUS_BORDER;
             }
@@ -449,7 +459,7 @@ bool _CheckShip(
             }
          }
          result = true;
-         debug_print("(n,r,c,h,s)=(%c,%d,%d,%c,%c%c)\n",
+         debug_print("%c %d %d %c %c%c\n",
                      ship_info->name[0],
                      ship->location.row,
                      ship->location.col,
@@ -457,6 +467,21 @@ bool _CheckShip(
                      (*status & GRID_STATUS_COLLISION ? '1' : '0'),
                      (*status & GRID_STATUS_BORDER) ? '1' : '0');
       }
+   }
+   return result;
+}
+
+bool _CheckBorder(
+   Grid_t const * const grid,
+   Coord_t const * const loc,
+   bool * const valid)
+{
+   bool result = false;
+   if (grid && loc && valid)
+   {
+      *valid = (loc->row >= 0 && loc->row < (int)grid->rows &&
+                loc->col >= 0 && loc->col < (int)grid->cols);
+      result = true;
    }
    return result;
 }

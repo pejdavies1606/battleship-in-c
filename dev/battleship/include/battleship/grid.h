@@ -82,7 +82,7 @@ bool Grid_PlaceHit(
    Grid_t const * const grid,
    GridState_e * const states,
    Coord_t const * const location,
-   bool * const hit);
+   ShipType_e * const hit_ship);
 
 bool Grid_StateToStr(
    GridState_e const state,

@@ -33,6 +33,7 @@
 static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const shipChoice);
 static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const placeChoice);
 static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice);
+static bool _ProcTurn(Coord_t const * const target, Player_t * const player);
 
 bool BattleShip_Game_Init(Game_t * const game)
 {
@@ -96,10 +97,17 @@ bool BattleShip_Game_Start(Game_t * const game)
    {
       // initialise computer player
       result = Player_PlaceShipsAuto(&game->players[1]);
+#ifdef DEBUG
+      result = Player_PlaceShipsAuto(&game->players[0]);
+#endif
       // enter UI for user player
       do
       {
+#ifdef DEBUG
+         mainChoice = MENU_OPTION_MAIN_BEGIN;
+#else
          mainChoice = BattleShipUI_MainMenu("");
+#endif
          result = _ProcMainMenu(game, mainChoice);
       }
       while (result && mainChoice != MENU_OPTION_MAIN_RETURN);
@@ -183,21 +191,20 @@ static bool _ProcBeginGame(Game_t * const game)
          BattleShipUI_GameScreen(
             &game->players[0].grid,
             game->players[1].grid.states);
+#ifdef DEBUG
          BattleShipUI_GameScreen(
             &game->players[1].grid,
             game->players[0].grid.states);
-         // TODO player turn
-         Coord_t location;
-         bool target = BattleShipUI_ReadCoord(&location);
-         if (target)
-         {
-            bool hit = false;
-            result = Grid_PlaceHit(
-              &game->players[1].grid,
-               game->players[1].grid.states,
-              &location, &hit);
-            if (!result) break;
-         }
+#endif
+         Coord_t target;
+         result = BattleShipUI_ReadCoord(&target);
+         if (!result) break;
+         result = _ProcTurn(&target, &game->players[1]);
+#if 0
+         result = BattleShipAI_GetCoord(&target);
+         if (!result) break;
+         result = _ProcTurn(&target, &game->players[0]);
+#endif
          round++;
          // TODO check all ships sunk
       }
@@ -250,10 +257,30 @@ static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice
    return result;
 }
 
-// Identify which ship was hit and determine if it has been sunk.
-/*void BattleShip_Identify_Ship() // TODO
+bool _ProcTurn(
+   Coord_t const * const target,
+   Player_t * const player)
 {
-}*/
+   bool result = false;
+   if (target && player)
+   {
+      ShipType_e hit_ship = SHIP_NONE;
+      result = Grid_PlaceHit(
+          &player->grid,
+          player->grid.states,
+          target, &hit_ship);
+      if (result && hit_ship != SHIP_NONE)
+      {
+         bool sunk = false;
+         result = Player_HitShip(player, hit_ship, &sunk);
+         if (result && sunk)
+         {
+            // TODO print message
+         }
+      }
+   }
+   return result;
+}
 
 // state machine
 /*void BattleShip_Ai() // TODO

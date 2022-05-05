@@ -83,19 +83,41 @@ bool Player_PlaceShipsAuto(Player_t * const player)
    return result;
 }
 
+bool Player_HitShip(
+   Player_t * const player,
+   ShipType_e const ship_type,
+   bool * const sunk)
+{
+   bool result = false;
+   if (player && sunk)
+   {
+      Ship_t * const ship = _GetShip(player, ship_type);
+      Ship_Info_t const * const ship_info = Ship_GetInfo(ship_type);
+      if (ship && ship_info)
+      {
+         ship->hits++;
+         *sunk = (ship->hits == ship_info->length);
+         result = true;
+      }
+   }
+   return result;
+}
+
 Ship_t * _GetShip(
    Player_t * const player,
    ShipType_e const type)
 {
+   Ship_t * ship = NULL;
    if (player)
    {
       for (uint i = 0; i < NUM_SHIPS; i++)
       {
          if (type == player->ships[i].type)
          {
-            return &player->ships[i];
+            ship = &player->ships[i];
+            break;
          }
       }
    }
-   return NULL;
+   return ship;
 }
