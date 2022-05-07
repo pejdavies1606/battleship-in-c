@@ -87,7 +87,7 @@ static bool _AppendLine(
    Line_t * const line,
    size_t const space_len,
    char const * const str,
-   size_t const str_size);
+   size_t const str_len);
 
 static bool _IsValidLine(
     Line_t *const line);
@@ -286,12 +286,12 @@ bool _InitMeta(
 
       bool corner = RepeatChar(
           meta->corner_str,
-          LEN_GRID_CORNER,
+          LEN_GRID_CORNER + 1,
           corner_char[0]);
 
       bool side = RepeatChar(
           meta->side_str,
-          LEN_GRID_SIDE,
+          LEN_GRID_SIDE + 1,
           side_char[0]);
 
       result = (corner && side);
@@ -445,20 +445,19 @@ bool _AppendRowTitle(
       // title row
       result = _AppendLine(
           line,
-          grid->meta.row_width - 1,
+          grid->meta.row_width + LEN_GRID_SPACE,
           (off_grid) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
-          SIZE_TITLE_STR);
+          LEN_TITLE_STR);
       // row filler
-      len =
-          LEN_GRID_SIDE +
-          6 * LEN_GRID_SPACE -
-          grid->meta.row_width -
-          SIZE_TITLE_STR;
-      RepeatChar(
+      len = LEN_GRID_SIDE + LEN_GRID_CORNER - LEN_TITLE_STR;
+      result = RepeatChar(
           line->buffer + line->position,
           len,
           ' ');
-      line->position += len - 1;
+      if (result)
+      {
+         line->position += len - 1;
+      }
    }
    return result;
 }
@@ -468,30 +467,31 @@ bool _AppendRowHeader(
     Line_t *const line)
 {
    bool result = false;
-   char cell_str[SIZE_CELL_STR + 1] = {0};
+   char cell_str[SIZE_CELL_STR] = {0};
    if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
       // header row
       // grid corner
       result = _AppendLine(
           line,
-          grid->meta.row_width - 1,
+          grid->meta.row_width - LEN_GRID_CORNER,
           grid->meta.corner_str,
-          LEN_GRID_SPACE);
+          LEN_GRID_CORNER);
       if (result)
       {
          // column labels
          for (uint col = 0; col < grid->cols; col++)
          {
-            cell_str[0] = '\0';
-            result = (Coord_ColToChar(
-                          (int)col,
-                          &cell_str[0]) &&
-                      _AppendLine(
-                          line,
-                          LEN_GRID_SPACE,
-                          cell_str,
-                          grid->meta.col_width));
+            result = Coord_ColToChar(
+                (int)col,
+                cell_str);
+            if (!result)
+               break;
+            result = _AppendLine(
+                line,
+                LEN_GRID_SPACE,
+                cell_str,
+                grid->meta.col_width);
             if (!result)
                break;
          }
@@ -516,25 +516,30 @@ bool _AppendRowFooter(
    bool result = false;
    if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
-      // footer row
-      // grid corner
-      // row filler
       // grid corner
       result = _AppendLine(
-                   line,
-                   grid->meta.row_width - 1,
-                   grid->meta.corner_str,
-                   LEN_GRID_SPACE) &&
-               _AppendLine(
-                   line,
-                   LEN_GRID_SPACE,
-                   grid->meta.side_str,
-                   LEN_GRID_SIDE - 1) &&
-               _AppendLine(
-                   line,
-                   LEN_GRID_SPACE,
-                   STR_GRID_CORNER,
-                   LEN_GRID_SPACE);
+          line,
+          grid->meta.row_width - LEN_GRID_CORNER,
+          grid->meta.corner_str,
+          LEN_GRID_CORNER);
+      if (result)
+      {
+         // row filler
+         result = _AppendLine(
+             line,
+             LEN_GRID_SPACE,
+             grid->meta.side_str,
+             LEN_GRID_SIDE - 1);
+      }
+      if (result)
+      {
+         // grid corner
+         result = _AppendLine(
+             line,
+             LEN_GRID_SPACE,
+             STR_GRID_CORNER,
+             LEN_GRID_SPACE);
+      }
    }
    return result;
 }
@@ -546,23 +551,22 @@ bool _AppendRowData(
     bool const off_grid)
 {
    bool result = false;
-   char cell_str[SIZE_CELL_STR + 1] = {0};
+   char cell_str[SIZE_CELL_STR] = {0};
    ShipType_e ship = SHIP_NONE;
    GridState_e state = GRID_STATE_BLANK;
    if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
       // numbered rows
-      result = true;
       // row label
       if (snprintf(
-              line->buffer + line->position, MAX_BUFFER_SIZE - line->position,
-              "%*u", (int)grid->meta.row_width, row + 1) > 0)
+              line->buffer + line->position,
+              MAX_BUFFER_SIZE - line->position,
+              "%*u",
+              (int)grid->meta.row_width,
+              row + 1) > 0)
       {
          line->position += (grid->meta.row_width);
-      }
-      else
-      {
-         result = false;
+         result = true;
       }
       if (result)
       {
@@ -578,12 +582,12 @@ bool _AppendRowData(
                 (off_grid && GRID_STATE_SUNK == state))
             {
                Grid_ShipTypeToStr(
-                  ship, cell_str, SIZE_CELL_STR + 1);
+                  ship, cell_str, SIZE_CELL_STR);
             }
             else
             {
                Grid_StateToStr(
-                  state, cell_str, SIZE_CELL_STR + 1);
+                  state, cell_str, SIZE_CELL_STR);
             }
             result = _AppendLine(
                 line,
@@ -613,10 +617,12 @@ bool _AppendLine(
     Line_t * const line,
     size_t const space_len,
     char const * const str,
-    size_t const str_size)
+    size_t const str_len)
 {
    bool result = false;
-   if (_IsValidLine(line))
+   if (_IsValidLine(line) &&
+      space_len < MAX_BUFFER_SIZE &&
+      str_len < MAX_BUFFER_SIZE)
    {
       if (snprintf(
               line->buffer + line->position,
@@ -624,10 +630,10 @@ bool _AppendLine(
               "%*s%*s",
               (int)space_len,
               "",
-              (int)str_size,
+              (int)str_len,
               str) > 0)
       {
-         line->position += (space_len + str_size);
+         line->position += (space_len + str_len);
          result = true;
       }
    }

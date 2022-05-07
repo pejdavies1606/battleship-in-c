@@ -46,8 +46,8 @@ typedef struct GridMeta
 {
    size_t row_width;
    size_t col_width;
-   char corner_str[LEN_GRID_CORNER];
-   char side_str[LEN_GRID_SIDE];
+   char corner_str[LEN_GRID_CORNER + 1];
+   char side_str[LEN_GRID_SIDE + 1];
 } GridMeta_t;
 
 typedef struct Grid

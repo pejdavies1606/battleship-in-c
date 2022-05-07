@@ -1,13 +1,13 @@
 #ifndef BATTLESHIP_LINE_H_
 #define BATTLESHIP_LINE_H_
 
-#define SIZE_CELL_STR 1 // not including null terminator
+#define SIZE_CELL_STR 2
 
 #define STR_TITLE_DEFENSE "DEFENSE"
 #define STR_TITLE_OFFENSE "OFFENSE"
-#define SIZE_TITLE_STR 7
+#define LEN_TITLE_STR 7
 
-#define MAX_BUFFER_SIZE 80
+#define MAX_BUFFER_SIZE 50
 
 typedef struct Line
 {
