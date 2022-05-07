@@ -26,8 +26,9 @@
 typedef enum GridState
 {
    GRID_STATE_BLANK,
+   GRID_STATE_MISS,
    GRID_STATE_HIT,
-   GRID_STATE_MISS
+   GRID_STATE_SUNK,
 } GridState_e;
 
 typedef enum GridStatus
@@ -65,8 +66,8 @@ bool Grid_Clear(
    Grid_t * const grid);
 
 bool Grid_GetRowStr(
-   Grid_t const * const grid,
-   GridState_e const * const states,
+   Grid_t const * const def_grid,
+   bool const off_grid,
    int const row,
    char * const line,
    size_t const line_size,
@@ -81,8 +82,13 @@ bool Grid_PlaceShip(
 bool Grid_PlaceHit(
    Grid_t const * const grid,
    GridState_e * const states,
-   Coord_t const * const location,
+   Coord_t const * const target,
    ShipType_e * const hit_ship);
+
+bool Grid_SinkShip(
+   const Grid_t * const grid,
+   GridState_e * const states,
+   Ship_t const * const ship);
 
 bool Grid_StateToStr(
    GridState_e const state,

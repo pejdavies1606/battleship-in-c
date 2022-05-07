@@ -233,7 +233,8 @@ MainMenuOption_e BattleShipUI_MainMenu(char * message)
    return choice;
 }
 
-PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid)
+PlaceMenuOption_e BattleShipUI_PlaceMenu(
+   Grid_t * const grid)
 {
    PlaceMenuOption_e choice = MENU_OPTION_PLACE_RETURN;
    bool read_success = false;
@@ -247,7 +248,8 @@ PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid)
    return choice;
 }
 
-ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid)
+ShipMenuChoice_t BattleShipUI_ShipMenuManual(
+   Grid_t * const grid)
 {
    ShipMenuChoice_t result = {0};
    uint choice = 0;
@@ -274,11 +276,17 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid)
 }
 
 void BattleShipUI_GameScreen(
-   Grid_t * const grid,
-   GridState_e * const states)
+   Game_t const * const game)
 {
    BattleShipUI_ClearScreen();
-   BattleShipUI_PrintGrid(grid, states);
+   BattleShipUI_PrintGrid(
+       &game->players[0].grid,
+       &game->players[1].grid);
+#ifdef DEBUG
+   BattleShipUI_PrintGrid(
+       &game->players[1].grid,
+       &game->players[0].grid);
+#endif
    /* screen
     *    defense + offense grids
     *    scoreboards

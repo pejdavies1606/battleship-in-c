@@ -15,12 +15,13 @@ typedef struct GridStateInfo
    char const * str;
 } GridStateInfo_t;
 
-#define GRID_STATE_COUNT 3
+#define GRID_STATE_COUNT 4
 static GridStateInfo_t const GRID_STATE_TABLE[GRID_STATE_COUNT] =
 {
    { GRID_STATE_BLANK, " " },
-   { GRID_STATE_HIT,   "x" },
    { GRID_STATE_MISS,  "o" },
+   { GRID_STATE_HIT,   "x" },
+   { GRID_STATE_SUNK,  "X" },
 };
 
 char const * Grid_GetStateStr(GridState_e const state)
@@ -53,10 +54,16 @@ static bool _CheckBorder(
    bool * const valid);
 
 static bool _SetShip(
+   Grid_t const * const grid,
    ShipType_e * const ships,
-   const Ship_t * const ship,
-   uint len,
-   ShipType_e type);
+   Ship_t const * const ship,
+   ShipType_e const type);
+
+static bool _SetState(
+   Grid_t const * const grid,
+   GridState_e * const states,
+   Ship_t const * const ship,
+   GridState_e state);
 
 static bool _AppendLine(
    char * const line,
@@ -96,7 +103,7 @@ bool Grid_Clear(
 
 bool Grid_GetRowStr(
     Grid_t const *const grid,
-    GridState_e const *const states,
+    bool const off_grid,
     int const row,
     char *const line,
     size_t const line_size,
@@ -109,6 +116,8 @@ bool Grid_GetRowStr(
    int i = 0;
    size_t len = 0;
    bool result = false;
+
+   // TODO split row cases into subroutines
 
    if (grid &&
        _IsValidMeta(&grid->meta) &&
@@ -126,7 +135,7 @@ bool Grid_GetRowStr(
              line_size,
              line_pos,
              meta->row_width - 1,
-             (states) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
+             (off_grid) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
              SIZE_TITLE_STR);
          // row filler
          len =
@@ -234,12 +243,29 @@ bool Grid_GetRowStr(
             for (int col = 0; col < (int)grid->cols; col++)
             {
                i = row * (int)(grid->cols) + col;
-               state = (states) ? states[i] : grid->states[i];
-               Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
-               if (!states && state == GRID_STATE_BLANK)
+               state = grid->states[i];
+               ship = grid->ships[i];
+               if (off_grid)
                {
-                  ship = grid->ships[i];
-                  Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
+                  if (state == GRID_STATE_SUNK)
+                  {
+                     Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
+                  }
+                  else
+                  {
+                     Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
+                  }
+               }
+               else
+               {
+                  if (state == GRID_STATE_BLANK)
+                  {
+                     Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
+                  }
+                  else
+                  {
+                     Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
+                  }
                }
                result = _AppendLine(
                    line,
@@ -281,33 +307,28 @@ bool Grid_PlaceShip(
    if (grid && ship && status)
    {
       result = _CheckShip(grid, ship, status);
-      if (GRID_STATUS_OK == *status)
+      if (result && GRID_STATUS_OK == *status)
       {
-         Ship_Info_t const *ship_info = Ship_GetInfo(ship->type);
-         if (ship_info)
+         // Check if ship has been placed before,
+         // otherwise location defaults to 0,0 (A1)
+         // and may clear a ship already placed there
+         if (player_ship->heading != HEADING_UNKNOWN)
          {
-            // Check if ship has been placed before,
-            // otherwise location defaults to 0,0 (A1)
-            // and may clear a ship already placed there
-            if (player_ship->heading != HEADING_UNKNOWN)
-            {
-               // Remove previous location of ship on grid
-               result = _SetShip(
-                   grid->ships,
-                   player_ship,
-                   ship_info->length,
-                   SHIP_NONE);
-            }
+            // Remove previous location of ship on grid
+            result = _SetShip(grid, grid->ships,
+                              player_ship, SHIP_NONE);
+         }
+         if (result)
+         {
             // Place new location of ship on grid
-            result = _SetShip(
-                grid->ships,
-                ship,
-                ship_info->length,
-                ship->type);
+            result = _SetShip(grid, grid->ships,
+                              ship, ship->type);
+         }
+         if (result)
+         {
             // Update player ship location and heading
             player_ship->location = ship->location;
             player_ship->heading = ship->heading;
-            result = true;
          }
       }
    }
@@ -315,9 +336,9 @@ bool Grid_PlaceShip(
 }
 
 bool Grid_PlaceHit(
-   const Grid_t * const grid,
+   Grid_t const * const grid,
    GridState_e * const states,
-   const Coord_t * const target,
+   Coord_t const * const target,
    ShipType_e * const hit_ship)
 {
    bool result = false;
@@ -331,6 +352,19 @@ bool Grid_PlaceHit(
          *hit_ship = grid->ships[i];
          states[i] = (*hit_ship != SHIP_NONE) ? GRID_STATE_HIT : GRID_STATE_MISS;
       }
+   }
+   return result;
+}
+
+bool Grid_SinkShip(
+   const Grid_t * const grid,
+   GridState_e * const states,
+   Ship_t const * const ship)
+{
+   bool result = false;
+   if (grid && states && ship)
+   {
+      result = _SetState(grid, states, ship, GRID_STATE_SUNK);
    }
    return result;
 }
@@ -487,23 +521,61 @@ bool _CheckBorder(
 }
 
 bool _SetShip(
+   Grid_t const * const grid,
    ShipType_e * const ships,
-   const Ship_t * const ship,
-   uint len,
-   ShipType_e type)
+   Ship_t const * const ship,
+   ShipType_e const type)
 {
    bool result = false;
    if (ships && ship)
    {
-      for (uint i = 0; i < len; i++)
+      Ship_Info_t const * const ship_info =
+         Ship_GetInfo(ship->type);
+      if (ship_info)
       {
-         Coord_t loc = Ship_GetPoint(ship, i);
-         if (loc.col < MAX_COORD_COL && loc.row < MAX_COORD_ROW)
+         result = true;
+         for (uint i = 0; i < ship_info->length; i++)
          {
-            ships[loc.row * MAX_COORD_COL + loc.col] = type;
+            Coord_t const loc = Ship_GetPoint(ship, i);
+            bool border = false;
+            result = _CheckBorder(grid, &loc, &border);
+            if (!result) break;
+            if (border)
+            {
+               ships[loc.row * (int)grid->cols + loc.col] = type;
+            }
          }
       }
-      result = true;
+   }
+   return result;
+}
+
+bool _SetState(
+   Grid_t const * const grid,
+   GridState_e * const states,
+   Ship_t const * const ship,
+   GridState_e state)
+{
+   bool result = false;
+   if (states && ship)
+   {
+      Ship_Info_t const * const ship_info =
+         Ship_GetInfo(ship->type);
+      if (ship_info)
+      {
+         result = true;
+         for (uint i = 0; i < ship_info->length; i++)
+         {
+            Coord_t const loc = Ship_GetPoint(ship, i);
+            bool border = false;
+            result = _CheckBorder(grid, &loc, &border);
+            if (!result) break;
+            if (border)
+            {
+               states[loc.row * (int)grid->cols + loc.col] = state;
+            }
+         }
+      }
    }
    return result;
 }

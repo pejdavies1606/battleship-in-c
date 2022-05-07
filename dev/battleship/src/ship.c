@@ -33,3 +33,19 @@ Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i)
    }
    return point;
 }
+
+bool Ship_Hit(Ship_t * const ship)
+{
+   bool result = false;
+   if (ship)
+   {
+      Ship_Info_t const * const ship_info = Ship_GetInfo(ship->type);
+      if (ship_info)
+      {
+         ship->hits++;
+         ship->sunk = (ship->hits == ship_info->length);
+         result = true;
+      }
+   }
+   return result;
+}

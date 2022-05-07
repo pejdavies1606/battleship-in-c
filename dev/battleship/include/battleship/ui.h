@@ -11,6 +11,7 @@
 #include "battleship/scoreboard.h"
 #include "battleship/menu.h"
 #include "battleship/player.h"
+#include "battleship/game.h"
 
 #define NUM_LOGO_ROWS 21
 
@@ -66,7 +67,7 @@ void BattleShipUI_Destroy();
 void BattleShipUI_ClearScreen();
 bool BattleShipUI_PrintMessage(char const * const message);
 void BattleShipUI_PrintLogo();
-bool BattleShipUI_PrintGrid(Grid_t * const grid, GridState_e * const states);
+bool BattleShipUI_PrintGrid(Grid_t const * const def_grid, Grid_t const * const off_grid);
 
 MainMenuOption_e BattleShipUI_MainMenu(char * message);
 PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid);
@@ -77,7 +78,7 @@ bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice);
 bool BattleShipUI_ReadCoord(Coord_t *location);
 bool BattleShipUI_ReadHeading(Heading_e *heading);
 
-void BattleShipUI_GameScreen(Grid_t * const grid, GridState_e * const states);
+void BattleShipUI_GameScreen(Game_t const * const game);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 

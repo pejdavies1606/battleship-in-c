@@ -69,31 +69,31 @@ bool BattleShipUI_PrintMessage(char const * const message)
 }
 
 bool BattleShipUI_PrintGrid(
-   Grid_t * const grid,
-   GridState_e * const states)
+   Grid_t const * const def_grid,
+   Grid_t const * const off_grid)
 {
    bool result = false;
-   if (grid)
+   if (def_grid)
    {
       result = true;
-      for (int row = GRID_ROW_TITLE; row < (int)(grid->rows + 1); row++)
+      for (int row = GRID_ROW_TITLE; row < (int)(def_grid->rows + 1); row++)
       {
          static char line[MAX_BUFFER_SIZE] = {0};
          size_t line_pos = 0;
          if (Grid_GetRowStr(
-                 grid,
-                 NULL,
+                 def_grid,
+                 false,
                  row,
                  line,
                  MAX_BUFFER_SIZE,
                  &line_pos))
          {
-            if (states)
+            if (off_grid)
             {
                line[line_pos++] = ' ';
                if (!Grid_GetRowStr(
-                       grid,
-                       states,
+                       off_grid,
+                       true,
                        row,
                        line,
                        MAX_BUFFER_SIZE,

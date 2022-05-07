@@ -27,6 +27,7 @@ typedef struct
    Coord_t location;
    Heading_e heading;
    uint hits;
+   bool sunk;
 } Ship_t;
 
 typedef struct
@@ -56,11 +57,14 @@ static inline Ship_Info_t const * Ship_GetInfo(const ShipType_e type)
       if (type == SHIP_TABLE[i].type)
       {
          info = &SHIP_TABLE[i];
+         break;
       }
    }
    return info;
 }
 
 Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i);
+
+bool Ship_Hit(Ship_t * const ship);
 
 #endif /* BATTLESHIP_SHIP_H_ */

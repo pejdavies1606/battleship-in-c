@@ -181,22 +181,15 @@ static bool _ProcPlaceMenu(Player_t *player, PlaceMenuOption_e placeChoice)
 static bool _ProcBeginGame(Game_t * const game)
 {
    bool result = false;
+   int round = 0;
+   Coord_t target = {0};
    if (game)
    {
       bool stop = false;
       do
       {
          result = true;
-         int round = 0;
-         BattleShipUI_GameScreen(
-            &game->players[0].grid,
-            game->players[1].grid.states);
-#ifdef DEBUG
-         BattleShipUI_GameScreen(
-            &game->players[1].grid,
-            game->players[0].grid.states);
-#endif
-         Coord_t target;
+         BattleShipUI_GameScreen(game);
          result = BattleShipUI_ReadCoord(&target);
          if (!result) break;
          result = _ProcTurn(&target, &game->players[1]);

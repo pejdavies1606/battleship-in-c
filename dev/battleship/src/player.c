@@ -92,12 +92,20 @@ bool Player_HitShip(
    if (player && sunk)
    {
       Ship_t * const ship = _GetShip(player, ship_type);
-      Ship_Info_t const * const ship_info = Ship_GetInfo(ship_type);
-      if (ship && ship_info)
+      if (ship)
       {
-         ship->hits++;
-         *sunk = (ship->hits == ship_info->length);
-         result = true;
+         result = Ship_Hit(ship);
+         if (result)
+         {
+            *sunk = ship->sunk;
+            if (ship->sunk)
+            {
+               result = Grid_SinkShip(
+                   &player->grid,
+                   player->grid.states,
+                   ship);
+            }
+         }
       }
    }
    return result;
