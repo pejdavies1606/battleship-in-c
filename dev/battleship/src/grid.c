@@ -245,27 +245,16 @@ bool Grid_GetRowStr(
                i = row * (int)(grid->cols) + col;
                state = grid->states[i];
                ship = grid->ships[i];
-               if (off_grid)
+               // show ship type if not hit or sunk on defense grid
+               // only reveal ship type on offense grid when sunk
+               if ((!off_grid && GRID_STATE_BLANK == state) ||
+                   (off_grid && GRID_STATE_SUNK == state))
                {
-                  if (state == GRID_STATE_SUNK)
-                  {
-                     Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
-                  }
-                  else
-                  {
-                     Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
-                  }
+                  Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
                }
                else
                {
-                  if (state == GRID_STATE_BLANK)
-                  {
-                     Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
-                  }
-                  else
-                  {
-                     Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
-                  }
+                  Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
                }
                result = _AppendLine(
                    line,
