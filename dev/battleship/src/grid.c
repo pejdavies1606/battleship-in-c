@@ -65,6 +65,39 @@ static bool _SetState(
    Ship_t const * const ship,
    GridState_e state);
 
+static bool _IsValidLine(
+    Grid_t const *const grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos);
+
+static bool _AppendRowTitle(
+    Grid_t const *const grid,
+    bool const off_grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos);
+
+static bool _AppendRowHeader(
+    Grid_t const *const grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos);
+
+static bool _AppendRowFooter(
+    Grid_t const *const grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos);
+
+static bool _AppendRowData(
+    Grid_t const *const grid,
+    bool const off_grid,
+    int const row,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos);
+
 static bool _AppendLine(
    char * const line,
    size_t const line_size,
@@ -109,180 +142,32 @@ bool Grid_GetRowStr(
     size_t const line_size,
     size_t *const line_pos)
 {
-   GridMeta_t const * meta = NULL;
-   char cell_str[SIZE_CELL_STR + 1] = {0};
-   ShipType_e ship = SHIP_NONE;
-   GridState_e state = GRID_STATE_BLANK;
-   int i = 0;
-   size_t len = 0;
    bool result = false;
-
-   // TODO split row cases into subroutines
-
-   if (grid &&
-       _IsValidMeta(&grid->meta) &&
-       line &&
-       line_size > 0 &&
-       line_pos &&
-       *line_pos < line_size)
+   if (_IsValidLine(grid, line, line_size, line_pos))
    {
-      meta = &grid->meta;
       if (row == GRID_ROW_TITLE)
       {
-         // title row
-         result = _AppendLine(
-             line,
-             line_size,
-             line_pos,
-             meta->row_width - 1,
-             (off_grid) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
-             SIZE_TITLE_STR);
-         // row filler
-         len =
-            LEN_GRID_SIDE +
-            6 * LEN_GRID_SPACE -
-            meta->row_width -
-            SIZE_TITLE_STR;
-         RepeatChar(
-             line + *line_pos,
-             len,
-             ' ');
-         *line_pos += len - 1;
+         result = _AppendRowTitle(
+            grid, off_grid, line, line_size, line_pos);
       }
       else if (row == GRID_ROW_HEADER)
       {
-         // header row
-         // grid corner
-         result = _AppendLine(
-             line,
-             line_size,
-             line_pos,
-             meta->row_width - 1,
-             meta->corner_str,
-             LEN_GRID_SPACE);
-         if (result)
-         {
-            // column labels
-            for (uint col = 0; col < grid->cols; col++)
-            {
-               cell_str[0] = '\0';
-               result = (Coord_ColToChar(
-                             (int)col,
-                             &cell_str[0]) &&
-                         _AppendLine(
-                             line,
-                             line_size,
-                             line_pos,
-                             LEN_GRID_SPACE,
-                             cell_str,
-                             meta->col_width));
-               if (!result)
-               {
-                  break;
-               }
-            }
-         }
-         if (result)
-         {
-            // grid corner
-            result = _AppendLine(
-                line,
-                line_size,
-                line_pos,
-                LEN_GRID_SPACE,
-                STR_GRID_CORNER,
-                LEN_GRID_SPACE);
-         }
+         result = _AppendRowHeader(
+            grid, line, line_size, line_pos);
       }
       else if (row == (int)grid->rows)
       {
-         // footer row
-         // grid corner
-         // row filler
-         // grid corner
-         result = _AppendLine(
-                      line,
-                      line_size,
-                      line_pos,
-                      meta->row_width - 1,
-                      meta->corner_str,
-                      LEN_GRID_SPACE) &&
-                  _AppendLine(
-                      line,
-                      line_size,
-                      line_pos,
-                      LEN_GRID_SPACE,
-                      meta->side_str,
-                      LEN_GRID_SIDE - 1) &&
-                  _AppendLine(
-                      line,
-                      line_size,
-                      line_pos,
-                      LEN_GRID_SPACE,
-                      STR_GRID_CORNER,
-                      LEN_GRID_SPACE);
+         result = _AppendRowFooter(
+            grid, line, line_size, line_pos);
+
       }
       else
       {
-         // numbered rows
-         result = true;
-         // row label
-         if (snprintf(
-                 line + *line_pos, line_size - *line_pos,
-                 "%*u", (int)meta->row_width, row + 1) > 0)
-         {
-            *line_pos += (meta->row_width);
-         }
-         else
-         {
-            result = false;
-         }
-         if (result)
-         {
-            // cell states
-            for (int col = 0; col < (int)grid->cols; col++)
-            {
-               i = row * (int)(grid->cols) + col;
-               state = grid->states[i];
-               ship = grid->ships[i];
-               // show ship type if not hit or sunk on defense grid
-               // only reveal ship type on offense grid when sunk
-               if ((!off_grid && GRID_STATE_BLANK == state) ||
-                   (off_grid && GRID_STATE_SUNK == state))
-               {
-                  Grid_ShipTypeToStr(ship, cell_str, SIZE_CELL_STR + 1);
-               }
-               else
-               {
-                  Grid_StateToStr(state, cell_str, SIZE_CELL_STR + 1);
-               }
-               result = _AppendLine(
-                   line,
-                   line_size,
-                   line_pos,
-                   LEN_GRID_SPACE,
-                   cell_str,
-                   meta->col_width);
-               if (!result)
-               {
-                  break;
-               }
-            }
-         }
-         if (result)
-         {
-            // column filler
-            result = _AppendLine(
-                line,
-                line_size,
-                line_pos,
-                LEN_GRID_SPACE,
-                STR_GRID_SIDE_V,
-                LEN_GRID_SPACE);
-         }
+         result = _AppendRowData(
+            grid, off_grid, row,
+            line, line_size, line_pos);
       }
    }
-
    return result;
 }
 
@@ -564,6 +449,209 @@ bool _SetState(
                states[loc.row * (int)grid->cols + loc.col] = state;
             }
          }
+      }
+   }
+   return result;
+}
+
+bool _IsValidLine(
+    Grid_t const *const grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos)
+{
+   return (grid &&
+       _IsValidMeta(&grid->meta) &&
+       line &&
+       line_size > 0 &&
+       line_pos &&
+       *line_pos < line_size);
+}
+
+bool _AppendRowTitle(
+    Grid_t const *const grid,
+    bool const off_grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos)
+{
+   bool result = false;
+   size_t len = 0;
+   if (_IsValidLine(grid, line, line_size, line_pos))
+   {
+      // title row
+      result = _AppendLine(line, line_size, line_pos,
+          grid->meta.row_width - 1,
+          (off_grid) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
+          SIZE_TITLE_STR);
+      // row filler
+      len =
+          LEN_GRID_SIDE +
+          6 * LEN_GRID_SPACE -
+          grid->meta.row_width -
+          SIZE_TITLE_STR;
+      RepeatChar(
+          line + *line_pos,
+          len,
+          ' ');
+      *line_pos += len - 1;
+   }
+   return result;
+}
+
+bool _AppendRowHeader(
+    Grid_t const *const grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos)
+{
+   bool result = false;
+   char cell_str[SIZE_CELL_STR + 1] = {0};
+   if (_IsValidLine(grid, line, line_size, line_pos))
+   {
+      // header row
+      // grid corner
+      result = _AppendLine(
+          line, line_size, line_pos,
+          grid->meta.row_width - 1,
+          grid->meta.corner_str,
+          LEN_GRID_SPACE);
+      if (result)
+      {
+         // column labels
+         for (uint col = 0; col < grid->cols; col++)
+         {
+            cell_str[0] = '\0';
+            result = (Coord_ColToChar(
+                          (int)col,
+                          &cell_str[0]) &&
+                      _AppendLine(
+                          line, line_size, line_pos,
+                          LEN_GRID_SPACE,
+                          cell_str,
+                          grid->meta.col_width));
+            if (!result)
+               break;
+         }
+      }
+      if (result)
+      {
+         // grid corner
+         result = _AppendLine(
+             line, line_size, line_pos,
+             LEN_GRID_SPACE,
+             STR_GRID_CORNER,
+             LEN_GRID_SPACE);
+      }
+   }
+   return result;
+}
+
+bool _AppendRowFooter(
+    Grid_t const *const grid,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos)
+{
+   bool result = false;
+   if (_IsValidLine(grid, line, line_size, line_pos))
+   {
+      // footer row
+      // grid corner
+      // row filler
+      // grid corner
+      result = _AppendLine(
+                   line,
+                   line_size,
+                   line_pos,
+                   grid->meta.row_width - 1,
+                   grid->meta.corner_str,
+                   LEN_GRID_SPACE) &&
+               _AppendLine(
+                   line,
+                   line_size,
+                   line_pos,
+                   LEN_GRID_SPACE,
+                   grid->meta.side_str,
+                   LEN_GRID_SIDE - 1) &&
+               _AppendLine(
+                   line,
+                   line_size,
+                   line_pos,
+                   LEN_GRID_SPACE,
+                   STR_GRID_CORNER,
+                   LEN_GRID_SPACE);
+   }
+   return result;
+}
+
+bool _AppendRowData(
+    Grid_t const *const grid,
+    bool const off_grid,
+    int const row,
+    char *const line,
+    size_t const line_size,
+    size_t *const line_pos)
+{
+   bool result = false;
+   char cell_str[SIZE_CELL_STR + 1] = {0};
+   ShipType_e ship = SHIP_NONE;
+   GridState_e state = GRID_STATE_BLANK;
+   if (_IsValidLine(grid, line, line_size, line_pos))
+   {
+      // numbered rows
+      result = true;
+      // row label
+      if (snprintf(
+              line + *line_pos, line_size - *line_pos,
+              "%*u", (int)grid->meta.row_width, row + 1) > 0)
+      {
+         *line_pos += (grid->meta.row_width);
+      }
+      else
+      {
+         result = false;
+      }
+      if (result)
+      {
+         // cell states
+         for (int col = 0; col < (int)grid->cols; col++)
+         {
+            int i = row * (int)(grid->cols) + col;
+            state = grid->states[i];
+            ship = grid->ships[i];
+            // show ship type if not hit or sunk on defense grid
+            // only reveal ship type on offense grid when sunk
+            if ((!off_grid && GRID_STATE_BLANK == state) ||
+                (off_grid && GRID_STATE_SUNK == state))
+            {
+               Grid_ShipTypeToStr(
+                  ship, cell_str, SIZE_CELL_STR + 1);
+            }
+            else
+            {
+               Grid_StateToStr(
+                  state, cell_str, SIZE_CELL_STR + 1);
+            }
+            result = _AppendLine(
+                line, line_size, line_pos,
+                LEN_GRID_SPACE,
+                cell_str,
+                grid->meta.col_width);
+            if (!result)
+            {
+               break;
+            }
+         }
+      }
+      if (result)
+      {
+         // column filler
+         result = _AppendLine(
+             line, line_size, line_pos,
+             LEN_GRID_SPACE,
+             STR_GRID_SIDE_V,
+             LEN_GRID_SPACE);
       }
    }
    return result;
