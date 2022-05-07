@@ -73,45 +73,32 @@ bool BattleShipUI_PrintGrid(
    Grid_t const * const off_grid)
 {
    bool result = false;
+   static Line_t line = {0};
    if (def_grid)
    {
       result = true;
       for (int row = GRID_ROW_TITLE; row < (int)(def_grid->rows + 1); row++)
       {
-         static char line[MAX_BUFFER_SIZE] = {0};
-         size_t line_pos = 0;
-         if (Grid_GetRowStr(
-                 def_grid,
-                 false,
-                 row,
-                 line,
-                 MAX_BUFFER_SIZE,
-                 &line_pos))
+         if (Grid_GetRowStr(def_grid, &line, row, false))
          {
             if (off_grid)
             {
-               line[line_pos++] = ' ';
-               if (!Grid_GetRowStr(
-                       off_grid,
-                       true,
-                       row,
-                       line,
-                       MAX_BUFFER_SIZE,
-                       &line_pos))
+               line.buffer[line.position++] = ' ';
+               if (!Grid_GetRowStr(off_grid, &line, row, true))
                {
                   result = false;
                   break;
                }
             }
-            printf("%s\n", line);
+            printf("%s\n", line.buffer);
          }
          else
          {
             result = false;
             break;
          }
-         memset(line, 0, MAX_BUFFER_SIZE);
-         line_pos = 0;
+         memset(line.buffer, 0, MAX_BUFFER_SIZE);
+         line.position = 0U;
       }
    }
    return result;

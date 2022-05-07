@@ -9,6 +9,9 @@
 #define BATTLESHIP_GRID_H_
 
 #include "battleship/commondefs.h"
+#include "battleship/coord.h"
+#include "battleship/ship.h"
+#include "battleship/line.h"
 
 #define SIZE_GRID (MAX_COORD_ROW * MAX_COORD_COL)
 
@@ -67,11 +70,9 @@ bool Grid_Clear(
 
 bool Grid_GetRowStr(
    Grid_t const * const def_grid,
-   bool const off_grid,
+   Line_t * const line,
    int const row,
-   char * const line,
-   size_t const line_size,
-   size_t * const line_pos);
+   bool const off_grid);
 
 bool Grid_PlaceShip(
    Grid_t * const grid,

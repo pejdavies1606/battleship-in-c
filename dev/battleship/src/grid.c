@@ -5,7 +5,6 @@
  *      Author: pejdavies1606
  */
 
-#include "battleship/ui.h"
 #include "battleship/util.h"
 #include "battleship/grid.h"
 
@@ -65,46 +64,33 @@ static bool _SetState(
    Ship_t const * const ship,
    GridState_e state);
 
-static bool _IsValidLine(
-    Grid_t const *const grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos);
-
 static bool _AppendRowTitle(
     Grid_t const *const grid,
-    bool const off_grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos);
+    Line_t *const line,
+    bool const off_grid);
 
 static bool _AppendRowHeader(
     Grid_t const *const grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos);
+    Line_t *const line);
 
 static bool _AppendRowFooter(
     Grid_t const *const grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos);
+    Line_t *const line);
 
 static bool _AppendRowData(
     Grid_t const *const grid,
-    bool const off_grid,
+    Line_t *const line,
     int const row,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos);
+    bool const off_grid);
 
 static bool _AppendLine(
-   char * const line,
-   size_t const line_size,
-   size_t * const line_pos,
+   Line_t * const line,
    size_t const space_len,
    char const * const str,
    size_t const str_size);
+
+static bool _IsValidLine(
+    Line_t *const line);
 
 bool Grid_Init(
    Grid_t * const grid)
@@ -136,36 +122,29 @@ bool Grid_Clear(
 
 bool Grid_GetRowStr(
     Grid_t const *const grid,
-    bool const off_grid,
+    Line_t * const line,
     int const row,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos)
+    bool const off_grid)
 {
    bool result = false;
-   if (_IsValidLine(grid, line, line_size, line_pos))
+   if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
       if (row == GRID_ROW_TITLE)
       {
-         result = _AppendRowTitle(
-            grid, off_grid, line, line_size, line_pos);
+         result = _AppendRowTitle(grid, line, off_grid);
       }
       else if (row == GRID_ROW_HEADER)
       {
-         result = _AppendRowHeader(
-            grid, line, line_size, line_pos);
+         result = _AppendRowHeader(grid, line);
       }
       else if (row == (int)grid->rows)
       {
-         result = _AppendRowFooter(
-            grid, line, line_size, line_pos);
+         result = _AppendRowFooter(grid, line);
 
       }
       else
       {
-         result = _AppendRowData(
-            grid, off_grid, row,
-            line, line_size, line_pos);
+         result = _AppendRowData(grid, line, row, off_grid);
       }
    }
    return result;
@@ -454,33 +433,18 @@ bool _SetState(
    return result;
 }
 
-bool _IsValidLine(
-    Grid_t const *const grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos)
-{
-   return (grid &&
-       _IsValidMeta(&grid->meta) &&
-       line &&
-       line_size > 0 &&
-       line_pos &&
-       *line_pos < line_size);
-}
-
 bool _AppendRowTitle(
     Grid_t const *const grid,
-    bool const off_grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos)
+    Line_t *const line,
+    bool const off_grid)
 {
    bool result = false;
    size_t len = 0;
-   if (_IsValidLine(grid, line, line_size, line_pos))
+   if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
       // title row
-      result = _AppendLine(line, line_size, line_pos,
+      result = _AppendLine(
+          line,
           grid->meta.row_width - 1,
           (off_grid) ? STR_TITLE_OFFENSE : STR_TITLE_DEFENSE,
           SIZE_TITLE_STR);
@@ -491,28 +455,26 @@ bool _AppendRowTitle(
           grid->meta.row_width -
           SIZE_TITLE_STR;
       RepeatChar(
-          line + *line_pos,
+          line->buffer + line->position,
           len,
           ' ');
-      *line_pos += len - 1;
+      line->position += len - 1;
    }
    return result;
 }
 
 bool _AppendRowHeader(
     Grid_t const *const grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos)
+    Line_t *const line)
 {
    bool result = false;
    char cell_str[SIZE_CELL_STR + 1] = {0};
-   if (_IsValidLine(grid, line, line_size, line_pos))
+   if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
       // header row
       // grid corner
       result = _AppendLine(
-          line, line_size, line_pos,
+          line,
           grid->meta.row_width - 1,
           grid->meta.corner_str,
           LEN_GRID_SPACE);
@@ -526,7 +488,7 @@ bool _AppendRowHeader(
                           (int)col,
                           &cell_str[0]) &&
                       _AppendLine(
-                          line, line_size, line_pos,
+                          line,
                           LEN_GRID_SPACE,
                           cell_str,
                           grid->meta.col_width));
@@ -538,7 +500,7 @@ bool _AppendRowHeader(
       {
          // grid corner
          result = _AppendLine(
-             line, line_size, line_pos,
+             line,
              LEN_GRID_SPACE,
              STR_GRID_CORNER,
              LEN_GRID_SPACE);
@@ -549,12 +511,10 @@ bool _AppendRowHeader(
 
 bool _AppendRowFooter(
     Grid_t const *const grid,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos)
+    Line_t *const line)
 {
    bool result = false;
-   if (_IsValidLine(grid, line, line_size, line_pos))
+   if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
       // footer row
       // grid corner
@@ -562,22 +522,16 @@ bool _AppendRowFooter(
       // grid corner
       result = _AppendLine(
                    line,
-                   line_size,
-                   line_pos,
                    grid->meta.row_width - 1,
                    grid->meta.corner_str,
                    LEN_GRID_SPACE) &&
                _AppendLine(
                    line,
-                   line_size,
-                   line_pos,
                    LEN_GRID_SPACE,
                    grid->meta.side_str,
                    LEN_GRID_SIDE - 1) &&
                _AppendLine(
                    line,
-                   line_size,
-                   line_pos,
                    LEN_GRID_SPACE,
                    STR_GRID_CORNER,
                    LEN_GRID_SPACE);
@@ -587,26 +541,24 @@ bool _AppendRowFooter(
 
 bool _AppendRowData(
     Grid_t const *const grid,
-    bool const off_grid,
+    Line_t *const line,
     int const row,
-    char *const line,
-    size_t const line_size,
-    size_t *const line_pos)
+    bool const off_grid)
 {
    bool result = false;
    char cell_str[SIZE_CELL_STR + 1] = {0};
    ShipType_e ship = SHIP_NONE;
    GridState_e state = GRID_STATE_BLANK;
-   if (_IsValidLine(grid, line, line_size, line_pos))
+   if (grid && _IsValidMeta(&grid->meta) && _IsValidLine(line))
    {
       // numbered rows
       result = true;
       // row label
       if (snprintf(
-              line + *line_pos, line_size - *line_pos,
+              line->buffer + line->position, MAX_BUFFER_SIZE - line->position,
               "%*u", (int)grid->meta.row_width, row + 1) > 0)
       {
-         *line_pos += (grid->meta.row_width);
+         line->position += (grid->meta.row_width);
       }
       else
       {
@@ -634,7 +586,7 @@ bool _AppendRowData(
                   state, cell_str, SIZE_CELL_STR + 1);
             }
             result = _AppendLine(
-                line, line_size, line_pos,
+                line,
                 LEN_GRID_SPACE,
                 cell_str,
                 grid->meta.col_width);
@@ -648,7 +600,7 @@ bool _AppendRowData(
       {
          // column filler
          result = _AppendLine(
-             line, line_size, line_pos,
+             line,
              LEN_GRID_SPACE,
              STR_GRID_SIDE_V,
              LEN_GRID_SPACE);
@@ -658,31 +610,32 @@ bool _AppendRowData(
 }
 
 bool _AppendLine(
-    char * const line,
-    size_t const line_size,
-    size_t * const line_pos,
+    Line_t * const line,
     size_t const space_len,
     char const * const str,
     size_t const str_size)
 {
    bool result = false;
-   if (line &&
-      line_size > 0 &&
-      line_pos &&
-      *line_pos < line_size)
+   if (_IsValidLine(line))
    {
       if (snprintf(
-              line + *line_pos,
-              line_size - *line_pos,
+              line->buffer + line->position,
+              MAX_BUFFER_SIZE - line->position,
               "%*s%*s",
               (int)space_len,
               "",
               (int)str_size,
               str) > 0)
       {
-         *line_pos += (space_len + str_size);
+         line->position += (space_len + str_size);
          result = true;
       }
    }
    return result;
+}
+
+bool _IsValidLine(
+    Line_t * const line)
+{
+   return (line && line->position < MAX_BUFFER_SIZE);
 }

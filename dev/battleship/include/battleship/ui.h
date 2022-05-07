@@ -12,6 +12,8 @@
 #include "battleship/menu.h"
 #include "battleship/player.h"
 #include "battleship/game.h"
+#include "battleship/grid.h"
+#include "battleship/line.h"
 
 #define NUM_LOGO_ROWS 21
 
@@ -20,15 +22,7 @@
 #define NUM_SHIP_MENU_OPTIONS 2 // must match enum below
 #define NUM_SHIP_MENU_OPTIONS_FULL (1 + NUM_SHIPS)
 
-#define SIZE_CELL_STR 1 // not including null terminator
-
-#define STR_TITLE_DEFENSE "DEFENSE"
-#define STR_TITLE_OFFENSE "OFFENSE"
-#define SIZE_TITLE_STR 7
-
 #define MAX_READ_RETRIES 3
-
-#define MAX_BUFFER_SIZE 80
 
 typedef enum MainMenuOption
 {
