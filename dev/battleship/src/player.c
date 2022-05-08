@@ -86,24 +86,27 @@ bool Player_PlaceShipsAuto(Player_t * const player)
 bool Player_HitShip(
    Player_t * const player,
    ShipType_e const ship_type,
-   bool * const sunk)
+   bool * const sunk,
+   bool * const sunk_all)
 {
    bool result = false;
-   if (player && sunk)
+   if (player && sunk && sunk_all)
    {
       Ship_t * const ship = _GetShip(player, ship_type);
       if (ship)
       {
-         result = Ship_Hit(ship);
-         if (result)
+         result = Ship_Hit(ship, sunk);
+         if (result && *sunk)
          {
-            *sunk = ship->sunk;
-            if (ship->sunk)
+            result = Grid_SinkShip(
+                &player->grid,
+                player->grid.states,
+                ship);
+            if (result)
             {
-               result = Grid_SinkShip(
-                   &player->grid,
-                   player->grid.states,
-                   ship);
+               player->sunk_ships++;
+               player->sunk_all = (1 == player->sunk_ships);
+               *sunk_all = player->sunk_all;
             }
          }
       }

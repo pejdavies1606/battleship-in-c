@@ -17,6 +17,8 @@ typedef struct Player
 {
    Grid_t grid;
    Ship_t ships[NUM_SHIPS];
+   uint sunk_ships;
+   bool sunk_all;
 } Player_t;
 
 bool Player_Init(
@@ -33,6 +35,7 @@ bool Player_PlaceShipsAuto(
 bool Player_HitShip(
    Player_t * const player,
    ShipType_e const ship_type,
-   bool * const sunk);
+   bool * const sunk,
+   bool * const sunk_all);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

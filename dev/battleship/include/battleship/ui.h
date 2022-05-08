@@ -72,7 +72,7 @@ bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice);
 bool BattleShipUI_ReadCoord(Coord_t *location);
 bool BattleShipUI_ReadHeading(Heading_e *heading);
 
-void BattleShipUI_GameScreen(Game_t const * const game);
+bool BattleShipUI_GameScreen(Game_t const * const game);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 

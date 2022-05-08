@@ -59,10 +59,10 @@ static bool _SetShip(
    ShipType_e const type);
 
 static bool _SetState(
-   Grid_t const * const grid,
-   GridState_e * const states,
-   Ship_t const * const ship,
-   GridState_e state);
+    Grid_t const *const grid,
+    GridState_e *const states,
+    Ship_t const *const ship,
+    GridState_e const state);
 
 static bool _AppendRowTitle(
     Grid_t const *const grid,
@@ -210,9 +210,9 @@ bool Grid_PlaceHit(
 }
 
 bool Grid_SinkShip(
-   const Grid_t * const grid,
-   GridState_e * const states,
-   Ship_t const * const ship)
+    Grid_t const *const grid,
+    GridState_e *const states,
+    Ship_t const *const ship)
 {
    bool result = false;
    if (grid && states && ship)
@@ -404,10 +404,10 @@ bool _SetShip(
 }
 
 bool _SetState(
-   Grid_t const * const grid,
-   GridState_e * const states,
-   Ship_t const * const ship,
-   GridState_e state)
+    Grid_t const *const grid,
+    GridState_e *const states,
+    Ship_t const *const ship,
+    GridState_e const state)
 {
    bool result = false;
    if (states && ship)

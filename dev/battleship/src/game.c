@@ -33,7 +33,7 @@
 static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const shipChoice);
 static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const placeChoice);
 static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice);
-static bool _ProcTurn(Coord_t const * const target, Player_t * const player);
+static bool _ProcTurn(Coord_t const * const target, Player_t * const player, bool *const sunk_all);
 
 bool BattleShip_Game_Init(Game_t * const game)
 {
@@ -109,6 +109,9 @@ bool BattleShip_Game_Start(Game_t * const game)
          mainChoice = BattleShipUI_MainMenu("");
 #endif
          result = _ProcMainMenu(game, mainChoice);
+#ifdef DEBUG
+         mainChoice = MENU_OPTION_MAIN_RETURN;
+#endif
       }
       while (result && mainChoice != MENU_OPTION_MAIN_RETURN);
    }
@@ -188,20 +191,26 @@ static bool _ProcBeginGame(Game_t * const game)
       bool stop = false;
       do
       {
-         result = true;
-         BattleShipUI_GameScreen(game);
+         result = BattleShipUI_GameScreen(game);
+         if (!result)
+            break;
+         if (stop)
+            break;
+
          result = BattleShipUI_ReadCoord(&target);
-         if (!result) break;
-         result = _ProcTurn(&target, &game->players[1]);
+         if (!result)
+            break;
+
+         result = _ProcTurn(&target, &game->players[1], &stop);
+         if (!result)
+            break;
 #if 0
          result = BattleShipAI_GetCoord(&target);
          if (!result) break;
          result = _ProcTurn(&target, &game->players[0]);
 #endif
          round++;
-         // TODO check all ships sunk
-      }
-      while (result && !stop);
+      } while (result);
    }
    /* loop
     *    increment round counter
@@ -252,7 +261,8 @@ static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice
 
 bool _ProcTurn(
    Coord_t const * const target,
-   Player_t * const player)
+   Player_t * const player,
+   bool *const sunk_all)
 {
    bool result = false;
    if (target && player)
@@ -265,7 +275,7 @@ bool _ProcTurn(
       if (result && hit_ship != SHIP_NONE)
       {
          bool sunk = false;
-         result = Player_HitShip(player, hit_ship, &sunk);
+         result = Player_HitShip(player, hit_ship, &sunk, sunk_all);
          if (result && sunk)
          {
             // TODO print message

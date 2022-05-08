@@ -65,6 +65,6 @@ static inline Ship_Info_t const * Ship_GetInfo(const ShipType_e type)
 
 Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i);
 
-bool Ship_Hit(Ship_t * const ship);
+bool Ship_Hit(Ship_t * const ship, bool *const sunk);
 
 #endif /* BATTLESHIP_SHIP_H_ */

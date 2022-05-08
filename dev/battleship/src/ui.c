@@ -275,25 +275,33 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(
    return result;
 }
 
-void BattleShipUI_GameScreen(
+bool BattleShipUI_GameScreen(
    Game_t const * const game)
 {
-   BattleShipUI_ClearScreen();
-   BattleShipUI_PrintGrid(
-       &game->players[0].grid,
-       &game->players[1].grid);
+   bool result = false;
+   if (game)
+   {
+      BattleShipUI_ClearScreen();
+      result = BattleShipUI_PrintGrid(
+          &game->players[0].grid,
+          &game->players[1].grid);
 #ifdef DEBUG
-   BattleShipUI_PrintGrid(
-       &game->players[1].grid,
-       &game->players[0].grid);
+      if (result)
+      {
+         result = BattleShipUI_PrintGrid(
+             &game->players[1].grid,
+             &game->players[0].grid);
+      }
 #endif
-   /* screen
-    *    defense + offense grids
-    *    scoreboards
-    *    round counter
-    *    player turns
-    *       hit/miss
-    *       ship sunk
-    *       all ships sunk
-    */
+      /* screen
+       *    defense + offense grids
+       *    scoreboards
+       *    round counter
+       *    player turns
+       *       hit/miss
+       *       ship sunk
+       *       all ships sunk
+       */
+   }
+   return result;
 }
