@@ -33,7 +33,11 @@
 static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * const shipChoice);
 static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const placeChoice);
 static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice);
-static bool _ProcTurn(Coord_t const * const target, Player_t * const player, bool *const sunk_all);
+static bool _ProcTurn(
+   Coord_t const *const target,
+   Player_t *const player,
+   bool *const sunk_all,
+   Line_t *const message);
 
 bool BattleShip_Game_Init(Game_t * const game)
 {
@@ -189,9 +193,10 @@ static bool _ProcBeginGame(Game_t * const game)
    if (game)
    {
       bool stop = false;
+      Line_t message = {0};
       do
       {
-         result = BattleShipUI_GameScreen(game);
+         result = BattleShipUI_GameScreen(game, &message);
          if (!result)
             break;
          if (stop)
@@ -201,7 +206,11 @@ static bool _ProcBeginGame(Game_t * const game)
          if (!result)
             break;
 
-         result = _ProcTurn(&target, &game->players[1], &stop);
+         result = _ProcTurn(
+            &target,
+            &game->players[1],
+            &stop,
+            &message);
          if (!result)
             break;
 #if 0
@@ -260,25 +269,34 @@ static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice
 }
 
 bool _ProcTurn(
-   Coord_t const * const target,
-   Player_t * const player,
-   bool *const sunk_all)
+   Coord_t const *const target,
+   Player_t *const player,
+   bool *const sunk_all,
+   Line_t *const message)
 {
    bool result = false;
    if (target && player)
    {
       ShipType_e hit_ship = SHIP_NONE;
-      result = Grid_PlaceHit(
-          &player->grid,
-          player->grid.states,
-          target, &hit_ship);
+      bool sunk = false;
+      result = Player_PlaceHit(
+          player,
+          target,
+          &hit_ship,
+          &sunk,
+          sunk_all);
       if (result && hit_ship != SHIP_NONE)
       {
-         bool sunk = false;
-         result = Player_HitShip(player, hit_ship, &sunk, sunk_all);
-         if (result && sunk)
+         Ship_Info_t const *ship_info =
+            Ship_GetInfo(hit_ship);
+         if (sunk)
          {
-            // TODO print message
+            snprintf(
+               message->buffer,
+               MAX_BUFFER_SIZE,
+               "%s %s",
+               "sunk",
+               ship_info->name);
          }
       }
    }

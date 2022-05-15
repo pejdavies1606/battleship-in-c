@@ -7,6 +7,12 @@
 
 #include "battleship/player.h"
 
+static bool _HitShip(
+   Player_t *const player,
+   ShipType_e const ship_type,
+   bool *const sunk,
+   bool *const sunk_all);
+
 static Ship_t* _GetShip(
    Player_t * const player,
    ShipType_e const type);
@@ -83,7 +89,33 @@ bool Player_PlaceShipsAuto(Player_t * const player)
    return result;
 }
 
-bool Player_HitShip(
+bool Player_PlaceHit(
+   Player_t * const player,
+   Coord_t const * const target,
+   ShipType_e *const hit_ship,
+   bool *const sunk,
+   bool *const sunk_all)
+{
+   bool result = false;
+   if (player && target && hit_ship && sunk && sunk_all)
+   {
+      result = Grid_PlaceHit(
+          &player->grid,
+          player->grid.states,
+          target, hit_ship);
+      if (result && hit_ship != SHIP_NONE)
+      {
+         result = _HitShip(
+            player,
+            *hit_ship,
+            sunk,
+            sunk_all);
+      }
+   }
+   return result;
+}
+
+bool _HitShip(
    Player_t * const player,
    ShipType_e const ship_type,
    bool * const sunk,

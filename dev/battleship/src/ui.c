@@ -218,7 +218,8 @@ void BattleShipUI_Destroy(void)
    }
 }
 
-MainMenuOption_e BattleShipUI_MainMenu(char * message)
+MainMenuOption_e BattleShipUI_MainMenu(
+   char const * const message)
 {
    MainMenuOption_e choice = MENU_OPTION_MAIN_RETURN;
    bool read_success = false;
@@ -276,7 +277,8 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(
 }
 
 bool BattleShipUI_GameScreen(
-   Game_t const * const game)
+   Game_t const * const game,
+   Line_t const *const message)
 {
    bool result = false;
    if (game)
@@ -293,6 +295,10 @@ bool BattleShipUI_GameScreen(
              &game->players[0].grid);
       }
 #endif
+      if (result && message)
+      {
+         result = BattleShipUI_PrintMessage(message->buffer);
+      }
       /* screen
        *    defense + offense grids
        *    scoreboards

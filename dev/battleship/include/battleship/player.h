@@ -32,10 +32,11 @@ bool Player_PlaceShip(
 bool Player_PlaceShipsAuto(
    Player_t * const player);
 
-bool Player_HitShip(
-   Player_t * const player,
-   ShipType_e const ship_type,
-   bool * const sunk,
-   bool * const sunk_all);
+bool Player_PlaceHit(
+   Player_t *const player,
+   Coord_t const *const target,
+   ShipType_e *const hit_ship,
+   bool *const sunk,
+   bool *const sunk_all);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

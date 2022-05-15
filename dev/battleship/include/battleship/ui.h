@@ -59,20 +59,28 @@ bool BattleShipUI_Init();
 void BattleShipUI_Destroy();
 
 void BattleShipUI_ClearScreen();
-bool BattleShipUI_PrintMessage(char const * const message);
+bool BattleShipUI_PrintMessage(
+   char const *const message);
 void BattleShipUI_PrintLogo();
-bool BattleShipUI_PrintGrid(Grid_t const * const def_grid, Grid_t const * const off_grid);
+bool BattleShipUI_PrintGrid(
+   Grid_t const *const def_grid,
+   Grid_t const *const off_grid);
 
-MainMenuOption_e BattleShipUI_MainMenu(char * message);
-PlaceMenuOption_e BattleShipUI_PlaceMenu(Grid_t * const grid);
-ShipMenuChoice_t BattleShipUI_ShipMenuManual(Grid_t * const grid);
+MainMenuOption_e BattleShipUI_MainMenu(
+   char const *const message);
+PlaceMenuOption_e BattleShipUI_PlaceMenu(
+   Grid_t *const grid);
+ShipMenuChoice_t BattleShipUI_ShipMenuManual(
+   Grid_t *const grid);
 
 bool BattleShipUI_PrintMenu(Menu_t *menu);
 bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice);
 bool BattleShipUI_ReadCoord(Coord_t *location);
 bool BattleShipUI_ReadHeading(Heading_e *heading);
 
-bool BattleShipUI_GameScreen(Game_t const * const game);
+bool BattleShipUI_GameScreen(
+   Game_t const *const game,
+   Line_t const *const message);
 
 //void BattleShip_UI_Print_Scoreboard(Scoreboard_t *scoreboard);
 
