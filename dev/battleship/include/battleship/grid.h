@@ -54,8 +54,6 @@ typedef struct Grid
 {
    ShipType_e ships[SIZE_GRID];
    GridState_e states[SIZE_GRID];
-   uint rows;
-   uint cols;
    GridMeta_t meta;
 } Grid_t;
 

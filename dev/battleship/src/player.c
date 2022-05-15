@@ -71,8 +71,8 @@ bool Player_PlaceShipsAuto(Player_t * const player)
                do
                {
                   ship.location = Coord_InitRandom(
-                      0, (int)player->grid.rows,
-                      0, (int)player->grid.cols);
+                      0, MAX_COORD_ROW,
+                      0, MAX_COORD_COL);
                   ship.heading = Heading_InitRandom();
                   result = Grid_PlaceShip(
                       &player->grid,

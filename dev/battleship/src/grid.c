@@ -7,6 +7,7 @@
 
 #include "battleship/util.h"
 #include "battleship/grid.h"
+#include "battleship/input.h"
 
 typedef struct GridStateInfo
 {
@@ -98,8 +99,6 @@ bool Grid_Init(
    bool result = false;
    if (grid)
    {
-      grid->rows = MAX_COORD_ROW;
-      grid->cols = MAX_COORD_COL;
       memset(grid->ships, 0, SIZE_GRID * sizeof(ShipType_e));
       memset(grid->states, 0, SIZE_GRID * sizeof(GridState_e));
       result = _InitMeta(&grid->meta);
@@ -137,7 +136,7 @@ bool Grid_GetRowStr(
       {
          result = _AppendRowHeader(grid, line);
       }
-      else if (row == (int)grid->rows)
+      else if (row == MAX_COORD_ROW)
       {
          result = _AppendRowFooter(grid, line);
 
@@ -201,7 +200,7 @@ bool Grid_PlaceHit(
       result = _CheckBorder(grid, target, &border);
       if (result && border)
       {
-         int i = target->row * (int)grid->cols + target->col;
+         int i = target->row * MAX_COORD_COL + target->col;
          *hit_ship = grid->ships[i];
          states[i] = (*hit_ship != SHIP_NONE)
                          ? GRID_STATE_HIT
@@ -340,7 +339,7 @@ bool _CheckShip(
             else
             {
                ShipType_e ship_type =
-                   grid->ships[loc.row * (int)grid->cols + loc.col];
+                   grid->ships[loc.row * MAX_COORD_COL + loc.col];
                // Allow collision with same type to enable replacing
                if (ship_type != SHIP_NONE && ship_type != ship->type)
                {
@@ -369,8 +368,9 @@ bool _CheckBorder(
    bool result = false;
    if (grid && loc && valid)
    {
-      *valid = (loc->row >= 0 && loc->row < (int)grid->rows &&
-                loc->col >= 0 && loc->col < (int)grid->cols);
+      bool col = ValidateRange(loc->col, 0, MAX_COORD_COL);
+      bool row = ValidateRange(loc->row, 0, MAX_COORD_ROW);
+      *valid = (col && row);
       result = true;
    }
    return result;
@@ -398,7 +398,7 @@ bool _SetShip(
             if (!result) break;
             if (border)
             {
-               ships[loc.row * (int)grid->cols + loc.col] = type;
+               ships[loc.row * MAX_COORD_COL + loc.col] = type;
             }
          }
       }
@@ -428,7 +428,7 @@ bool _SetState(
             if (!result) break;
             if (border)
             {
-               states[loc.row * (int)grid->cols + loc.col] = state;
+               states[loc.row * MAX_COORD_COL + loc.col] = state;
             }
          }
       }
@@ -483,7 +483,7 @@ bool _AppendRowHeader(
       if (result)
       {
          // column labels
-         for (uint col = 0; col < grid->cols; col++)
+         for (uint col = 0; col < MAX_COORD_COL; col++)
          {
             result = Coord_ColToChar(
                 (int)col,
@@ -574,9 +574,9 @@ bool _AppendRowData(
       if (result)
       {
          // cell states
-         for (int col = 0; col < (int)grid->cols; col++)
+         for (int col = 0; col < MAX_COORD_COL; col++)
          {
-            int i = row * (int)(grid->cols) + col;
+            int i = row * MAX_COORD_COL + col;
             state = grid->states[i];
             ship = grid->ships[i];
             // show ship type if not hit or sunk on defense grid

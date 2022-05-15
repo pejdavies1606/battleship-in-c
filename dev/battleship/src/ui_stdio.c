@@ -77,7 +77,7 @@ bool BattleShipUI_PrintGrid(
    if (def_grid)
    {
       result = true;
-      for (int row = GRID_ROW_TITLE; row < (int)(def_grid->rows + 1); row++)
+      for (int row = GRID_ROW_TITLE; row < (MAX_COORD_ROW + 1); row++)
       {
          if (Grid_GetRowStr(def_grid, &line, row, false))
          {
