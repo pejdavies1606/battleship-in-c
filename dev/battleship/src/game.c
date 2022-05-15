@@ -203,16 +203,13 @@ static bool _ProcBeginGame(Game_t * const game)
             break;
          if (stop)
             break;
-         
          memset(
             message.buffer,
             0,
             MAX_BUFFER_SIZE * sizeof(char));
-
          result = BattleShipUI_ReadCoord(&target);
          if (!result)
             break;
-
          result = _ProcTurn(
             &target,
             &game->players[1],
@@ -220,14 +217,12 @@ static bool _ProcBeginGame(Game_t * const game)
             &message);
          if (!result)
             break;
-
          result = BattleShipAI_GetCoord(
             &game->players[1],
             game->players[0].grid.states,
             &target);
          if (!result)
             break;
-
          result = _ProcTurn(
             &target,
             &game->players[0],
@@ -235,22 +230,9 @@ static bool _ProcBeginGame(Game_t * const game)
             &message);
          if (!result)
             break;
-
-
          round++;
       } while (result);
    }
-   /* loop
-    *    increment round counter
-    *    update screen
-    *    player turns
-    *       manual
-    *          read location
-    *       auto
-    *          random stage
-    *          circle stage
-    *            line stage
-    */
    return result;
 }
 
@@ -321,8 +303,3 @@ bool _ProcTurn(
    }
    return result;
 }
-
-// state machine
-/*void BattleShip_Ai() // TODO
-{
-}*/
