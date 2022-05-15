@@ -36,4 +36,6 @@ typedef struct InputData
 bool ParseInput(const char *input, InputData_t *output);
 bool ParseInt(const char *input, int *output);
 
+bool ValidateRange(int val, int min, int max);
+
 #endif /* _INPUT_H_ */

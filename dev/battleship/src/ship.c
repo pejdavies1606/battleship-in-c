@@ -7,7 +7,9 @@
 
 #include "battleship/ship.h"
 
-Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i)
+Coord_t Ship_GetPoint(
+   Ship_t const * const ship,
+   uint const i)
 {
    Coord_t point = { 0 };
    if (ship)
@@ -34,16 +36,20 @@ Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i)
    return point;
 }
 
-bool Ship_Hit(Ship_t * const ship, bool *const sunk)
+bool Ship_Hit(
+   Ship_t * const ship,
+   bool *const sunk)
 {
    bool result = false;
    if (ship && sunk)
    {
-      Ship_Info_t const * const ship_info = Ship_GetInfo(ship->type);
+      Ship_Info_t const * const ship_info =
+         Ship_GetInfo(ship->type);
       if (ship_info)
       {
          ship->hits++;
-         ship->sunk = (ship->hits == ship_info->length);
+         ship->sunk =
+            (ship->hits == ship_info->length);
          *sunk = ship->sunk;
          result = true;
       }

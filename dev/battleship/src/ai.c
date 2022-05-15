@@ -1,5 +1,6 @@
 #include "battleship/comp_player.h"
 #include "battleship/player.h"
+#include "battleship/input.h"
 
 bool _ChangeState(
    Comp_Player_t *const comp);
@@ -48,9 +49,10 @@ bool _ChangeState(Comp_Player_t *const comp)
       case SEARCH_RANDOM:
          if (comp->hit)
          {
-            //comp->search = SEARCH_CIRCLE;
+            comp->search = SEARCH_CIRCLE;
             comp->circle.heading = Heading_InitRandom();
             int i = rand() % 2;
+            debug_print("%d\n", i);
             comp->circle.clockwise = (0 == i);
             comp->circle.tries = NUM_HEADINGS - 1;
          }
@@ -104,6 +106,10 @@ bool _ActionState(
             result = _GetCoordRandom(
                states,
                target);
+            if (result)
+            {
+               comp->circle.centre = *target;
+            }
             break;
       case SEARCH_CIRCLE:
             result = _GetCoordCircle(
@@ -140,6 +146,10 @@ bool _GetCoordRandom(
          {
             *target = COORD_TABLE[i++];
          }
+         else
+         {
+            debug_print("%s\n","out of coords");
+         }
 #else
          *target = Coord_InitRandom(
              0, MAX_COORD_ROW,
@@ -161,7 +171,29 @@ bool _GetCoordCircle(
    bool result = false;
    if (states && target && circle)
    {
-      // TODO
+      while (!result && circle->tries > 0)
+      {
+         Ship_t ship = {0};
+         ship.location = circle->centre;
+         ship.heading = circle->heading;
+         *target = Ship_GetPoint(&ship, 1);
+         bool col = ValidateRange(
+             target->col,
+             0,
+             MAX_COORD_COL);
+         bool row = ValidateRange(
+             target->row,
+             0,
+             MAX_COORD_ROW);
+         result = (col && row);
+         if (!result)
+         {
+            circle->heading = Heading_GetNext(
+                circle->heading,
+                circle->clockwise);
+            circle->tries--;
+         }
+      }
    }
    return result;
 }

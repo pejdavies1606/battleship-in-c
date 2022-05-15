@@ -322,7 +322,8 @@ bool _CheckShip(
    bool result = false;
    if (grid && ship && status)
    {
-      Ship_Info_t const *ship_info = Ship_GetInfo(ship->type);
+      Ship_Info_t const *const ship_info =
+         Ship_GetInfo(ship->type);
       if (ship_info)
       {
          *status = GRID_STATUS_OK;

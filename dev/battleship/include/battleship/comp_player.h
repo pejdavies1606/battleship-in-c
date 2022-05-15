@@ -26,6 +26,7 @@ typedef struct CircleSearch
    Heading_e heading;
    bool clockwise;
    uint tries;
+   Coord_t centre;
 } CircleSearch_t;
 
 typedef struct Comp_Player
@@ -39,7 +40,6 @@ typedef struct Comp_Player
    int clock;
    uint pos;
    int line_pos;
-   Coord_t centre;
    Coord_t target;
    Coord_t adjacent[NUM_ADJACENT];
    Coord_t line[NUM_LINE];

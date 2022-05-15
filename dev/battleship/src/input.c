@@ -9,8 +9,6 @@
 static bool _ParseCoord(const char *input, Coord_t *output);
 static bool _ParseHeading(const char *input, Heading_e *output);
 
-static bool _ValidateRange(int val, int min, int max);
-
 bool ParseInput(const char *str, InputData_t *data)
 {
    bool result = false;
@@ -20,18 +18,18 @@ bool ParseInput(const char *str, InputData_t *data)
       {
       case INPUT_INT:
          result = ParseInt(str, &data->val.ival) &&
-            _ValidateRange(
+            ValidateRange(
                (int) data->val.ival,
                (int) data->min.ival,
                (int) data->max.ival);
          break;
       case INPUT_COORD:
          result = _ParseCoord(str, &data->val.loc) &&
-            _ValidateRange(
+            ValidateRange(
                data->val.loc.col,
                0,
                data->max.loc.col) &&
-            _ValidateRange(
+            ValidateRange(
                data->val.loc.row,
                0,
                data->max.loc.row);
@@ -119,7 +117,7 @@ bool _ParseHeading(const char * const str, Heading_e * const hdg)
    return result;
 }
 
-bool _ValidateRange(int val, int min, int max)
+bool ValidateRange(int val, int min, int max)
 {
    bool result = false;
    result = (val >= min) && (val < max);
