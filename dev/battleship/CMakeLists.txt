@@ -1,4 +1,5 @@
 set (SRC_FILES
+   "src/ai.c"
    "src/coord.c"
    "src/game.c"
    "src/grid.c"

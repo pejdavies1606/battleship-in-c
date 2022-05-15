@@ -9,10 +9,21 @@
 #define BATTLESHIP_COMP_PLAYER_H_
 
 #include "battleship/commondefs.h"
+#include "battleship/coord.h"
+
+#define NUM_ADJACENT 4
+#define NUM_LINE     9
+
+typedef enum SearchState
+{
+   SEARCH_RANDOM,
+   SEARCH_CIRCLE,
+   SEARCH_LINE,
+} SearchState_e;
 
 typedef struct
 {
-   uint stage;
+   SearchState_e search;
    uint pass;
    uint scan_stage;
    uint start;
@@ -25,5 +36,9 @@ typedef struct
    Coord_t line[NUM_LINE];
    bool first_time;
 } Comp_Player_t;
+
+bool BattleShipAI_GetCoord(
+   Comp_Player_t *const comp,
+   Coord_t *const target);
 
 #endif /* BATTLESHIP_COMP_PLAYER_H_ */

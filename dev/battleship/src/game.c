@@ -201,6 +201,11 @@ static bool _ProcBeginGame(Game_t * const game)
             break;
          if (stop)
             break;
+         
+         memset(
+            message.buffer,
+            0,
+            MAX_BUFFER_SIZE * sizeof(char));
 
          result = BattleShipUI_ReadCoord(&target);
          if (!result)
@@ -211,13 +216,23 @@ static bool _ProcBeginGame(Game_t * const game)
             &game->players[1],
             &stop,
             &message);
+
          if (!result)
             break;
-#if 0
-         result = BattleShipAI_GetCoord(&target);
-         if (!result) break;
-         result = _ProcTurn(&target, &game->players[0]);
-#endif
+
+         result = BattleShipAI_GetCoord(
+            &game->comps[1],
+            &target);
+
+         if (!result)
+            break;
+
+         result = _ProcTurn(
+            &target,
+            &game->players[0],
+            &stop,
+            &message);
+
          round++;
       } while (result);
    }
