@@ -2,6 +2,8 @@
 #include "battleship/player.h"
 #include "battleship/input.h"
 
+#include "battleship/ui.h"
+
 bool _ChangeState(
    Comp_Player_t *const comp);
 
@@ -118,7 +120,7 @@ bool _ActionState(
                &comp->circle);
             break;
          default:
-            break;
+           break;
       }
    }
    return result;
@@ -135,21 +137,7 @@ bool _GetCoordRandom(
       do
       {
 #ifdef DEBUG
-         static uint i = 0U;
-         #define NUM_COORDS 2
-         static Coord_t COORD_TABLE[NUM_COORDS] =
-             {
-                 {1, 7},
-                 {2, 7},
-             };
-         if (i < NUM_COORDS)
-         {
-            *target = COORD_TABLE[i++];
-         }
-         else
-         {
-            debug_print("%s\n","out of coords");
-         }
+         result = BattleShipUI_ReadCoord(target);
 #else
          *target = Coord_InitRandom(
              0, MAX_COORD_ROW,
@@ -177,21 +165,27 @@ bool _GetCoordCircle(
          ship.location = circle->centre;
          ship.heading = circle->heading;
          *target = Ship_GetPoint(&ship, 1);
-         bool col = ValidateRange(
-             target->col,
-             0,
-             MAX_COORD_COL);
          bool row = ValidateRange(
              target->row,
              0,
              MAX_COORD_ROW);
-         result = (col && row);
+         bool col = ValidateRange(
+             target->col,
+             0,
+             MAX_COORD_COL);
+         result = (row && col);
+         circle->tries--;
+         debug_print(
+            "%u (%d,%d) %d\n",
+            circle->tries,
+            target->row,
+            target->col,
+            result);
          if (!result)
          {
             circle->heading = Heading_GetNext(
                 circle->heading,
                 circle->clockwise);
-            circle->tries--;
          }
       }
    }
