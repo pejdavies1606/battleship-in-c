@@ -203,7 +203,9 @@ bool Grid_PlaceHit(
       {
          int i = target->row * (int)grid->cols + target->col;
          *hit_ship = grid->ships[i];
-         states[i] = (*hit_ship != SHIP_NONE) ? GRID_STATE_HIT : GRID_STATE_MISS;
+         states[i] = (*hit_ship != SHIP_NONE)
+                         ? GRID_STATE_HIT
+                         : GRID_STATE_MISS;
       }
    }
    return result;

@@ -21,7 +21,7 @@ typedef enum SearchState
    SEARCH_LINE,
 } SearchState_e;
 
-typedef struct
+typedef struct Comp_Player
 {
    SearchState_e search;
    uint pass;
@@ -36,9 +36,5 @@ typedef struct
    Coord_t line[NUM_LINE];
    bool first_time;
 } Comp_Player_t;
-
-bool BattleShipAI_GetCoord(
-   Comp_Player_t *const comp,
-   Coord_t *const target);
 
 #endif /* BATTLESHIP_COMP_PLAYER_H_ */

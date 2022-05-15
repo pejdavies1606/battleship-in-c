@@ -8,10 +8,11 @@
 #ifndef BATTLESHIP_PLAYER_H_
 #define BATTLESHIP_PLAYER_H_
 
-#include "battleship/ship.h"
 #include "battleship/commondefs.h"
-#include "battleship/scoreboard.h"
+#include "battleship/comp_player.h"
 #include "battleship/grid.h"
+#include "battleship/scoreboard.h"
+#include "battleship/ship.h"
 
 typedef struct Player
 {
@@ -19,6 +20,7 @@ typedef struct Player
    Ship_t ships[NUM_SHIPS];
    uint sunk_ships;
    bool sunk_all;
+   Comp_Player_t comp;
 } Player_t;
 
 bool Player_Init(
@@ -38,5 +40,10 @@ bool Player_PlaceHit(
    ShipType_e *const hit_ship,
    bool *const sunk,
    bool *const sunk_all);
+
+bool BattleShipAI_GetCoord(
+   Player_t *const player,
+   GridState_e const *const states,
+   Coord_t *const target);
 
 #endif /* BATTLESHIP_PLAYER_H_ */

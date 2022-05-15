@@ -196,7 +196,9 @@ static bool _ProcBeginGame(Game_t * const game)
       Line_t message = {0};
       do
       {
-         result = BattleShipUI_GameScreen(game, &message);
+         result = BattleShipUI_GameScreen(
+            game,
+            &message);
          if (!result)
             break;
          if (stop)
@@ -216,14 +218,13 @@ static bool _ProcBeginGame(Game_t * const game)
             &game->players[1],
             &stop,
             &message);
-
          if (!result)
             break;
 
          result = BattleShipAI_GetCoord(
-            &game->comps[1],
+            &game->players[1],
+            game->players[0].grid.states,
             &target);
-
          if (!result)
             break;
 
@@ -232,6 +233,9 @@ static bool _ProcBeginGame(Game_t * const game)
             &game->players[0],
             &stop,
             &message);
+         if (!result)
+            break;
+
 
          round++;
       } while (result);
