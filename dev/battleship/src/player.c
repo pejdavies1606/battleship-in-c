@@ -103,7 +103,7 @@ bool Player_PlaceHit(
           &player->grid,
           player->grid.states,
           target, hit_ship);
-      if (result && hit_ship != SHIP_NONE)
+      if (result && *hit_ship != SHIP_NONE)
       {
          result = _HitShip(
             player,
@@ -137,7 +137,8 @@ bool _HitShip(
             if (result)
             {
                player->sunk_ships++;
-               player->sunk_all = (1 == player->sunk_ships);
+               player->sunk_all =
+                  (NUM_SHIPS == player->sunk_ships);
                *sunk_all = player->sunk_all;
             }
          }
