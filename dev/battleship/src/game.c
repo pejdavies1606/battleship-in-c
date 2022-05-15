@@ -35,6 +35,7 @@ static bool _ProcPlaceMenu(Player_t * const player, PlaceMenuOption_e const plac
 static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice);
 static bool _ProcTurn(
    Coord_t const *const target,
+   Comp_Player_t *const comp,
    Player_t *const player,
    bool *const sunk_all,
    Line_t *const message);
@@ -212,11 +213,13 @@ static bool _ProcBeginGame(Game_t * const game)
             break;
          result = _ProcTurn(
             &target,
+            &game->players[0].comp,
             &game->players[1],
             &stop,
             &message);
          if (!result)
             break;
+         memset(&target, 0, sizeof(Coord_t));
          result = BattleShipAI_GetCoord(
             &game->players[1],
             game->players[0].grid.states,
@@ -225,6 +228,7 @@ static bool _ProcBeginGame(Game_t * const game)
             break;
          result = _ProcTurn(
             &target,
+            &game->players[1].comp,
             &game->players[0],
             &stop,
             &message);
@@ -271,17 +275,19 @@ static bool _ProcMainMenu(Game_t * const game, MainMenuOption_e const mainChoice
 
 bool _ProcTurn(
    Coord_t const *const target,
+   Comp_Player_t *const comp,
    Player_t *const player,
    bool *const sunk_all,
    Line_t *const message)
 {
    bool result = false;
-   if (target && player)
+   if (target && comp && player && sunk_all && message)
    {
       ShipType_e hit_ship = SHIP_NONE;
       bool sunk = false;
       result = Player_PlaceHit(
           player,
+          comp,
           target,
           &hit_ship,
           &sunk,

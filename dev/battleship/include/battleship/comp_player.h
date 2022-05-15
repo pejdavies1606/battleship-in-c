@@ -21,9 +21,18 @@ typedef enum SearchState
    SEARCH_LINE,
 } SearchState_e;
 
+typedef struct CircleSearch
+{
+   Heading_e heading;
+   bool clockwise;
+   uint tries;
+} CircleSearch_t;
+
 typedef struct Comp_Player
 {
+   bool hit;
    SearchState_e search;
+   CircleSearch_t circle;
    uint pass;
    uint scan_stage;
    uint start;

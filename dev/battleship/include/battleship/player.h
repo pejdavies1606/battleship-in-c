@@ -36,6 +36,7 @@ bool Player_PlaceShipsAuto(
 
 bool Player_PlaceHit(
    Player_t *const player,
+   Comp_Player_t *const comp,
    Coord_t const *const target,
    ShipType_e *const hit_ship,
    bool *const sunk,

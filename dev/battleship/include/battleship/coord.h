@@ -38,6 +38,7 @@ typedef struct HeadingInfo
    char c;
 } HeadingInfo_t;
 
+// TODO remove HEADING_UNKNOWN from HEADING_TABLE
 #define LEN_HEADING 1
 #define NUM_HEADINGS 5
 static const HeadingInfo_t HEADING_TABLE[NUM_HEADINGS] =
@@ -73,6 +74,33 @@ static inline Heading_e Heading_GetHdg(char c)
       }
    }
    return h;
+}
+
+static inline Heading_e Heading_GetNext(
+   Heading_e const heading,
+   bool const clockwise)
+{
+   Heading_e result = HEADING_UNKNOWN;
+   switch(heading)
+   {
+      case HEADING_NORTH:
+         result = (clockwise) ? HEADING_EAST : HEADING_WEST;
+         break;
+      case HEADING_EAST:
+         result = (clockwise) ? HEADING_SOUTH : HEADING_NORTH;
+         break;
+      case HEADING_SOUTH:
+         result = (clockwise) ? HEADING_WEST : HEADING_EAST;
+         break;
+      case HEADING_WEST:
+         result = (clockwise) ? HEADING_NORTH : HEADING_SOUTH;
+         break;
+      case HEADING_UNKNOWN: /* fall through */
+      default:
+         // result initialised to HEADING_UNKNOWN
+         break;
+   }
+   return result;
 }
 
 static inline Coord_t Coord_Init(int row, int col)

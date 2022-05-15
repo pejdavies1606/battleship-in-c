@@ -91,25 +91,30 @@ bool Player_PlaceShipsAuto(Player_t * const player)
 
 bool Player_PlaceHit(
    Player_t * const player,
+   Comp_Player_t *const comp,
    Coord_t const * const target,
    ShipType_e *const hit_ship,
    bool *const sunk,
    bool *const sunk_all)
 {
    bool result = false;
-   if (player && target && hit_ship && sunk && sunk_all)
+   if (player && comp && target && hit_ship && sunk && sunk_all)
    {
       result = Grid_PlaceHit(
           &player->grid,
           player->grid.states,
           target, hit_ship);
-      if (result && *hit_ship != SHIP_NONE)
+      if (result)
       {
-         result = _HitShip(
-            player,
-            *hit_ship,
-            sunk,
-            sunk_all);
+         comp->hit = (*hit_ship != SHIP_NONE);
+         if (comp->hit)
+         {
+            result = _HitShip(
+                player,
+                *hit_ship,
+                sunk,
+                sunk_all);
+         }
       }
    }
    return result;
@@ -138,7 +143,7 @@ bool _HitShip(
             {
                player->sunk_ships++;
                player->sunk_all =
-                  (NUM_SHIPS == player->sunk_ships);
+                   (NUM_SHIPS == player->sunk_ships);
                *sunk_all = player->sunk_all;
             }
          }
