@@ -11,9 +11,6 @@
 #include "battleship/commondefs.h"
 #include "battleship/coord.h"
 
-#define NUM_ADJACENT 4
-#define NUM_LINE     9
-
 typedef enum SearchState
 {
    SEARCH_RANDOM,
@@ -24,26 +21,17 @@ typedef enum SearchState
 typedef struct CircleSearch
 {
    Heading_e heading;
-   bool clockwise;
+   bool direction;
    uint tries;
    Coord_t centre;
-} CircleSearch_t;
+   uint pos;
+} Search_t;
 
 typedef struct Comp_Player
 {
    bool hit;
-   SearchState_e search;
-   CircleSearch_t circle;
-   uint pass;
-   uint scan_stage;
-   uint start;
-   int clock;
-   uint pos;
-   int line_pos;
-   Coord_t target;
-   Coord_t adjacent[NUM_ADJACENT];
-   Coord_t line[NUM_LINE];
-   bool first_time;
+   SearchState_e state;
+   Search_t search;
 } Comp_Player_t;
 
 #endif /* BATTLESHIP_COMP_PLAYER_H_ */

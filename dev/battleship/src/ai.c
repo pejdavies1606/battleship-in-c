@@ -19,7 +19,12 @@ bool _GetCoordRandom(
 bool _GetCoordCircle(
    GridState_e const *const states,
    Coord_t *const target,
-   CircleSearch_t *const circle);
+   Search_t *const search);
+
+bool _GetCoordLine(
+   GridState_e const *const states,
+   Coord_t *const target,
+   Search_t *const search);
 
 bool BattleShipAI_GetCoord(
    Player_t *const player,
@@ -46,36 +51,39 @@ bool _ChangeState(Comp_Player_t *const comp)
    bool result = false;
    if (comp)
    {
-      switch (comp->search)
+      switch (comp->state)
       {
       case SEARCH_RANDOM:
          if (comp->hit)
          {
-            comp->search = SEARCH_CIRCLE;
-            comp->circle.heading = Heading_InitRandom();
+            // TODO check search for existing hits and goto line
+            comp->state = SEARCH_CIRCLE;
+            comp->search.heading = Heading_InitRandom();
             int i = rand() % 2;
             debug_print("%d\n", i);
-            comp->circle.clockwise = (0 == i);
-            comp->circle.tries = NUM_HEADINGS - 1;
+            comp->search.direction = (1 == i);
+            comp->search.tries = NUM_HEADINGS - 1;
          }
          result = true;
          break;
       case SEARCH_CIRCLE:
          if (comp->hit)
          {
-            comp->search = SEARCH_LINE;
+            comp->state = SEARCH_LINE;
+            comp->search.tries = 2;
+            comp->search.pos = 2;
          }
          else
          {
-            if (0 == comp->circle.tries)
+            if (0 == comp->search.tries)
             {
-               comp->search = SEARCH_RANDOM;
+               comp->state = SEARCH_RANDOM;
             }
             else
             {
-               comp->circle.heading = Heading_GetNext(
-                   comp->circle.heading,
-                   comp->circle.clockwise);
+               comp->search.heading = Heading_GetNext(
+                   comp->search.heading,
+                   comp->search.direction);
             }
          }
          result = true;
@@ -83,9 +91,31 @@ bool _ChangeState(Comp_Player_t *const comp)
       case SEARCH_LINE:
          if (!comp->hit)
          {
-            // TODO
+            if (0 == comp->search.tries)
+            {
+               comp->state = SEARCH_RANDOM;
+            }
+            else
+            {
+               // return to centre
+               comp->search.pos = 1;
+               // rotate twice to get opposite direction
+               comp->search.heading = Heading_GetNext(
+                   comp->search.heading,
+                   comp->search.direction);
+               comp->search.heading = Heading_GetNext(
+                   comp->search.heading,
+                   comp->search.direction);
+            }
          }
-         //result = true;
+         else
+         {
+            // extend range
+            comp->search.pos++;
+            // continue in same direction
+            comp->search.tries++;
+         }
+         result = true;
       default:
          // result initialised to false
          break;
@@ -102,7 +132,7 @@ bool _ActionState(
    bool result = false;
    if (comp && states && target)
    {
-      switch(comp->search)
+      switch(comp->state)
       {
          case SEARCH_RANDOM:
             result = _GetCoordRandom(
@@ -110,14 +140,20 @@ bool _ActionState(
                target);
             if (result)
             {
-               comp->circle.centre = *target;
+               comp->search.centre = *target;
             }
             break;
       case SEARCH_CIRCLE:
             result = _GetCoordCircle(
                states,
                target,
-               &comp->circle);
+               &comp->search);
+            break;
+      case SEARCH_LINE:
+            result = _GetCoordLine(
+               states,
+               target,
+               &comp->search);
             break;
          default:
            break;
@@ -154,16 +190,16 @@ bool _GetCoordRandom(
 bool _GetCoordCircle(
    GridState_e const *const states,
    Coord_t *const target,
-   CircleSearch_t *const circle)
+   Search_t *const search)
 {
    bool result = false;
-   if (states && target && circle)
+   if (states && target && search)
    {
-      while (!result && circle->tries > 0)
+      while (!result && search->tries > 0)
       {
          Ship_t ship = {0};
-         ship.location = circle->centre;
-         ship.heading = circle->heading;
+         ship.location = search->centre;
+         ship.heading = search->heading;
          *target = Ship_GetPoint(&ship, 1);
          bool row = ValidateRange(
              target->row,
@@ -174,18 +210,65 @@ bool _GetCoordCircle(
              0,
              MAX_COORD_COL);
          result = (row && col);
-         circle->tries--;
+         search->tries--;
          debug_print(
             "%u (%d,%d) %d\n",
-            circle->tries,
+            search->tries,
             target->row,
             target->col,
             result);
          if (!result)
          {
-            circle->heading = Heading_GetNext(
-                circle->heading,
-                circle->clockwise);
+            search->heading = Heading_GetNext(
+                search->heading,
+                search->direction);
+         }
+      }
+   }
+   return result;
+}
+
+bool _GetCoordLine(
+   GridState_e const *const states,
+   Coord_t *const target,
+   Search_t *const search)
+{
+   bool result = false;
+   if (states && target && search)
+   {
+      while (!result && search->tries > 0)
+      {
+         Ship_t ship = {0};
+         ship.location = search->centre;
+         ship.heading = search->heading;
+         *target = Ship_GetPoint(&ship, search->pos);
+         bool row = ValidateRange(
+             target->row,
+             0,
+             MAX_COORD_ROW);
+         bool col = ValidateRange(
+             target->col,
+             0,
+             MAX_COORD_COL);
+         result = (row && col);
+         search->tries--;
+         debug_print(
+            "%u (%d,%d) %d\n",
+            search->tries,
+            target->row,
+            target->col,
+            result);
+         if (!result)
+         {
+            // return to centre
+            search->pos = 1;
+            // rotate twice to get opposite direction
+            search->heading = Heading_GetNext(
+                search->heading,
+                search->direction);
+            search->heading = Heading_GetNext(
+                search->heading,
+                search->direction);
          }
       }
    }
