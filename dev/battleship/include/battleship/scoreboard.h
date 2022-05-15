@@ -12,7 +12,7 @@
 
 typedef struct ScoreboardEntity
 {
-   char * name;
+   char const *name;
    uint score;
    uint total;
 } ScoreboardEntity_t;

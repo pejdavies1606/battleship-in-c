@@ -11,7 +11,7 @@
 typedef struct GridStateInfo
 {
    GridState_e state;
-   char const * str;
+   char const *str;
 } GridStateInfo_t;
 
 #define GRID_STATE_COUNT 4
@@ -23,9 +23,9 @@ static GridStateInfo_t const GRID_STATE_TABLE[GRID_STATE_COUNT] =
    { GRID_STATE_SUNK,  "X" },
 };
 
-char const * Grid_GetStateStr(GridState_e const state)
+char const *Grid_GetStateStr(GridState_e const state)
 {
-   char const * str = NULL;
+   char const *str = NULL;
    for (uint i = 0; i < GRID_STATE_COUNT; i++)
    {
       if (state == GRID_STATE_TABLE[i].state)
@@ -37,25 +37,25 @@ char const * Grid_GetStateStr(GridState_e const state)
 }
 
 static bool _InitMeta(
-   GridMeta_t * const meta);
+   GridMeta_t *const meta);
 
 static bool _IsValidMeta(
-   GridMeta_t const * const meta);
+   GridMeta_t const *const meta);
 
 static bool _CheckShip(
-   const Grid_t * const grid,
-   const Ship_t * const ship,
-   GridStatus_e * const status);
+   Grid_t const *const grid,
+   Ship_t const *const ship,
+   GridStatus_e *const status);
 
 static bool _CheckBorder(
-   Grid_t const * const grid,
-   Coord_t const * const loc,
-   bool * const valid);
+   Grid_t const *const grid,
+   Coord_t const *const loc,
+   bool *const valid);
 
 static bool _SetShip(
-   Grid_t const * const grid,
-   ShipType_e * const ships,
-   Ship_t const * const ship,
+   Grid_t const *const grid,
+   ShipType_e *const ships,
+   Ship_t const *const ship,
    ShipType_e const type);
 
 static bool _SetState(
@@ -84,16 +84,16 @@ static bool _AppendRowData(
     bool const off_grid);
 
 static bool _AppendLine(
-   Line_t * const line,
+   Line_t *const line,
    size_t const space_len,
-   char const * const str,
+   char const *const str,
    size_t const str_len);
 
 static bool _IsValidLine(
     Line_t *const line);
 
 bool Grid_Init(
-   Grid_t * const grid)
+   Grid_t *const grid)
 {
    bool result = false;
    if (grid)
@@ -108,7 +108,7 @@ bool Grid_Init(
 }
 
 bool Grid_Clear(
-   Grid_t * const grid)
+   Grid_t *const grid)
 {
    bool result = false;
    if (grid)
@@ -122,7 +122,7 @@ bool Grid_Clear(
 
 bool Grid_GetRowStr(
     Grid_t const *const grid,
-    Line_t * const line,
+    Line_t *const line,
     int const row,
     bool const off_grid)
 {
@@ -151,10 +151,10 @@ bool Grid_GetRowStr(
 }
 
 bool Grid_PlaceShip(
-   Grid_t * const grid,
-   Ship_t * const player_ship,
-   const Ship_t * const ship,
-   GridStatus_e * const status)
+   Grid_t *const grid,
+   Ship_t *const player_ship,
+   const Ship_t *const ship,
+   GridStatus_e *const status)
 {
    bool result = false;
    if (grid && ship && status)
@@ -189,10 +189,10 @@ bool Grid_PlaceShip(
 }
 
 bool Grid_PlaceHit(
-   Grid_t const * const grid,
-   GridState_e * const states,
-   Coord_t const * const target,
-   ShipType_e * const hit_ship)
+   Grid_t const *const grid,
+   GridState_e *const states,
+   Coord_t const *const target,
+   ShipType_e *const hit_ship)
 {
    bool result = false;
    if (grid && states && target && hit_ship)
@@ -224,11 +224,11 @@ bool Grid_SinkShip(
 
 bool Grid_ShipTypeToStr(
    ShipType_e const type,
-   char const * const str,
+   char const *const str,
    size_t const str_len)
 {
-   Ship_Info_t const * ship_info = NULL;
-   char const * state_str = NULL;
+   Ship_Info_t const *ship_info = NULL;
+   char const *state_str = NULL;
    bool result = false;
    if (str && str_len > 0)
    {
@@ -256,11 +256,11 @@ bool Grid_ShipTypeToStr(
 
 bool Grid_StateToStr(
    GridState_e const state,
-   char const * const str,
+   char const *const str,
    size_t const str_len)
 {
    bool result = false;
-   char const * state_str = NULL;
+   char const *state_str = NULL;
    if (str && str_len > 0)
    {
       state_str = Grid_GetStateStr(state);
@@ -273,7 +273,7 @@ bool Grid_StateToStr(
 }
 
 bool _InitMeta(
-   GridMeta_t * const meta)
+   GridMeta_t *const meta)
 {
    bool result = false;
    if (meta)
@@ -300,7 +300,7 @@ bool _InitMeta(
 }
 
 bool _IsValidMeta(
-   GridMeta_t const * const meta)
+   GridMeta_t const *const meta)
 {
    bool result = false;
    if (meta)
@@ -313,14 +313,14 @@ bool _IsValidMeta(
 }
 
 bool _CheckShip(
-   const Grid_t * const grid,
-   const Ship_t * const ship,
-   GridStatus_e * const status)
+   Grid_t const *const grid,
+   Ship_t const *const ship,
+   GridStatus_e *const status)
 {
    bool result = false;
    if (grid && ship && status)
    {
-      const Ship_Info_t *ship_info = Ship_GetInfo(ship->type);
+      Ship_Info_t const *ship_info = Ship_GetInfo(ship->type);
       if (ship_info)
       {
          *status = GRID_STATUS_OK;
@@ -359,9 +359,9 @@ bool _CheckShip(
 }
 
 bool _CheckBorder(
-   Grid_t const * const grid,
-   Coord_t const * const loc,
-   bool * const valid)
+   Grid_t const *const grid,
+   Coord_t const *const loc,
+   bool *const valid)
 {
    bool result = false;
    if (grid && loc && valid)
@@ -374,15 +374,15 @@ bool _CheckBorder(
 }
 
 bool _SetShip(
-   Grid_t const * const grid,
-   ShipType_e * const ships,
-   Ship_t const * const ship,
+   Grid_t const *const grid,
+   ShipType_e *const ships,
+   Ship_t const *const ship,
    ShipType_e const type)
 {
    bool result = false;
    if (ships && ship)
    {
-      Ship_Info_t const * const ship_info =
+      Ship_Info_t const *const ship_info =
          Ship_GetInfo(ship->type);
       if (ship_info)
       {
@@ -412,7 +412,7 @@ bool _SetState(
    bool result = false;
    if (states && ship)
    {
-      Ship_Info_t const * const ship_info =
+      Ship_Info_t const *const ship_info =
          Ship_GetInfo(ship->type);
       if (ship_info)
       {
@@ -614,9 +614,9 @@ bool _AppendRowData(
 }
 
 bool _AppendLine(
-    Line_t * const line,
+    Line_t *const line,
     size_t const space_len,
-    char const * const str,
+    char const *const str,
     size_t const str_len)
 {
    bool result = false;
@@ -641,7 +641,7 @@ bool _AppendLine(
 }
 
 bool _IsValidLine(
-    Line_t * const line)
+    Line_t *const line)
 {
    return (line && line->position < MAX_BUFFER_SIZE);
 }

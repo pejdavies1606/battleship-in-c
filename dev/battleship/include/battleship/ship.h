@@ -33,7 +33,7 @@ typedef struct
 typedef struct
 {
    ShipType_e type;
-   char * name;
+   char const *name;
    uint length;
 } Ship_Info_t;
 
@@ -49,9 +49,10 @@ static Ship_Info_t const SHIP_TABLE[NUM_SHIPS] =
    { SHIP_AIRCRAFT_CARRIER,   "Aircraft Carrier",  5 }
 };
 
-static inline Ship_Info_t const * Ship_GetInfo(const ShipType_e type)
+static inline Ship_Info_t const *Ship_GetInfo(
+   ShipType_e const type)
 {
-   Ship_Info_t const * info = NULL;
+   Ship_Info_t const *info = NULL;
    for (uint i = 0; i < NUM_SHIPS; i++)
    {
       if (type == SHIP_TABLE[i].type)
@@ -63,8 +64,8 @@ static inline Ship_Info_t const * Ship_GetInfo(const ShipType_e type)
    return info;
 }
 
-Coord_t Ship_GetPoint(Ship_t const * const ship, uint const i);
+Coord_t Ship_GetPoint(Ship_t const *const ship, uint const i);
 
-bool Ship_Hit(Ship_t * const ship, bool *const sunk);
+bool Ship_Hit(Ship_t *const ship, bool *const sunk);
 
 #endif /* BATTLESHIP_SHIP_H_ */
