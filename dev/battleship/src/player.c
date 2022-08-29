@@ -114,6 +114,10 @@ bool Player_PlaceHit(
                 *hit_ship,
                 sunk,
                 sunk_all);
+            if (result)
+            {
+               comp->sunk = *sunk;
+            }
          }
       }
    }

@@ -54,20 +54,23 @@ bool _ChangeState(Comp_Player_t *const comp)
       switch (comp->state)
       {
       case SEARCH_RANDOM:
-         if (comp->hit)
+         if (!comp->sunk && comp->hit)
          {
             // TODO check search for existing hits and goto line
             comp->state = SEARCH_CIRCLE;
             comp->search.heading = Heading_InitRandom();
             int i = rand() % 2;
-            debug_print("%d\n", i);
             comp->search.direction = (1 == i);
             comp->search.tries = NUM_HEADINGS - 1;
          }
          result = true;
          break;
       case SEARCH_CIRCLE:
-         if (comp->hit)
+         if (comp->sunk)
+         {
+            comp->state = SEARCH_RANDOM;
+         }
+         else if (comp->hit)
          {
             comp->state = SEARCH_LINE;
             comp->search.tries = 2;
@@ -89,7 +92,18 @@ bool _ChangeState(Comp_Player_t *const comp)
          result = true;
          break;
       case SEARCH_LINE:
-         if (!comp->hit)
+         if (comp->sunk)
+         {
+            comp->state = SEARCH_RANDOM;
+         }
+         else if (comp->hit)
+         {
+            // extend range
+            comp->search.pos++;
+            // continue in same direction
+            comp->search.tries++;
+         }
+         else
          {
             if (0 == comp->search.tries)
             {
@@ -108,14 +122,8 @@ bool _ChangeState(Comp_Player_t *const comp)
                    comp->search.direction);
             }
          }
-         else
-         {
-            // extend range
-            comp->search.pos++;
-            // continue in same direction
-            comp->search.tries++;
-         }
          result = true;
+         break;
       default:
          // result initialised to false
          break;
@@ -211,12 +219,6 @@ bool _GetCoordCircle(
              MAX_COORD_COL);
          result = (row && col);
          search->tries--;
-         debug_print(
-            "%u (%d,%d) %d\n",
-            search->tries,
-            target->row,
-            target->col,
-            result);
          if (!result)
          {
             search->heading = Heading_GetNext(
@@ -252,12 +254,6 @@ bool _GetCoordLine(
              MAX_COORD_COL);
          result = (row && col);
          search->tries--;
-         debug_print(
-            "%u (%d,%d) %d\n",
-            search->tries,
-            target->row,
-            target->col,
-            result);
          if (!result)
          {
             // return to centre

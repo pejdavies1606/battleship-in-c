@@ -30,6 +30,7 @@ typedef struct CircleSearch
 typedef struct Comp_Player
 {
    bool hit;
+   bool sunk;
    SearchState_e state;
    Search_t search;
 } Comp_Player_t;
