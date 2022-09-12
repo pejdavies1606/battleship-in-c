@@ -181,7 +181,7 @@ bool _GetCoordRandom(
       do
       {
 #ifdef DEBUG
-         result = BattleShipUI_ReadCoord(target);
+         result = BattleShipUI_CoordForm(target);
 #else
          *target = Coord_InitRandom(
              0, MAX_COORD_ROW,

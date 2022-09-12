@@ -90,8 +90,10 @@ void BattleShip_Game_Destroy(Game_t * const game)
    {
       Scoreboard_Destroy(&game->hit_score);
       Scoreboard_Destroy(&game->ship_health);
-      BattleShipUI_Destroy();
    }
+
+   BattleShipUI_Destroy();
+   Window_Destroy();
 }
 
 bool BattleShip_Game_Start(Game_t * const game)
@@ -105,18 +107,12 @@ bool BattleShip_Game_Start(Game_t * const game)
 #ifdef DEBUG
       result = Player_PlaceShipsAuto(&game->players[0]);
 #endif
+
       // enter UI for user player
       do
       {
-#ifdef DEBUG
-         mainChoice = MENU_OPTION_MAIN_BEGIN;
-#else
-         mainChoice = BattleShipUI_MainMenu("");
-#endif
+         mainChoice = BattleShipUI_MainMenu("hello world");
          result = _ProcMainMenu(game, mainChoice);
-#ifdef DEBUG
-         mainChoice = MENU_OPTION_MAIN_RETURN;
-#endif
       }
       while (result && mainChoice != MENU_OPTION_MAIN_RETURN);
    }
@@ -138,15 +134,18 @@ static bool _ProcShipMenu(Player_t * const player, ShipMenuChoice_t const * cons
          GridStatus_e status = GRID_STATUS_UNKNOWN;
          Ship_t ship = {0};
          ship.type = shipChoice->type;
-         bool loc = BattleShipUI_ReadCoord(&ship.location);
-         bool hdg = BattleShipUI_ReadHeading(&ship.heading);
-         if (loc && hdg)
+         result = BattleShipUI_CoordForm(&ship.location);
+         if (result)
+         {
+            result = BattleShipUI_HeadingForm(&ship.heading);
+         }
+         if (result)
          {
             result = Player_PlaceShip(player, &ship, &status);
-            if (result)
-            {
-               result = (GRID_STATUS_OK == status);
-            }
+         }
+         if (result)
+         {
+            result = (GRID_STATUS_OK == status);
          }
       }
       break;
@@ -208,7 +207,7 @@ static bool _ProcBeginGame(Game_t * const game)
             message.buffer,
             0,
             MAX_BUFFER_SIZE * sizeof(char));
-         result = BattleShipUI_ReadCoord(&target);
+         result = BattleShipUI_CoordForm(&target);
          if (!result)
             break;
          result = _ProcTurn(

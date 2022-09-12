@@ -10,6 +10,12 @@
 
 #include "battleship/commondefs.h"
 
-void Window_Init(uint pos_x, uint pos_y, uint size_w, uint size_h);
+void Window_Init(uint x, uint y, uint w, uint h);
+
+void Window_Start(void);
+
+void Window_Wait(void);
+
+void Window_Destroy(void);
 
 #endif /* WINDOW_H_ */

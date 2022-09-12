@@ -12,25 +12,17 @@
 
 #define SIZE_MENU_COL_MAX 32
 
-typedef struct MenuMeta
-{
-   uint column_width_index; // depends on num_options
-   uint * column_width_data; // num_headers, max width of header and options for that column
-   uint * header_width_data; // num_headers, width of each header
-   uint * option_width_data; // 2D array: row+col*num_rows = option+header*num_options
-} MenuMeta_t;
-
 typedef struct Menu
 {
-   char * title;
+   char *title;
    uint num_headers;
-   char * *headers;
+   char **headers;
    uint num_options;
-   char * *options; // 2D array: row+col*num_rows = option+header*num_options
-   MenuMeta_t meta;
+   char **options; // 2D array: row+col*num_rows = option+header*num_options
+   void *data; // implementation specific
 } Menu_t;
 
-bool Menu_InitMeta(Menu_t * menu);
-void Menu_DestroyMeta(Menu_t * const menu);
+bool Menu_InitData(Menu_t *const menu);
+void Menu_DestroyData(Menu_t *const menu);
 
 #endif /* MENU_H_ */

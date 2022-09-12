@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <limits.h>
+#include "battleship/menu_stdio.h"
 #include "battleship/util.h"
 #include "battleship/ui.h"
 #include "battleship/input.h"
@@ -109,36 +110,40 @@ bool BattleShipUI_PrintMenu(Menu_t *menu)
    bool result = false;
    if (menu)
    {
-      puts("");
-      printf("%*s%s\n", menu->meta.column_width_index, "", menu->title);
-      printf("%*s%s", menu->meta.column_width_index, "", "#");
-      for (uint col = 0; col < menu->num_headers; col++)
+      MenuData_t *data = menu->data;
+      if (data)
       {
-         uint column_width =
-             (col == 0)
-                 ? menu->meta.column_width_index
-                 : (menu->meta.column_width_data[col - 1] -
-                    menu->meta.header_width_data[col - 1] + 1);
-         printf("%*s%s", column_width, "",
-                IF_NULL_VAL(menu->headers[col], ""));
-      }
-      printf("\n");
-      for (uint row = 0; row < menu->num_options; row++)
-      {
-         printf("%*s%d", menu->meta.column_width_index, "", row);
+         puts("");
+         printf("%*s%s\n", data->column_width_index, "", menu->title);
+         printf("%*s%s", data->column_width_index, "", "#");
          for (uint col = 0; col < menu->num_headers; col++)
          {
             uint column_width =
                 (col == 0)
-                    ? menu->meta.column_width_index
-                    : (menu->meta.column_width_data[col - 1] -
-                       menu->meta.option_width_data[row + (col - 1) * menu->num_options] + 1);
+                    ? data->column_width_index
+                    : (data->column_widths[col - 1] -
+                       data->header_widths[col - 1] + 1);
             printf("%*s%s", column_width, "",
-                   IF_NULL_VAL(menu->options[row + col * menu->num_options], ""));
+                   IF_NULL_VAL(menu->headers[col], ""));
          }
          printf("\n");
+         for (uint row = 0; row < menu->num_options; row++)
+         {
+            printf("%*s%d", data->column_width_index, "", row);
+            for (uint col = 0; col < menu->num_headers; col++)
+            {
+               uint column_width =
+                   (col == 0)
+                       ? data->column_width_index
+                       : (data->column_widths[col - 1] -
+                          data->option_widths[row + (col - 1) * menu->num_options] + 1);
+               printf("%*s%s", column_width, "",
+                      IF_NULL_VAL(menu->options[row + col * menu->num_options], ""));
+            }
+            printf("\n");
+         }
+         result = true;
       }
-      result = true;
    }
    return result;
 }
@@ -146,52 +151,40 @@ bool BattleShipUI_PrintMenu(Menu_t *menu)
 bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice)
 {
    bool result = false;
-   InputData_t option = { 0 };
    if (menu && choice)
    {
-      option.type = INPUT_INT;
-      option.max.ival = (int) menu->num_options;
-      result = _ReadInput(
-          "option",
-          menu->meta.column_width_index,
-          &option);
-      if (result)
+      MenuData_t *data = menu->data;
+      if (data)
       {
-         *choice = (uint) option.val.ival;
+         InputData_t option = {0};
+         option.type = INPUT_INT;
+         option.max.ival = (int)menu->num_options;
+         result = _ReadInput(
+             "option",
+             data->column_width_index,
+             &option);
+         if (result)
+         {
+            *choice = (uint)option.val.ival;
+         }
       }
    }
    return result;
 }
 
-bool BattleShipUI_ReadCoord(Coord_t *location)
+bool BattleShipUI_ReadForm(Form_t *form, InputVal_t *val)
 {
    bool result = false;
-   if (location)
+   if (form && val)
    {
-      static InputData_t loc = {0};
-      loc.type = INPUT_COORD;
-      loc.max.loc.col = MAX_COORD_COL;
-      loc.max.loc.row = MAX_COORD_ROW;
-      result = _ReadInput("loc <A1-J10>", LEN_COORD, &loc);
-      if (result)
+      if (form->fields)
       {
-         *location = loc.val.loc;
-      }
-   }
-   return result;
-}
-
-bool BattleShipUI_ReadHeading(Heading_e *heading)
-{
-   bool result = false;
-   if (heading)
-   {
-      InputData_t hdg = { 0 };
-      hdg.type = INPUT_HEADING;
-      result = _ReadInput("hdg <N|E|S|W>", LEN_HEADING, &hdg);
-      if (result)
-      {
-         *heading = hdg.val.hdg;
+         Field_t *field = &form->fields[0];
+         result = _ReadInput(field->prompt, field->len, field->data);
+         if (result)
+         {
+            *val = form->fields[0].data->val;
+         }
       }
    }
    return result;

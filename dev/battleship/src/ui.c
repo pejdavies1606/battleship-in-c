@@ -11,11 +11,15 @@
 #include "battleship/grid.h"
 #include "battleship/util.h"
 #include "battleship/input.h"
+#include "battleship/form.h"
 #include "battleship/ui.h"
+#include "battleship/window.h"
 
-#define NUM_MAIN_MENU_HEADERS 1
-#define NUM_PLACE_MENU_HEADERS 1
-#define NUM_SHIP_MENU_HEADERS 2
+#define NUM_MAIN_MENU_HEADERS    1
+#define NUM_PLACE_MENU_HEADERS   1
+#define NUM_SHIP_MENU_HEADERS    2
+#define NUM_COORD_FORM_FIELDS    1
+#define NUM_HEADING_FORM_FIELDS  1
 
 // ASCII font 'cybermedium' http://www.topster.de/text-to-ascii/cybermedium.html
 char const *LOGO[NUM_LOGO_ROWS] =
@@ -108,6 +112,50 @@ static Menu_t SHIP_MENU =
    .options = SHIP_MENU_OPTIONS,
 };
 
+static InputData_t COORD_INPUT_DATA =
+{
+   .type = INPUT_COORD,
+   .max.loc.col = MAX_COORD_COL,
+   .max.loc.row = MAX_COORD_ROW,
+};
+
+static Field_t COORD_FORM_FIELDS[NUM_COORD_FORM_FIELDS] =
+{
+   {
+      .prompt = "<A1-J10>",
+      .len = LEN_COORD,
+      .data = &COORD_INPUT_DATA
+   },
+};
+
+static Form_t COORD_FORM =
+{
+   .title = "Location",
+   .num_fields = NUM_COORD_FORM_FIELDS,
+   .fields = COORD_FORM_FIELDS,
+};
+
+static InputData_t HEADING_INPUT_DATA =
+{
+   .type = INPUT_HEADING,
+};
+
+static Field_t HEADING_FORM_FIELDS[NUM_HEADING_FORM_FIELDS] =
+{
+   {
+      .prompt = "<N|E|S|W>",
+      .len = LEN_HEADING,
+      .data = &HEADING_INPUT_DATA
+   },
+};
+
+static Form_t HEADING_FORM =
+{
+   .title = "Heading",
+   .num_fields = NUM_HEADING_FORM_FIELDS,
+   .fields = HEADING_FORM_FIELDS,
+};
+
 char const * BattleShipUI_GetLogo(int row)
 {
    char const * result = NULL;
@@ -192,10 +240,16 @@ bool BattleShipUI_Init(void)
    }
    if (result)
    {
-      bool res_main = Menu_InitMeta(&MAIN_MENU);
-      bool res_place = Menu_InitMeta(&PLACE_MENU);
-      bool res_ship = Menu_InitMeta(&SHIP_MENU);
+      bool res_main = Menu_InitData(&MAIN_MENU);
+      bool res_place = Menu_InitData(&PLACE_MENU);
+      bool res_ship = Menu_InitData(&SHIP_MENU);
       result = (res_main && res_place && res_ship);
+   }
+   if (result)
+   {
+      bool res_loc = Form_InitData(&COORD_FORM);
+      bool res_hdg = Form_InitData(&HEADING_FORM);
+      result = res_loc && res_hdg;
    }
    if (!result)
    {
@@ -206,9 +260,13 @@ bool BattleShipUI_Init(void)
 
 void BattleShipUI_Destroy(void)
 {
-   Menu_DestroyMeta(&MAIN_MENU);
-   Menu_DestroyMeta(&PLACE_MENU);
-   Menu_DestroyMeta(&SHIP_MENU);
+   Menu_DestroyData(&MAIN_MENU);
+   Menu_DestroyData(&PLACE_MENU);
+   Menu_DestroyData(&SHIP_MENU);
+
+   Form_DestroyData(&COORD_FORM);
+   Form_DestroyData(&HEADING_FORM);
+
    for (uint i = 0; i < SHIP_MENU.num_options; i++)
    {
       uint name_index = i;
@@ -227,8 +285,12 @@ MainMenuOption_e BattleShipUI_MainMenu(
    {
       BattleShipUI_ClearScreen();
       BattleShipUI_PrintLogo();
-      BattleShipUI_PrintMessage(message);
-      BattleShipUI_PrintMenu(&MAIN_MENU);
+      bool messageResult = BattleShipUI_PrintMessage(message);
+      bool menuResult = BattleShipUI_PrintMenu(&MAIN_MENU);
+      if (!(messageResult && menuResult))
+      {
+         break;
+      }
       read_success = BattleShipUI_ReadMenu(&MAIN_MENU, (uint*) &choice);
    }
    return choice;
@@ -242,8 +304,12 @@ PlaceMenuOption_e BattleShipUI_PlaceMenu(
    while(!read_success)
    {
       BattleShipUI_ClearScreen();
-      BattleShipUI_PrintGrid(grid, NULL);
-      BattleShipUI_PrintMenu(&PLACE_MENU);
+      bool gridResult = BattleShipUI_PrintGrid(grid, NULL);
+      bool menuResult = BattleShipUI_PrintMenu(&PLACE_MENU);
+      if (!(gridResult && menuResult))
+      {
+         break;
+      }
       read_success = BattleShipUI_ReadMenu(&PLACE_MENU, (uint*) &choice);
    }
    return choice;
@@ -258,20 +324,42 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(
    while(!read_success)
    {
       BattleShipUI_ClearScreen();
-      if (BattleShipUI_PrintGrid(grid, NULL) &&
-          BattleShipUI_PrintMenu(&SHIP_MENU))
-      {
-         read_success = BattleShipUI_ReadMenu(&SHIP_MENU, &choice);
-      }
-      else
+      bool gridResult = BattleShipUI_PrintGrid(grid, NULL);
+      bool menuResult = BattleShipUI_PrintMenu(&SHIP_MENU);
+      if (!(gridResult && menuResult))
       {
          break;
       }
+      read_success = BattleShipUI_ReadMenu(&SHIP_MENU, &choice);
    }
    if (choice > 0)
    {
       result.option = MENU_OPTION_SHIP_PLACE;
       result.type = (ShipType_e)(choice);
+   }
+   return result;
+}
+
+bool BattleShipUI_CoordForm(Coord_t *location)
+{
+   bool result = false;
+   if (location)
+   {
+      InputVal_t val = {0};
+      result = BattleShipUI_ReadForm(&COORD_FORM, &val);
+      *location = val.loc;
+   }
+   return result;
+}
+
+bool BattleShipUI_HeadingForm(Heading_e *heading)
+{
+   bool result = false;
+   if (heading)
+   {
+      InputVal_t val = {0};
+      result = BattleShipUI_ReadForm(&HEADING_FORM, &val);
+      *heading = val.hdg;
    }
    return result;
 }

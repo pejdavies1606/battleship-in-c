@@ -9,6 +9,7 @@
 #define BATTLESHIP_UI_H_
 
 #include "battleship/scoreboard.h"
+#include "battleship/form.h"
 #include "battleship/menu.h"
 #include "battleship/player.h"
 #include "battleship/game.h"
@@ -75,8 +76,10 @@ ShipMenuChoice_t BattleShipUI_ShipMenuManual(
 
 bool BattleShipUI_PrintMenu(Menu_t *menu);
 bool BattleShipUI_ReadMenu(Menu_t *menu, uint *choice);
-bool BattleShipUI_ReadCoord(Coord_t *location);
-bool BattleShipUI_ReadHeading(Heading_e *heading);
+
+bool BattleShipUI_CoordForm(Coord_t *location);
+bool BattleShipUI_HeadingForm(Heading_e *heading);
+bool BattleShipUI_ReadForm(Form_t *form, InputVal_t *val);
 
 bool BattleShipUI_GameScreen(
    Game_t const *const game,

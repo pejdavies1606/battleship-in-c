@@ -30,8 +30,5 @@ int main(int argc, char *argv[])
       BattleShip_Game_Destroy(&game);
    }
 
-   puts("done");
-   getchar();
-
    return (result) ? 0 : 1;
 }
